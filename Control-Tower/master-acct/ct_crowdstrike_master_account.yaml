@@ -263,7 +263,7 @@ Resources:
       Description: Layer for requests package
       LayerName: requests-package
 
-  CaptureControlTowerLifeCycleEvents:
+  CrowdstrikeCaptureControlTowerLifeCycleEvents:
     DependsOn:
     - TriggerCustomizationsOnLifeCycleEvent
     Type: AWS::Events::Rule
@@ -274,23 +274,17 @@ Resources:
           eventName:
           - CreateManagedAccount
           - UpdateManagedAccount
-          - EnableGuardrail
-          - DisableGuardrail
-          - SetupLandingZone
-          - UpdateLandingZone
-          - RegisterOrganizationalUnit
-          - DeregisterOrganizationalUnit
           eventSource:
           - controltower.amazonaws.com
         detail-type:
         - AWS Service Event via CloudTrail
         source:
         - aws.controltower
-      Name: CaptureControlTowerLifeCycleEvents
+      Name: CrowdstrikeCaptureControlTowerLifeCycleEvents
       State: ENABLED
       Targets:
       - Arn: !GetAtt "TriggerCustomizationsOnLifeCycleEvent.Arn"
-        Id: IDCaptureControlTowerLifeCycleEvents
+        Id: IDCrowdstrikeCaptureControlTowerLifeCycleEvents
 
   LambdaRoleToCaptureEvents:
     Type: AWS::IAM::Role
@@ -344,4 +338,4 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !GetAtt "TriggerCustomizationsOnLifeCycleEvent.Arn"
       Principal: events.amazonaws.com
-      SourceArn: !GetAtt "CaptureControlTowerLifeCycleEvents.Arn"
+      SourceArn: !GetAtt "CrowdstrikeCaptureControlTowerLifeCycleEvents.Arn"
