@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 # handler = logging.StreamHandler()
 handler = RotatingFileHandler(
-    "../control-tower/get_registered_accounts.log", maxBytes=20971520, backupCount=5)
+    "../../control-tower/get_registered_accounts.log", maxBytes=20971520, backupCount=5)
 formatter = logging.Formatter('%(levelname)-8s %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
