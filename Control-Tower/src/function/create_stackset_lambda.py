@@ -167,7 +167,6 @@ def lambda_handler(event, context):
     try:
         STACKSETNAME = 'CrowdstrikeDiscover-IAM-ROLES'
 
-        FalconDiscoverSecretsRole = os.environ['FalconDiscoverSecretsRole']
         AwsRegion = os.environ['AwsRegion']
         RoleName = os.environ['RoleName']
         CSAccountNumber = os.environ['CSAccountNumber']
@@ -175,9 +174,8 @@ def lambda_handler(event, context):
         LogArchiveBucketRegion = os.environ['LogArchiveBucketRegion']
         LogArchiveBucketName = os.environ['LogArchiveBucketName']
         LogArchiveAccount = os.environ['LogArchiveAccount']
-        LambdaBucketName = os.environ['LambdaBucketName']
         CredentialsSecret = os.environ['CrowdstrikeCredentialsSecret']
-        CrowdstrikeTemplateUrl = 'https://'+LambdaBucketName+'.s3-'+AwsRegion+'.amazonaws.com/ct_crowdstrike_stackset.yaml'
+        CrowdstrikeTemplateUrl = 'https://crowdstrike-sa-resources-ct-'+AwsRegion+'.s3-'+AwsRegion+'.amazonaws.com/ct_crowdstrike_stackset.yaml'
 
         AccountId = get_master_id()
         cList = ['CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND']
@@ -210,10 +208,6 @@ def lambda_handler(event, context):
             keyDict['ParameterValue'] = RoleName
             CRWD_Discover_paramList.append(dict(keyDict))
 
-            keyDict['ParameterKey'] = 'FalconDiscoverSecretsRole'
-            keyDict['ParameterValue'] = FalconDiscoverSecretsRole
-            CRWD_Discover_paramList.append(dict(keyDict))
-
             keyDict['ParameterKey'] = 'CSAccountNumber'
             keyDict['ParameterValue'] = CSAccountNumber
             CRWD_Discover_paramList.append(dict(keyDict))
@@ -234,9 +228,6 @@ def lambda_handler(event, context):
             keyDict['ParameterValue'] = LogArchiveAccount
             CRWD_Discover_paramList.append(dict(keyDict))
 
-            keyDict['ParameterKey'] = 'LambdaBucketName'
-            keyDict['ParameterValue'] = LambdaBucketName
-            CRWD_Discover_paramList.append(dict(keyDict))
 
             logger.info('CRWD_Discover ParamList:{}'.format(CRWD_Discover_paramList))
             logger.info('AdminRoleARN: {}'.format(AdminRoleARN))

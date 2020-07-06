@@ -23,7 +23,7 @@ Metadata:
           default: S3 Buckets.
         Parameters:
           - LogArchiveBucketName
-          - LambdaBucketName
+
     ParameterLabels:
       LogArchiveBucketName:
         default: Cloudtrail log bucket created by Control Tower
@@ -35,12 +35,25 @@ Metadata:
         default: Crowdstrke AWS Account ID we are granting access to the role. Do not modify
       CSAssumingRoleName:
         default: Crowdstrike Role we are granting access to the role.  Do not modify
-      LambdaBucketName:
-        Name of the Lambda staging bucket created by the script
+
 Outputs:
   RoleARN:
     Description: The ARN of the role that can be assumed by Crowdstrike Discover.
     Value: !GetAtt 'S3AccessiamRole.Arn'
+
+Mappings:
+  S3perRegion:
+    us-east-1:
+      NAME: crowdstrike-sa-resources-ct-us-east-1
+    us-east-2:
+      NAME: crowdstrike-sa-resources-ct-us-east-2
+    us-west-2:
+      NAME: crowdstrike-sa-resources-ct-us-west-2
+    eu-west-1:
+      NAME: crowdstrike-sa-resources-ct-eu-west-1
+    ap-southeast-2:
+      NAME: crowdstrike-sa-resources-ct-ap-southeast-2
+
 Parameters:
 
   RoleName:
@@ -72,18 +85,19 @@ Parameters:
   FalconClientId:
     Description: Falcon OAuth2 Client ID.
     Type: String
+    NoEcho: 'true'
 
 
   FalconSecret:
     Description: Falcon Oath2 API secret.
     Type: String
+    NoEcho: 'true'
 
   LogArchiveBucketName:
     Type: String
     Description: Log Archive Bucket Name
 
-  LambdaBucketName:
-    Type: String
+
 
 
 Resources:
@@ -97,10 +111,9 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              Service:
-                - lambda.amazonaws.com
-            Action:
-              - sts:AssumeRole
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+            Condition: {}
       Path: /
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSLambdaExecute
@@ -124,7 +137,7 @@ Resources:
       CompatibleRuntimes:
         - python3.7
       Content:
-        S3Bucket: !Ref LambdaBucketName
+        S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
         S3Key: layer.zip
       Description: Layer for requests package
       LayerName: requests-package
@@ -145,7 +158,7 @@ Resources:
           LocalAccount: !Ref AWS::AccountId
 
       Code:
-        S3Bucket: !Ref LambdaBucketName
+        S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
         S3Key: add_S3_notification.zip
       Layers:
         - !Ref lambdaLayer
@@ -286,7 +299,7 @@ Resources:
           LocalAccount: !Ref AWS::AccountId
 
       Code:
-        S3Bucket: !Ref LambdaBucketName
+        S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
         S3Key: register_logarchive_account.zip
       Layers:
         - !Ref lambdaLayer
