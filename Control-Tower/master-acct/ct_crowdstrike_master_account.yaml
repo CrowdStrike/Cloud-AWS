@@ -20,9 +20,7 @@ Parameters:
     Default: '292230061137'
     Description: Crowdstrike Account ID.
     Type: String
-  LambdaBucketName:
-    Type: String
-    Description: Name of the S3 bucket that contains your lambda functions
+
 
   RoleName:
     Description: IAM Role Name (May be modified)
@@ -44,7 +42,18 @@ Parameters:
     Type: String
     Description: Log Archive Bucket Region
 
-
+Mappings:
+  S3perRegion:
+    us-east-1:
+      NAME: crowdstrike-sa-resources-ct-us-east-1
+    us-east-2:
+      NAME: crowdstrike-sa-resources-ct-us-east-2
+    us-west-2:
+      NAME: crowdstrike-sa-resources-ct-us-west-2
+    eu-west-1:
+      NAME: crowdstrike-sa-resources-ct-eu-west-1
+    ap-southeast-2:
+      NAME: crowdstrike-sa-resources-ct-ap-southeast-2
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -212,21 +221,19 @@ Resources:
     DeletionPolicy: Delete
     Properties:
       Code:
-        S3Bucket: !Ref LambdaBucketName
+        S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
         S3Key: create_stackset_lambda.zip
       Layers:
         - !Ref lambdaLayer
       Environment:
         Variables:
           AwsRegion: !Ref AWS::Region
-          FalconDiscoverSecretsRole: !GetAtt "FalconDiscoverCredentialsRole.Arn"
           LogArchiveAccount: !Ref LogArchiveAccount
           LogArchiveBucketName: !Ref LogArchiveBucketName
           LogArchiveBucketRegion: !Ref LogArchiveBucketRegion
           RoleName : !Ref RoleName
           CSAccountNumber: !Ref CSAccountNumber
           CSAssumingRoleName: !Ref CSAssumingRoleName
-          LambdaBucketName: !Ref LambdaBucketName
           CrowdstrikeCredentialsSecret: !Ref CrowdstrikeCredentials
       Handler: create_stackset_lambda.lambda_handler
       Runtime: python3.7
@@ -251,7 +258,7 @@ Resources:
       CompatibleRuntimes:
         - python3.7
       Content:
-        S3Bucket: !Ref LambdaBucketName
+        S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
         S3Key: layer.zip
       Description: Layer for requests package
       LayerName: requests-package
@@ -316,7 +323,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Code:
-        S3Bucket: !Ref LambdaBucketName
+        S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
         S3Key: crowdstrikeAccts_lambda.zip
       Layers:
         - !Ref lambdaLayer

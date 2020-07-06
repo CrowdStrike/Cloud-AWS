@@ -28,6 +28,7 @@ Parameters:
   FalconClientId:
     Description: Falcon OAuth2 Client ID.
     Type: String
+    NoEcho: 'true'
 
   FalconSecret:
     Description: Falcon Oath2 API secret.
@@ -44,12 +45,6 @@ Parameters:
     MinLength: '1'
     Type: String
     Default: testapi1
-
-  FalconDiscoverSecretsRole:
-    Description: The arn of the cross account IAM role to access secrets.
-    MinLength: '1'
-    Type: String
-    Default: arn:aws:iam::106808901653:role/FaLconDiscoverCredentialsRole
 
   LogArchiveBucketRegion:
     Type: String
@@ -75,13 +70,25 @@ Parameters:
     Description: Log Archive Bucket Name
     Default: aws-controltower-logs-004881111746-eu-west-1
 
-  LambdaBucketName:
-    Type: String
-    Default: ctstagingireland
+
   LogArchiveAccount:
     Type: String
     Description: AccountId of Log Archive Bucket
     Default: "004881111746"
+
+Mappings:
+  S3perRegion:
+    us-east-1:
+      NAME: crowdstrike-sa-resources-ct-us-east-1
+    us-east-2:
+      NAME: crowdstrike-sa-resources-ct-us-east-2
+    us-west-2:
+      NAME: crowdstrike-sa-resources-ct-us-west-2
+    eu-west-1:
+      NAME: crowdstrike-sa-resources-ct-eu-west-1
+    ap-southeast-2:
+      NAME: crowdstrike-sa-resources-ct-ap-southeast-2
+
 
 Resources:
   iamRole:
@@ -136,7 +143,7 @@ Resources:
       CompatibleRuntimes:
         - python3.7
       Content:
-        S3Bucket: !Ref LambdaBucketName
+        S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
         S3Key: layer.zip
       Description: Layer for requests package
       LayerName: requests-package
@@ -156,7 +163,7 @@ Resources:
           CSAssumingRoleName: !Ref CSAssumingRoleName
           LocalAccount: !Ref AWS::AccountId
       Code:
-        S3Bucket: !Ref LambdaBucketName
+        S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
         S3Key: register_new_account.zip
       Layers:
         - !Ref lambdaLayer
