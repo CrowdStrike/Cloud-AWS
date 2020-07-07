@@ -49,7 +49,7 @@ Mappings:
     us-east-2:
       NAME: crowdstrike-sa-resources-ct-us-east-2
     us-west-2:
-      NAME: crowdstrike1-sa-resources-ct-us-west-2
+      NAME: crowdstrike-sa-resources-ct-us-west-2
     eu-west-1:
       NAME: crowdstrike-sa-resources-ct-eu-west-1
     ap-southeast-2:
