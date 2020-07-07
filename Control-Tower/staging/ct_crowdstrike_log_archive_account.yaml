@@ -105,7 +105,7 @@ Resources:
   launchLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: CrowdstrikelaunchLambdaRole1
+      RoleName: LambdaRoleToCaptureEvents
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -115,8 +115,6 @@ Resources:
             Action: sts:AssumeRole
             Condition: {}
       Path: /
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AWSLambdaExecute
       Policies:
         - PolicyName: Get_Values
           PolicyDocument:
@@ -130,6 +128,9 @@ Resources:
                 - ''
                 - - 'arn:aws:s3:::'
                   - !Ref LogArchiveBucketName
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLambdaExecute
+
 
   lambdaLayer:
     Type: AWS::Lambda::LayerVersion
