@@ -29,10 +29,6 @@ Parameters:
     Type: String
     Description: AccountId of Log Archive Bucket
 
-  LogArchiveBucketName:
-    Type: String
-    Description: Log Archive Bucket Name
-
   LogArchiveBucketRegion:
     Type: String
     Description: Log Archive Bucket Region
@@ -71,7 +67,6 @@ Metadata:
           default: Log Archive Account Details
         Parameters:
           - LogArchiveAccount
-          - LogArchiveBucketName
           - LogArchiveBucketRegion
 Resources:
   CrowdstrikeCredentials:
@@ -169,7 +164,6 @@ Resources:
         Variables:
           AwsRegion: !Ref AWS::Region
           LogArchiveAccount: !Ref LogArchiveAccount
-          LogArchiveBucketName: !Ref LogArchiveBucketName
           LogArchiveBucketRegion: !Ref LogArchiveBucketRegion
           RoleName : !Ref RoleName
           CSAccountNumber: !Ref CSAccountNumber
