@@ -93,57 +93,6 @@ Resources:
           - '","FalconSecret": "'
           - Ref: FalconSecret
           - '"}'
-  FalconDiscoverCredentialsRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: FalconDiscoverCredentialsRole
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-            Condition: {}
-      Path: /
-      Policies:
-        - PolicyName: Assume_Role
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              Effect: Allow
-              Action:
-                - sts:AssumeRole
-              Resource: '*'
-        - PolicyName: Get_Values
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              Sid: VisualEditor1
-              Effect: Allow
-              Action:
-                - secretsmanager:GetSecretValue
-              Resource: !Ref CrowdStrikeCredentials
-        - PolicyName: List_secrets
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              Sid: VisualEditor2
-              Effect: Allow
-              Action:
-                - secretsmanager:ListSecrets
-              Resource: '*'
-        - PolicyName: Pass_Role
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              Sid: VisualEditor3
-              Effect: Allow
-              Action:
-                - iam:PassRole
-              Resource: !Join [':', ['arn:aws:iam:', !Ref "AWS::AccountId", 'role/service-role/AWSControlTowerStackSetRole']]
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AWSOrganizationsReadOnlyAccess
 
   launchLambdaRole:
     Type: AWS::IAM::Role
@@ -338,4 +287,4 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !GetAtt "TriggerCustomizationsOnLifeCycleEvent.Arn"
       Principal: events.amazonaws.com
-      SourceArn: !GetAtt "CrowdstrikeCaptureControlTowerLifeCycleEvents.Arn"
+      SourceArn: !GetAtt "CrowdStrikeCaptureControlTowerLifeCycleEvents.Arn"
