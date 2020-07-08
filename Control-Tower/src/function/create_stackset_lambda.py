@@ -172,11 +172,9 @@ def lambda_handler(event, context):
         CSAccountNumber = os.environ['CSAccountNumber']
         CSAssumingRoleName = os.environ['CSAssumingRoleName']
         LogArchiveBucketRegion = os.environ['LogArchiveBucketRegion']
-        LogArchiveBucketName = os.environ['LogArchiveBucketName']
         LogArchiveAccount = os.environ['LogArchiveAccount']
         CredentialsSecret = os.environ['CrowdstrikeCredentialsSecret']
         CrowdstrikeTemplateUrl = 'https://crowdstrike-sa-resources-ct-'+AwsRegion+'.s3-'+AwsRegion+'.amazonaws.com/ct_crowdstrike_stackset.yaml'
-
         AccountId = get_master_id()
         cList = ['CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND']
         ExecRole = 'AWSControlTowerExecution'
@@ -218,10 +216,6 @@ def lambda_handler(event, context):
 
             keyDict['ParameterKey'] = 'LogArchiveBucketRegion'
             keyDict['ParameterValue'] = LogArchiveBucketRegion
-            CRWD_Discover_paramList.append(dict(keyDict))
-
-            keyDict['ParameterKey'] = 'LogArchiveBucketName'
-            keyDict['ParameterValue'] = LogArchiveBucketName
             CRWD_Discover_paramList.append(dict(keyDict))
 
             keyDict['ParameterKey'] = 'LogArchiveAccount'
