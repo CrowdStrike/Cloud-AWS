@@ -11,11 +11,6 @@ Parameters:
     NoEcho: 'true'
     Type: String
 
-  ExternalId:
-    Description: ExternalID Used for authenticating assume role requests.
-    NoEcho: 'true'
-    Type: String
-
   CSAccountNumber:
     Default: '292230061137'
     Description: Crowdstrike Account ID.
@@ -67,7 +62,6 @@ Metadata:
           default: Crowdstrike Role Parameters.
         Parameters:
           - RoleName
-          - ExternalId
       - Label:
           default: Crowdstrike Falcom API keys.
         Parameters:
@@ -93,57 +87,6 @@ Resources:
           - '","FalconSecret": "'
           - Ref: FalconSecret
           - '"}'
-  FalconDiscoverCredentialsRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: FalconDiscoverCredentialsRole
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-            Condition: {}
-      Path: /
-      Policies:
-        - PolicyName: Assume_Role
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              Effect: Allow
-              Action:
-                - sts:AssumeRole
-              Resource: '*'
-        - PolicyName: Get_Values
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              Sid: VisualEditor1
-              Effect: Allow
-              Action:
-                - secretsmanager:GetSecretValue
-              Resource: !Ref CrowdstrikeCredentials
-        - PolicyName: List_secrets
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              Sid: VisualEditor2
-              Effect: Allow
-              Action:
-                - secretsmanager:ListSecrets
-              Resource: '*'
-        - PolicyName: Pass_Role
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              Sid: VisualEditor3
-              Effect: Allow
-              Action:
-                - iam:PassRole
-              Resource: !Join [':', ['arn:aws:iam:', !Ref "AWS::AccountId", 'role/service-role/AWSControlTowerStackSetRole']]
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AWSOrganizationsReadOnlyAccess
 
   launchLambdaRole:
     Type: AWS::IAM::Role
@@ -214,9 +157,6 @@ Resources:
       SourceAccount: !Ref "AWS::AccountId"
 
   LambdaToLaunchStackSet:
-    DependsOn:
-      - "launchLambdaRole"
-      - CrowdstrikeCredentials
     Type: 'AWS::Lambda::Function'
     DeletionPolicy: Delete
     Properties:
@@ -243,7 +183,6 @@ Resources:
   TriggerLambda:
     Type: 'Custom::TriggerLambda'
     DependsOn:
-      - LambdaToLaunchStackSet
       - "launchLambdaRole"
       - permissionForEventsToInvokeLambda
     Properties:
@@ -264,8 +203,6 @@ Resources:
       LayerName: requests-package
 
   CrowdstrikeCaptureControlTowerLifeCycleEvents:
-    DependsOn:
-    - TriggerCustomizationsOnLifeCycleEvent
     Type: AWS::Events::Rule
     Properties:
       Description: Capture Control Tower LifeCycle Events and Trigger an Action
@@ -312,8 +249,6 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
   TriggerCustomizationsOnLifeCycleEvent:
-    DependsOn:
-    - LambdaRoleToCaptureEvents
     Type: AWS::Lambda::Function
     Properties:
       Code:
