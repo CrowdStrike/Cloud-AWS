@@ -2,12 +2,12 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Control Tower Lifecycle Events
 Parameters:
   FalconClientId:
-    Description: Your Falcon Oauth2 API Key.
+    Description: Your Falcon OAuth2 API Key.
     NoEcho: 'true'
     Type: String
 
   FalconSecret:
-    Description: Your Falcon Oauth2 API Secret.
+    Description: Your Falcon OAuth2 API Secret.
     NoEcho: 'true'
     Type: String
 
@@ -18,7 +18,7 @@ Parameters:
 
   CSAccountNumber:
     Default: '292230061137'
-    Description: Crowdstrike Account ID.
+    Description: CrowdStrike Account ID.
     Type: String
 
 
@@ -59,17 +59,17 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
-          default: Crowdstrike Account Parameters. (Do Not Modify)
+          default: CrowdStrike Account Parameters. (Do Not Modify)
         Parameters:
           - CSAccountNumber
           - CSAssumingRoleName
       - Label:
-          default: Crowdstrike Role Parameters.
+          default: CrowdStrike Role Parameters.
         Parameters:
           - RoleName
           - ExternalId
       - Label:
-          default: Crowdstrike Falcom API keys.
+          default: CrowdStrike Falcom API keys.
         Parameters:
            - FalconClientId
            - FalconSecret
@@ -80,11 +80,11 @@ Metadata:
           - LogArchiveBucketName
           - LogArchiveBucketRegion
 Resources:
-  CrowdstrikeCredentials:
+  CrowdStrikeCredentials:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Description: Crowdstrike Credentials
-      Name: CrowdstrikeAPISecret
+      Description: CrowdStrike Credentials
+      Name: CrowdStrikeAPISecret
       SecretString:
         Fn::Join:
         - ''
@@ -123,7 +123,7 @@ Resources:
               Effect: Allow
               Action:
                 - secretsmanager:GetSecretValue
-              Resource: !Ref CrowdstrikeCredentials
+              Resource: !Ref CrowdStrikeCredentials
         - PolicyName: List_secrets
           PolicyDocument:
             Version: '2012-10-17'
@@ -167,7 +167,7 @@ Resources:
               Effect: Allow
               Action:
                 - secretsmanager:GetSecretValue
-              Resource: !Ref CrowdstrikeCredentials
+              Resource: !Ref CrowdStrikeCredentials
         - PolicyName: List_secrets
           PolicyDocument:
             Version: '2012-10-17'
@@ -216,7 +216,7 @@ Resources:
   LambdaToLaunchStackSet:
     DependsOn:
       - "launchLambdaRole"
-      - CrowdstrikeCredentials
+      - CrowdStrikeCredentials
     Type: 'AWS::Lambda::Function'
     DeletionPolicy: Delete
     Properties:
@@ -234,7 +234,7 @@ Resources:
           RoleName : !Ref RoleName
           CSAccountNumber: !Ref CSAccountNumber
           CSAssumingRoleName: !Ref CSAssumingRoleName
-          CrowdstrikeCredentialsSecret: !Ref CrowdstrikeCredentials
+          CrowdStrikeCredentialsSecret: !Ref CrowdStrikeCredentials
       Handler: create_stackset_lambda.lambda_handler
       Runtime: python3.7
       MemorySize: 128
@@ -263,7 +263,7 @@ Resources:
       Description: Layer for requests package
       LayerName: requests-package
 
-  CrowdstrikeCaptureControlTowerLifeCycleEvents:
+  CrowdStrikeCaptureControlTowerLifeCycleEvents:
     DependsOn:
     - TriggerCustomizationsOnLifeCycleEvent
     Type: AWS::Events::Rule
@@ -280,11 +280,11 @@ Resources:
         - AWS Service Event via CloudTrail
         source:
         - aws.controltower
-      Name: CrowdstrikeCaptureControlTowerLifeCycleEvents
+      Name: CrowdStrikeCaptureControlTowerLifeCycleEvents
       State: ENABLED
       Targets:
       - Arn: !GetAtt "TriggerCustomizationsOnLifeCycleEvent.Arn"
-        Id: IDCrowdstrikeCaptureControlTowerLifeCycleEvents
+        Id: IDCrowdStrikeCaptureControlTowerLifeCycleEvents
 
   LambdaRoleToCaptureEvents:
     Type: AWS::IAM::Role
