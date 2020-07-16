@@ -65,12 +65,6 @@ Parameters:
     Type: String
     Default: "CS-Prod-HG-CsCloudconnectaws"
 
-  LogArchiveBucketName:
-    Type: String
-    Description: Log Archive Bucket Name
-    Default: aws-controltower-logs-004881111746-eu-west-1
-
-
   LogArchiveAccount:
     Type: String
     Description: AccountId of Log Archive Bucket
@@ -135,7 +129,7 @@ Resources:
         Version: '2012-10-17'
       Roles:
         - !Ref 'iamRole'
-    DependsOn: iamRole
+
 
   lambdaLayer:
     Type: AWS::Lambda::LayerVersion
@@ -150,8 +144,6 @@ Resources:
 
 
   manageInstanceFalconAPI:
-    DependsOn:
-      - CrowdStrikeRegisterAcctLambdaRole
     Type: AWS::Lambda::Function
     Properties:
       Environment:
@@ -169,7 +161,7 @@ Resources:
         - !Ref lambdaLayer
       Handler: register_new_account.lambda_handler
       MemorySize: 128
-      Role: !GetAtt "CrowdstrikeRegisterAcctLambdaRole.Arn"
+      Role: !GetAtt "CrowdStrikeRegisterAcctLambdaRole.Arn"
       Runtime: python3.7
       Timeout: 60
 
@@ -177,7 +169,6 @@ Resources:
     Type: 'Custom::TriggerLambda'
     DependsOn:
       - CrowdStrikeRegisterAcctLambdaRole
-      - manageInstanceFalconAPI
     Properties:
       FalconSecret: !Ref FalconSecret
       FalconClientId: !Ref FalconClientId
