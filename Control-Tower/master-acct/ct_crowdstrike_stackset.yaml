@@ -154,6 +154,7 @@ Resources:
           CSAccountNumber: !Ref CSAccountNumber
           CSAssumingRoleName: !Ref CSAssumingRoleName
           LocalAccount: !Ref AWS::AccountId
+          aws_region: !Ref AWS::Region
       Code:
         S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
         S3Key: register_new_account.zip

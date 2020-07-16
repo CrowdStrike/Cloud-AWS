@@ -8,7 +8,7 @@ from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-Falcon_Discover_Url = 'https://ctstagingireland.s3-eu-west-1.amazonaws.com/crowdstrike_role_creation_ss.yaml'
+
 
 SUCCESS = "SUCCESS"
 FAILED = "FAILED"
@@ -19,6 +19,8 @@ iam_role_arn = os.environ['iam_role_arn']
 CSAccountNumber = os.environ['CSAccountNumber']
 CSAssumingRoleName = os.environ['CSAssumingRoleName']
 LocalAccount = os.environ['LocalAccount']
+aws_region = os.environ['aws_region']
+Falcon_Discover_Url = 'https://ctstagingireland.s3-'+aws_region+'.amazonaws.com/crowdstrike_role_creation_ss.yaml'
 
 def register_falcon_discover_account(payload, api_keys,api_method) -> bool:
     cs_action = api_method
