@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: For public release - This template sets up a cross account IAM role in order to enable CrowdStrike Falcon Discover For
-  AWS functionality.
+Description: This template sets up a cross account IAM role in order to
+  enable CrowdStrike Falcon Discover for AWS functionality.
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -161,14 +161,14 @@ Resources:
         - !Ref lambdaLayer
       Handler: register_new_account.lambda_handler
       MemorySize: 128
-      Role: !GetAtt "CrowdstrikeRegisterAcctLambdaRole.Arn"
+      Role: !GetAtt "CrowdStrikeRegisterAcctLambdaRole.Arn"
       Runtime: python3.7
       Timeout: 60
 
   TriggerLambda:
     Type: 'Custom::TriggerLambda'
     DependsOn:
-      - CrowdstrikeRegisterAcctLambdaRole
+      - CrowdStrikeRegisterAcctLambdaRole
     Properties:
       FalconSecret: !Ref FalconSecret
       FalconClientId: !Ref FalconClientId
@@ -177,10 +177,10 @@ Resources:
         - manageInstanceFalconAPI
         - Arn
 
-  CrowdstrikeRegisterAcctLambdaRole:
+  CrowdStrikeRegisterAcctLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: CrowdstrikeRegisterAcctLambdaRole
+      RoleName: CrowdStrikeRegisterAcctLambdaRole
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:

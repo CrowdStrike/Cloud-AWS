@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: For public release - This template sets up a cross account IAM role in order to enable CrowdStrike Falcon Discover For
-  AWS functionality.
+Description: This template sets up a cross account IAM role in order to
+  enable CrowdStrike Falcon Discover for AWS functionality.
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
