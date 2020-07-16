@@ -151,7 +151,7 @@ Resources:
 
   manageInstanceFalconAPI:
     DependsOn:
-      - CrowdstrikeRegisterAcctLambdaRole
+      - CrowdStrikeRegisterAcctLambdaRole
     Type: AWS::Lambda::Function
     Properties:
       Environment:
@@ -176,7 +176,7 @@ Resources:
   TriggerLambda:
     Type: 'Custom::TriggerLambda'
     DependsOn:
-      - CrowdstrikeRegisterAcctLambdaRole
+      - CrowdStrikeRegisterAcctLambdaRole
       - manageInstanceFalconAPI
     Properties:
       FalconSecret: !Ref FalconSecret
@@ -186,10 +186,10 @@ Resources:
         - manageInstanceFalconAPI
         - Arn
 
-  CrowdstrikeRegisterAcctLambdaRole:
+  CrowdStrikeRegisterAcctLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: CrowdstrikeRegisterAcctLambdaRole
+      RoleName: CrowdStrikeRegisterAcctLambdaRole
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
