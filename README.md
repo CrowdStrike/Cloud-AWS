@@ -6,11 +6,17 @@ Cloud Formation Templates and lambda functions to integrate Falcon Discover with
 
 [Implementation Guide](https://github.com/CrowdStrike/Cloud-AWS/blob/master/Control-Tower/documentation/implementation-guide.md)
 
-[Files](https://github.com/CrowdStrike/Cloud-AWS/blob/master/Control-Tower/documentation/implementation-guide.md)
+[Files](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Control-Tower)
 
 
 ##Discover for Cloud
-### Terraform
-Terraform templates for a shared log archive bucket.   Assumes CloudTrail will write to a single S3 bucket. 
-Terraform templates for the log archive S3 bucket 
-Terraform templates for additional accounts
+
+Assumes CloudTrail will write to a single S3 bucket. 
+
+[Terraform templates for the log archive account creating new bucket] (https://github.com/CrowdStrike/Cloud-AWS/tree/master/Discover-for-Cloud-Templates/AWS/terraform/log-archive-account-new-S3-bucket-with-new-trail)
+
+[Terraform templates for the log archive account using an existing bucket] (https://github.com/CrowdStrike/Cloud-AWS/tree/master/Discover-for-Cloud-Templates/AWS/terraform/log-archive-account-existing-S3-bucket-and-trail)
+
+[Terraform templates for additional accounts creating new CloudTrail log] (https://github.com/CrowdStrike/Cloud-AWS/tree/master/Discover-for-Cloud-Templates/AWS/terraform/additional-account-new-trail)
+
+[Terraform templates for additional accounts using and existing CloudTrail log] (https://github.com/CrowdStrike/Cloud-AWS/tree/master/Discover-for-Cloud-Templates/AWS/terraform/additional-account-existing-trail)
