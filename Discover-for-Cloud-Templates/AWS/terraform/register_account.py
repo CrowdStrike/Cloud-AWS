@@ -1,4 +1,6 @@
-import boto3
+#
+# Script to register
+
 import argparse
 import logging
 from logging.handlers import RotatingFileHandler
@@ -14,6 +16,8 @@ formatter = logging.Formatter('%(levelname)-8s %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
+
+OAUTH2URL = "https://api.crowdstrike.com/oauth2/token"
 
 
 def register_falcon_discover_account(payload) -> bool:
@@ -37,7 +41,7 @@ def register_falcon_discover_account(payload) -> bool:
                   .format(response.status_code, response["errors"][0]["message"]))
     except Exception as e:
         # logger.info('Got exception {} hiding host'.format(e))
-        print('Got exception {} hiding host'.format(e))
+        print(f'Got exception {e} hiding host')
         return
 
 
@@ -51,19 +55,22 @@ def get_auth_header(auth_token) -> str:
 
 
 def get_auth_token():
-    url = "https://api.crowdstrike.com/oauth2/token"
+
     payload = 'client_secret=' + falcon_client_secret + '&client_id=' + falcon_client_id
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
-    response = requests.request("POST", url, headers=headers, data=payload)
-    if response.ok:
-        response_object = (response.json())
-        token = response_object.get('access_token', '')
-        if token:
-            return \
-                token
-    return
+    try:
+        response = requests.request("POST", OAUTH2URL, headers=headers, data=payload)
+        if response.ok:
+            response_object = (response.json())
+            token = response_object.get('access_token', '')
+            if token:
+                return token
+            else:
+                return
+    except Exception as e:
+        print(f'Got exception {e} creating auth token')
 
 
 def format_notification_message(rate_limit_reqs=0, rate_limit_time=0):
@@ -75,8 +82,8 @@ def format_notification_message(rate_limit_reqs=0, rate_limit_time=0):
                 "external_id": external_id,
                 "iam_role_arn": iam_role_arn,
                 "id": local_account,
-                # "rate_limit_reqs": "<integer>",
-                # "rate_limit_time": "<long>"
+                "rate_limit_reqs": rate_limit_reqs,
+                "rate_limit_time": rate_limit_time
             }
         ]
     }

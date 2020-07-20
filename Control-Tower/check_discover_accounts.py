@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 # handler = logging.StreamHandler()
 handler = RotatingFileHandler(
-    "../../control-tower/get_registered_accounts.log", maxBytes=20971520, backupCount=5)
+    "./get_registered_accounts.log", maxBytes=20971520, backupCount=5)
 formatter = logging.Formatter('%(levelname)-8s %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
@@ -58,7 +58,6 @@ def get_falcon_discover_accounts(sortby=None, filterby=None) -> bool:
                     bad_accounts.append(account)
                 else:
                     good_accounts.append(account)
-
 
             print('\nThese accounts have problems ')
             for accountval in bad_accounts:
