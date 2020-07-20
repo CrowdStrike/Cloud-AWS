@@ -1,0 +1,4 @@
+boto3~=1.14.23
+requests~=2.24.0
+urllib3~=1.25.9
+botocore~=1.17.23
