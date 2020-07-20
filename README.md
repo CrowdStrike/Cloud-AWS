@@ -2,7 +2,7 @@
 A collection of projects supporting AWS Integration
 
 
-## Control Tower
+[## Control Tower]()
 Cloud Formation Templates and lambda functions to integrate Falcon Discover with AWS Control Tower
 
 ## Discover for Cloud
