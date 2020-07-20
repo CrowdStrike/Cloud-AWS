@@ -35,7 +35,7 @@ If an event of interest is found we proceed to step 4
 
 **Step 4: Crowdstrike assumes a role from the customer account that permits access.**
 
-If an event of interest is found in the log file, Crowdstrike will attempt to assume a role in the _ **account where the event has occurred** _ and discover more about the AWS object that has been created.
+If an event of interest is found in the log file, Crowdstrike will attempt to assume a role in the account where the event has occurred and discover more about the AWS object that has been created.
 
 
 
@@ -60,7 +60,7 @@ In the notification there is an &quot;Object&quot; key and a &quot;bucket&quot; 
 
 On receipt of the SNS notification Crowdstrike will make an api call to the customer account and will attempt to assume an IAM role to allow us to read the object from the S3 bucket specified in the SNS notification.
 
-A role should exist in the account that owns the S3 bucket that grants the Crowdstrike account number _292230061137_s3:getObject access to all resources in the bucket. Crowdstrike will pass an &quot;externalid&quot; in the request to assume the role for authentication purposes.
+A role should exist in the account that owns the S3 bucket that grants the Crowdstrike account number 292230061137 s3:getObject access to all resources in the bucket. Crowdstrike will pass an &quot;externalid&quot; in the request to assume the role for authentication purposes.
 
 
 **Step 3: Crowdstrike reads the log file from the bucket.**
