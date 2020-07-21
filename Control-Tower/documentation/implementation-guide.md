@@ -1,7 +1,7 @@
 # Implementation Guide for CrowdStrike Falcon Discover for Cloud
 
-# Foreward
-With CrowdStrike Discover for Cloud and Conainers you can gain immediate and comprehensive visibility into all managed endpoints equipped with CrowdStrike Falcon workload security, and unmanaged assets across all accounts. In addition, Discover for Cloud and Containers is able to cross boundaries to see Amazon Virtual Private Cloud (Amazon VPC) and subnets, and collect data from all endpoints -- even those that are unmanaged -- as well as all hybrid infrastructure. The rich AWS content Discover for Cloud and Containers allows organizations to quickly understand and prioritize instances and immediately ensure that the Falcon sensor is fully deployed, dramatically improving organizations' security positions.
+# Foreword
+With CrowdStrike Discover for Cloud and Containers you can gain immediate and comprehensive visibility into all managed endpoints equipped with CrowdStrike Falcon workload security, and unmanaged assets across all accounts. In addition, Discover for Cloud and Containers is able to cross boundaries to see Amazon Virtual Private Cloud (Amazon VPC) and subnets, and collect data from all endpoints -- even those that are unmanaged -- as well as all hybrid infrastructure. The rich AWS content Discover for Cloud and Containers allows organizations to quickly understand and prioritize instances and immediately ensure that the Falcon sensor is fully deployed, dramatically improving organizations' security positions.
 
 The purpose of this Implementation Guide is to enable every AWS Marketplace customer to seamlessly activate, deploy, and configure, CrowdStrike Discover for Cloud and Containers in an AWS Control Tower environment while taking full advantage of the resources pre-configured by AWS Control Tower as part of the initialization.
 
@@ -10,16 +10,16 @@ The purpose of this Implementation Guide is to enable every AWS Marketplace cust
 CrowdStrike Discover for Cloud and Containers offers streamlined integration not available with other third-party solutions. This integration saves organizations the time and expense of trying to develop these capabilities in-house. Discover for Cloud and Containers offers the following benefits:
 
 * **Identifies security gaps with comprehensive and consistent visibility across all Amazon Elastic Compute Cloud (Amazon EC2) instances and endpoints.** 
-By uniquely combining information from Discover for Cloud and Containers and AWS metadata, security teams are able to baseline exisitng Amazon EC2 deployments instantly across all regions and subsequently monitor AWS CloudTrail logs for any modifications to the environment. This holistic asset management across entire data centers and AWS cloud resources allows you to identify unmanaged assets -- pinpointing security gaps and closing them.
+By uniquely combining information from Discover for Cloud and Containers and AWS metadata, security teams are able to baseline existing Amazon EC2 deployments instantly across all regions and subsequently monitor AWS CloudTrail logs for any modifications to the environment. This holistic asset management across entire data centers and AWS cloud resources allows you to identify unmanaged assets -- pinpointing security gaps and closing them.
 
 * **Prioritizes detections for faster and more effective response.**
 Discover for Cloud and Containers delivers rish AWS metadata on EC2 instances, so that unprotected assets and impacted systems are quickly prioritized. It provides the critical answers analysts need such as: Is this system internet accessible? Does it have AWS Identity and Access Management (IAM) roles applied with elevated privileges? Is it on the same Amazon VPC as critical assets? Armed with this context-rich information, organizations can apply proactive measures to dramatically improve their security posture.
 
 * **Ensures consistent security across hybrid environments**.
-As organizations move to the cloud, they are implementing hybrid data center with workloads running on-premises and in the cloud, which can impede a consisteny level of security. Discover for Cloud and Containers provides visibility across all assets whether they are on-premises or EC2 instances in AWS. In addition, the visibility extends to both managed and unmanaged assets -- allowing organizationsl to quickly ensure that all assets are being protected.
+As organizations move to the cloud, they are implementing hybrid data center with workloads running on-premises and in the cloud, which can impede a consistent level of security. Discover for Cloud and Containers provides visibility across all assets whether they are on-premises or EC2 instances in AWS. In addition, the visibility extends to both managed and unmanaged assets -- allowing organizations to quickly ensure that all assets are being protected.
 
 * **Conserves resources with easy deployment and integrated management.**
-Often security teams find they must pivot across a variety of tools and workflows as they attempt to span physical, virtual, and cloud environments. Discover for Cloud and Containers is one tool that provides instant visibility and control over existing on-premise endpoints and EC2 isntances without requiring any additional agents, or installing scripts that can burden teams and slow performance. As a cloud-native security tool, Discover for Cloud and Containers deploys instantly and scales easily with no hit to performance and no requirement to reboot. It is powered by the Falcon sensor, a single lightweight agent, and managed via the unified Falcon console.
+Often security teams find they must pivot across a variety of tools and workflows as they attempt to span physical, virtual, and cloud environments. Discover for Cloud and Containers is one tool that provides instant visibility and control over existing on-premise endpoints and EC2 instances without requiring any additional agents, or installing scripts that can burden teams and slow performance. As a cloud-native security tool, Discover for Cloud and Containers deploys instantly and scales easily with no hit to performance and no requirement to reboot. It is powered by the Falcon sensor, a single lightweight agent, and managed via the unified Falcon console.
 
 # Architecture Diagram
 Falcon Discover for Cloud and Containers has read-only access to your EC2 metadata. This minimizes the security impact to your AWS infrastructure. It calls AWS APIs on your behalf using a cross account IAM role, and it also processes CloudTrail logs.
@@ -138,7 +138,7 @@ Setup consists of the following high-level tasks:
 
     Login to the ``log-archive`` account and apply the CloudFormation template "*ct_crowdstrike_log_archive_account.yaml*" from the ``log-archive-acct`` folder.
 
-    The CloudFormation template will create a Role named ``FalconDiscover`` in the ``log-archive`` account that will permit read access to objects in the S3 bucket and discover resources in the account. The role is restrictured such taht only the IAM role "*arn:aws:iam:292230061137:role/CS-Prod-HG-CsCloudconnectaws*" can assume the role in the account to read the log files.
+    The CloudFormation template will create a Role named ``FalconDiscover`` in the ``log-archive`` account that will permit read access to objects in the S3 bucket and discover resources in the account. The role is restricted such that only the IAM role "*arn:aws:iam:292230061137:role/CS-Prod-HG-CsCloudconnectaws*" can assume the role in the account to read the log files.
 
     ![AWS Roles for Falcon Discover)](images/aws-roles-falcondiscover.png)
 
@@ -186,7 +186,7 @@ Setup consists of the following high-level tasks:
 
     ![CloudWatch to StackSet)](images/cloudwatch-to-stackset.png)
 
-    * Lambda function to reguster the master account with CrowdStrike Falcon.
+    * Lambda function to register the master account with CrowdStrike Falcon.
 
 5) Verification Steps
 
@@ -207,7 +207,7 @@ Setup consists of the following high-level tasks:
     The StackSet will configure two resources:
 
         * IAM Role named ``FalconDiscover``
-        * Lambda functon to register the account with Falcon Discover service
+        * Lambda function to register the account with Falcon Discover service
 
     Verify that the IAM role has been configured in the new account:
 
