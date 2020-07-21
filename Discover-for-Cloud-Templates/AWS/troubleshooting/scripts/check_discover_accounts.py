@@ -1,16 +1,29 @@
-import boto3
-import argparse
-import logging
-from logging.handlers import RotatingFileHandler
-import json
-import requests
-import sys
-from pprint import pprint
+# Copyright © 2020 CrowdStrike Holdings, Inc
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the “Software”), to deal in the Software without
+# restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to
+# the following conditions: The above copyright notice and this permission notice shall be included in all copies or
+# substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
 
+import argparse
+import json
+import logging
+import sys
+from logging.handlers import RotatingFileHandler
+
+import requests
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
-# handler = logging.StreamHandler()
 handler = RotatingFileHandler(
     "./get_registered_accounts.log", maxBytes=20971520, backupCount=5)
 formatter = logging.Formatter('%(levelname)-8s %(message)s')
@@ -19,9 +32,13 @@ logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
 
-
-
 def get_falcon_discover_accounts(sortby=None, filterby=None) -> bool:
+    """
+    Prints a list of accounts that require modification and tries to indicate possible reasons for errors.
+    :param sortby:
+    :param filterby:
+    :return: Bool indicating if API call succeeded.
+    """
     good_accounts = []
     bad_accounts = []
 
@@ -92,6 +109,11 @@ def get_falcon_discover_accounts(sortby=None, filterby=None) -> bool:
 
 
 def get_auth_header(auth_token) -> str:
+    """
+    Generates the authentication headers required in the API request
+    :param auth_token: OAuth2 token as string
+    :return header as string
+    """
     if auth_token:
         auth_header = "Bearer " + auth_token
         headers = {
@@ -100,9 +122,13 @@ def get_auth_header(auth_token) -> str:
         return headers
 
 
-def get_auth_token():
+def get_auth_token() -> str:
+    """
+    Generates the OAuth2 token from credentials supplied in args
+    :return: OAuth2 token as string or Null if auth fails
+    """
     url = "https://api.crowdstrike.com/oauth2/token"
-    payload = 'client_secret='+falcon_client_secret+'&client_id='+falcon_client_id
+    payload = 'client_secret=' + falcon_client_secret + '&client_id=' + falcon_client_id
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
@@ -125,6 +151,3 @@ if __name__ == '__main__':
     falcon_client_id = args.falcon_client_id
     falcon_client_secret = args.falcon_client_secret
     get_falcon_discover_accounts()
-
-
-
