@@ -2,11 +2,12 @@
 # Script to register
 
 import argparse
-import logging
-from logging.handlers import RotatingFileHandler
 import json
-import requests
+import logging
 import sys
+from logging.handlers import RotatingFileHandler
+
+import requests
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
