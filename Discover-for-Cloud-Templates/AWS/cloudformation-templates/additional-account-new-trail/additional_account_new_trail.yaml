@@ -178,7 +178,10 @@ Resources:
     Type: AWS::CloudTrail::Trail
     Properties:
       EnableLogFileValidation: !Ref EnableLogFileValidation
-      IncludeGlobalServiceEvents: !Ref IncludeGlobalEvents
+      IncludeGlobalServiceEvents: !If
+        - IsMultiRegion
+        - True
+        - !Ref IncludeGlobalEvents
       S3KeyPrefix: !Ref AWSLogsS3KeyPrefix
       IsLogging: true
       IsMultiRegionTrail: !Ref MultiRegion
