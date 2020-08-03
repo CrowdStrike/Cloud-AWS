@@ -14,7 +14,7 @@ When an Azure resource is updated, Resource Graph is notified by Resource Manage
 
 CrowdStrike runs two periodic tasks that will query the Azure Resource Graph API.
 
-Baseline Task (Daily)
+### Baseline Task (Daily)
 
 The baseline task runs every 24 hours and invokes a ResourceGraph API request to capture snapshot of the all events and its attributes relevant to Discover for Azure.  Currently CrowdStrike will query the ResourceGraph API for the following resource types
 •	AzureVirtualMachine
@@ -23,7 +23,8 @@ The baseline task runs every 24 hours and invokes a ResourceGraph API request to
 •	AzureNetworkSecurityGroup
 •	AzureFirewall
 
-Change Task (xx Minutes)
+### Change Task (xx Minutes)
+
 The change task runs every xx minutes cadence and invokes a resourceChange API request to capture the resource changes made throughout the day for resources relevant to Discover for Azure.
 
  
