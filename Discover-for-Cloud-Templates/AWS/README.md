@@ -6,7 +6,7 @@
 
 1) "terraform" contains terraform templates for setting up the account containing the S3 bucket (log archive account) and additional accounts. 
 
-2) "troubleshooting" contains a description of how the service operates together with some troubleshooting scripts.
+2) "troubleshooting" contains a description of configuration settings to check together with some troubleshooting scripts.
 
 # How Crowdstrike Discover Works
 
