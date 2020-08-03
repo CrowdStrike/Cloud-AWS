@@ -1,24 +1,19 @@
-import boto3
 import argparse
-import logging
-from logging.handlers import RotatingFileHandler
 import json
-import requests
+import logging
 import sys
-from pprint import pprint
+from logging.handlers import RotatingFileHandler
 
+import requests
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
-# handler = logging.StreamHandler()
 handler = RotatingFileHandler(
     "./get_registered_accounts.log", maxBytes=20971520, backupCount=5)
 formatter = logging.Formatter('%(levelname)-8s %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
-
-
 
 
 def get_falcon_discover_accounts(sortby=None, filterby=None) -> bool:
@@ -102,7 +97,7 @@ def get_auth_header(auth_token) -> str:
 
 def get_auth_token():
     url = "https://api.crowdstrike.com/oauth2/token"
-    payload = 'client_secret='+falcon_client_secret+'&client_id='+falcon_client_id
+    payload = 'client_secret=' + falcon_client_secret + '&client_id=' + falcon_client_id
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
@@ -125,6 +120,3 @@ if __name__ == '__main__':
     falcon_client_id = args.falcon_client_id
     falcon_client_secret = args.falcon_client_secret
     get_falcon_discover_accounts()
-
-
-
