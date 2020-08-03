@@ -17,11 +17,11 @@ CrowdStrike runs two periodic tasks that will query the Azure Resource Graph API
 ### Baseline Task (Daily)
 
 The baseline task runs every 24 hours and invokes a ResourceGraph API request to capture snapshot of the all events and its attributes relevant to Discover for Azure.  Currently CrowdStrike will query the ResourceGraph API for the following resource types
-•	AzureVirtualMachine
-•	AzureDisk
-•	AzureVirtualNetwork
-•	AzureNetworkSecurityGroup
-•	AzureFirewall
+*	AzureVirtualMachine
+*	AzureDisk
+*	AzureVirtualNetwork
+*	AzureNetworkSecurityGroup
+*	AzureFirewall
 
 ### Change Task (xx Minutes)
 
@@ -35,14 +35,14 @@ An Azure service principal is an identity created for use with applications, hos
 
 The Account Onboarding process involves the creation of a service principal for each Azure tenant.  The service principal has the “READER” role assigned to it and uses certificate-based authentication. 
 
-_*“az ad sp create-for-rbac --name CrowdStrikeCSPM --cert XXXX”*_
+__*“az ad sp create-for-rbac --name CrowdStrikeCSPM --cert XXXX”*__
 
 A tenant will contain one or more subscriptions. 
 The “READER” role should be assigned to each subscription under the tenant.
 
-_*"az role assignment create --role acdd72a7-3385-48ef-bd42-f606fba81ae7 --assignee ${CLIENT_ID} --subscription xxxxxxx"*_
+__*"az role assignment create --role acdd72a7-3385-48ef-bd42-f606fba81ae7 --assignee ${CLIENT_ID} --subscription xxxxxxx"*__
 
-_*"az role assignment create --role acdd72a7-3385-48ef-bd42-f606fba81ae7 --assignee ${CLIENT_ID} --subscription yyyyyyy"*_
+__*"az role assignment create --role acdd72a7-3385-48ef-bd42-f606fba81ae7 --assignee ${CLIENT_ID} --subscription yyyyyyy"*__
 
 Note:  In order to create a service principal, the user or process must be authenticated with Azure and have “GLOBAL ADMINISTRATOR” permissions. 
 https://docs.microsoft.com/en-us/azure/active-directory/users-groups-roles/directory-assign-admin-roles#company-administrator-permissions
