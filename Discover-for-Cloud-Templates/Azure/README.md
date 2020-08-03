@@ -57,7 +57,8 @@ https://docs.microsoft.com/en-us/azure/active-directory/users-groups-roles/direc
 3)	Subscription ID, Tenant ID and certificate public/private key pair stored
 4)	API response returned with provisioning script containing public key of generated cert
 5)	Customer runs script and Service Principal created
-6)	Customer sends an API PATCH request to https://api.crowdstrike.com//cloud-connect-azure/entities/client-id/v1 with ClientID of service principal.¬¬¬¬
+6)	Customer sends an API PATCH request to https://api.crowdstrike.com//cloud-connect-azure/entities/client-id/v1 with ClientID of service principal.
 
+![Resource Discovery)](images/Slide2.png)
 
 
