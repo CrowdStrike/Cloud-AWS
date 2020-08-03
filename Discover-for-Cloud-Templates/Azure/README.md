@@ -34,14 +34,14 @@ The CrowdStrike Discover for Cloud service will use an Azure Service Principal t
 An Azure service principal is an identity created for use with applications, hosted services, and automated tools to access Azure resources. This access is restricted by the roles assigned to the service principal, giving you control over which resources can be accessed and at which level.
 
 The Account Onboarding process involves the creation of a service principal for each Azure tenant.  The service principal has the “READER” role assigned to it and uses certificate-based authentication. 
-“az ad sp create-for-rbac --name CrowdStrikeCSPM --cert XXXX”
+*“az ad sp create-for-rbac --name CrowdStrikeCSPM --cert XXXX”*
 
 A tenant will contain one or more subscriptions. 
 The “READER” role should be assigned to each subscription under the tenant.
 
-az role assignment create --role acdd72a7-3385-48ef-bd42-f606fba81ae7 --assignee ${CLIENT_ID} --subscription xxxxxxx
+*"az role assignment create --role acdd72a7-3385-48ef-bd42-f606fba81ae7 --assignee ${CLIENT_ID} --subscription xxxxxxx"*
 
-az role assignment create --role acdd72a7-3385-48ef-bd42-f606fba81ae7 --assignee ${CLIENT_ID} --subscription yyyyyyy
+*"az role assignment create --role acdd72a7-3385-48ef-bd42-f606fba81ae7 --assignee ${CLIENT_ID} --subscription yyyyyyy"*
 
 Note:  In order to create a service principal, the user or process must be authenticated with Azure and have “GLOBAL ADMINISTRATOR” permissions. 
 https://docs.microsoft.com/en-us/azure/active-directory/users-groups-roles/directory-assign-admin-roles#company-administrator-permissions
