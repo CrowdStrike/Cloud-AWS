@@ -15,6 +15,7 @@ When an Azure resource is updated, Resource Graph is notified by Resource Manage
 CrowdStrike runs two periodic tasks that will query the Azure Resource Graph API.
 
 Baseline Task (Daily)
+
 The baseline task runs every 24 hours and invokes a ResourceGraph API request to capture snapshot of the all events and its attributes relevant to Discover for Azure.  Currently CrowdStrike will query the ResourceGraph API for the following resource types
 •	AzureVirtualMachine
 •	AzureDisk
@@ -48,7 +49,7 @@ https://docs.microsoft.com/en-us/azure/active-directory/users-groups-roles/direc
  
 # Account Onboarding Workflow
 
-
+![Account Onboarding)](images/Slide1.png)
  
 
 1)	Customer sends an API POST request to https://api.crowdstrike.com/cloud-connect-azure/entities/account/v1.	
