@@ -69,7 +69,7 @@ Metadata:
           - RoleName
           - ExternalId
       - Label:
-          default: Crowdstrike Falcom API keys.
+          default: Crowdstrike Falcon API keys.
         Parameters:
            - FalconClientId
            - FalconSecret
