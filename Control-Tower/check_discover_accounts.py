@@ -49,7 +49,9 @@ def get_falcon_discover_accounts(sortby=None, filterby=None) -> bool:
 
             for account in accounts_list:
                 # print(json.dumps(account, indent=4))
-                if account['provisioning_state'] != "registered" or not account['access_health']['api']['valid']:
+                # access_health only available with accounts that have errors
+                if account['provisioning_state'] != "registered" or account.get('access_health', False):
+                    # account['access_health']['api']['valid']:
                     bad_accounts.append(account)
                 else:
                     good_accounts.append(account)
