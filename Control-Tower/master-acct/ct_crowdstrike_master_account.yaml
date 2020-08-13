@@ -11,6 +11,7 @@ Parameters:
     NoEcho: 'true'
     Type: String
 
+
   ExternalId:
     Description: ExternalID Used for authenticating assume role requests.
     NoEcho: 'true'
@@ -65,7 +66,7 @@ Metadata:
           - RoleName
           - ExternalId
       - Label:
-          default: CrowdStrike Falcom API keys.
+          default: CrowdStrike Falcon API keys.
         Parameters:
            - FalconClientId
            - FalconSecret
