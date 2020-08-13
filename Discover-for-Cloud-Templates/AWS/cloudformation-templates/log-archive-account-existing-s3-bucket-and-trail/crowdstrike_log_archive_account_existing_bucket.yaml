@@ -97,11 +97,12 @@ Parameters:
     Type: String
     Description: Log Archive Bucket Name
 
-
+  LambdaFunctionsBucketName:
+    Type: String
+    Description: S3 bucket where the lambda files are located. (Must be in the same region)
 
 
 Resources:
-
   launchLambdaRole:
     Type: AWS::IAM::Role
     Properties:
@@ -138,7 +139,7 @@ Resources:
       CompatibleRuntimes:
         - python3.7
       Content:
-        S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
+        S3Bucket: !Ref 'LambdaFunctionsBucketName'
         S3Key: layer.zip
       Description: Layer for requests package
       LayerName: requests-package
@@ -157,7 +158,7 @@ Resources:
           LocalAccount: !Ref AWS::AccountId
 
       Code:
-        S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
+        S3Bucket: !Ref 'LambdaFunctionsBucketName'
         S3Key: add_S3_notification.zip
       Layers:
         - !Ref lambdaLayer
@@ -291,7 +292,7 @@ Resources:
           LocalAccount: !Ref AWS::AccountId
 
       Code:
-        S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
+        S3Bucket: !Ref 'LambdaFunctionsBucketName'
         S3Key: register_logarchive_account.zip
       Layers:
         - !Ref lambdaLayer
