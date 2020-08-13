@@ -151,18 +151,10 @@ Parameters:
     Type: 'String'
     Description: 'Prefix for the managed resources'
 
-Mappings:
-  S3perRegion:
-    us-east-1:
-      NAME: crowdstrike-sa-resources-ct-us-east-1
-    us-east-2:
-      NAME: crowdstrike-sa-resources-ct-us-east-2
-    us-west-2:
-      NAME: crowdstrike-sa-resources-ct-us-west-2
-    eu-west-1:
-      NAME: crowdstrike-sa-resources-ct-eu-west-1
-    ap-southeast-2:
-      NAME: crowdstrike-sa-resources-ct-ap-southeast-2
+  LambdaFunctionsBucketName:
+    Type: String
+    Description: S3 bucket where the lambda files are located. (Must be in the same region)
+
 
 Conditions:
   IsMultiRegion: !Equals
@@ -282,7 +274,7 @@ Resources:
       CompatibleRuntimes:
         - python3.7
       Content:
-        S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
+        S3Bucket: !Ref 'LambdaFunctionsBucketName'
         S3Key: layer.zip
       Description: Layer for requests package
       LayerName: requests-package
@@ -301,7 +293,7 @@ Resources:
           LocalAccount: !Ref AWS::AccountId
           aws_region: !Ref AWS::Region
       Code:
-        S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
+        S3Bucket: !Ref 'LambdaFunctionsBucketName'
         S3Key: register_new_account.zip
       Layers:
         - !Ref lambdaLayer
