@@ -8,6 +8,8 @@
 
 2) "troubleshooting" contains a description of configuration settings to check together with some troubleshooting scripts.
 
+3) "cloudformation" contains cloudformation templates for setting up the log-archive account S3 bucket role and notification, and new accounts.
+
 # How Crowdstrike Discover Works
 
 ## Log Aggregation Account
