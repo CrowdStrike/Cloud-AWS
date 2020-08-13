@@ -7,3 +7,5 @@ Assumes the account has already been created and is sending CloudTrail logs to t
 ## New account new trail
 Configures CloudTrail to write logs to the central log archive account S3 bucket and creates the IAM role and permissions to perform API calls to gather details about the resources created.
 
+## Lambda-functions
+Contains lambda functions for setting up SNS notification on the S3 bucket and for registering the account with the CrowdStrike API
