@@ -1,34 +1,31 @@
-import boto3, json, time, os
+import json
 import logging
-from botocore.exceptions import ClientError
+import os
 # from botocore.vendored import requests
-import string, random
+import random
+import string
+import time
+
+import boto3
 import requests
+from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-
 SUCCESS = "SUCCESS"
 FAILED = "FAILED"
-
-
-
 
 
 def cfnresponse_send(event, context, responseStatus, responseData, physicalResourceId=None, noEcho=False):
     responseUrl = event['ResponseURL']
     print(responseUrl)
 
-    responseBody = {}
-    responseBody['Status'] = responseStatus
-    responseBody['Reason'] = 'See the details in CloudWatch Log Stream: ' + context.log_stream_name
-    responseBody['PhysicalResourceId'] = physicalResourceId or context.log_stream_name
-    responseBody['StackId'] = event['StackId']
-    responseBody['RequestId'] = event['RequestId']
-    responseBody['LogicalResourceId'] = event['LogicalResourceId']
-    responseBody['NoEcho'] = noEcho
-    responseBody['Data'] = responseData
+    responseBody = {'Status': responseStatus,
+                    'Reason': 'See the details in CloudWatch Log Stream: ' + context.log_stream_name,
+                    'PhysicalResourceId': physicalResourceId or context.log_stream_name, 'StackId': event['StackId'],
+                    'RequestId': event['RequestId'], 'LogicalResourceId': event['LogicalResourceId'], 'NoEcho': noEcho,
+                    'Data': responseData}
 
     json_responseBody = json.dumps(responseBody)
 
@@ -57,53 +54,53 @@ def get_secret_value(secret):
     for s in secret_list:
         if key in s.values():
             output = SM.get_secret_value(SecretId=key)['SecretString']
-    return (output)
+    return output
 
 
 def get_account_id(name='Log archive'):
-    '''Get the Account Id from AWS Organization'''
+    """Get the Account Id from AWS Organization"""
     ORG = boto3.client('organizations')
     result = ''
     try:
         orgList = ORG.list_accounts()['Accounts']
     except Exception as e:
-        raise (e)
+        raise e
     if len(orgList) > 1:
         for i in orgList:
             if i['Name'] == name:
-                result = (i['Id'])
-    return (result)
+                result = i['Id']
+    return result
 
 
 def get_master_id():
-    ''' Get the master Id from AWS Organization - Only on master'''
+    """ Get the master Id from AWS Organization - Only on master"""
     masterID = ''
     ORG = boto3.client('organizations')
     try:
         masterID = ORG.list_roots()['Roots'][0]['Arn'].rsplit(':')[4]
-        return (masterID)
+        return masterID
     except Exception as e:
-        logger.warn('This stack runs only on the Master of the AWS Organization')
+        logger.error('This stack runs only on the Master of the AWS Organization')
         return False
 
 
 def launch_crwd_discover(templateUrl, paramList, AdminRoleARN, ExecRole, cList, stacketsetName):
-    ''' Launch CRWD Discover Stackset on the Master Account '''
+    """ Launch CRWD Discover Stackset on the Master Account """
     CFT = boto3.client('cloudformation')
     result = {}
     if len(paramList):
         try:
-            result = CFT.create_stack_set(StackSetName=stacketsetName, \
-                                          Description='Roles for CRWD-Discover', \
-                                          TemplateURL=templateUrl, \
-                                          Parameters=paramList, \
-                                          AdministrationRoleARN=AdminRoleARN, \
-                                          ExecutionRoleName=ExecRole, \
+            result = CFT.create_stack_set(StackSetName=stacketsetName,
+                                          Description='Roles for CRWD-Discover',
+                                          TemplateURL=templateUrl,
+                                          Parameters=paramList,
+                                          AdministrationRoleARN=AdminRoleARN,
+                                          ExecutionRoleName=ExecRole,
                                           Capabilities=cList)
             return result
         except ClientError as e:
             if e.response['Error']['Code'] == 'NameAlreadyExistsException':
-                logger.warn("StackSet already exists")
+                logger.info("StackSet already exists")
                 result['StackSetName'] = 'CRWD-ROLES-CREATION'
                 return result
             else:
@@ -140,10 +137,8 @@ def delete_stackset(stacksetName):
             stackset_instances = CFT.list_stack_instances(StackSetName=stacksetName)
             counter = 2
             while len(stackset_instances["Summaries"]) > 0 and counter > 0:
-                logger.info("Deleting stackset instance from {}, remaining {}, sleeping for 10 sec".format(stacksetName,
-                                                                                                           len(
-                                                                                                               stackset_instances[
-                                                                                                                   "Summaries"])))
+                logger.info("Deleting stackset instance from {}, remaining {}, "
+                            "sleeping for 10 sec".format(stacksetName, len(stackset_instances["Summaries"])))
                 time.sleep(10)
                 counter = counter - 1
                 stackset_instances = CFT.list_stack_instances(StackSetName=stacksetName)
@@ -174,7 +169,15 @@ def lambda_handler(event, context):
         LogArchiveBucketRegion = os.environ['LogArchiveBucketRegion']
         LogArchiveAccount = os.environ['LogArchiveAccount']
         CredentialsSecret = os.environ['CrowdstrikeCredentialsSecret']
-        CrowdstrikeTemplateUrl = 'https://crowdstrike-sa-resources-ct-'+AwsRegion+'.s3-'+AwsRegion+'.amazonaws.com/ct_crowdstrike_stackset.yaml'
+        if AwsRegion == 'us-east-1':
+            CrowdstrikeTemplateUrl = 'https://crowdstrike-sa-resources-ct-' \
+                                     + AwsRegion + '.s3.amazonaws.com/ct_crowdstrike_stackset.yaml'
+        elif AwsRegion == 'us-east-2':
+            CrowdstrikeTemplateUrl = 'https://crowdstrike-sa-resources-ct-' + AwsRegion + '.s3.' \
+                                     + AwsRegion + '.amazonaws.com/ct_crowdstrike_stackset.yaml'
+        else:
+            CrowdstrikeTemplateUrl = 'https://crowdstrike-sa-resources-ct-' + AwsRegion + '.s3-' \
+                                     + AwsRegion + '.amazonaws.com/ct_crowdstrike_stackset.yaml'
         AccountId = get_master_id()
         cList = ['CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND']
         ExecRole = 'AWSControlTowerExecution'
@@ -193,9 +196,7 @@ def lambda_handler(event, context):
 
             # LocalAccount:
             for s in secretList.keys():
-                keyDict = {}
-                keyDict['ParameterKey'] = s
-                keyDict['ParameterValue'] = secretList[s]
+                keyDict = {'ParameterKey': s, 'ParameterValue': secretList[s]}
                 CRWD_Discover_paramList.append(dict(keyDict))
             ExternalID = get_random_alphanum_string(8)
             keyDict['ParameterKey'] = 'ExternalID'
@@ -221,7 +222,6 @@ def lambda_handler(event, context):
             keyDict['ParameterKey'] = 'LogArchiveAccount'
             keyDict['ParameterValue'] = LogArchiveAccount
             CRWD_Discover_paramList.append(dict(keyDict))
-
 
             logger.info('CRWD_Discover ParamList:{}'.format(CRWD_Discover_paramList))
             logger.info('AdminRoleARN: {}'.format(AdminRoleARN))
@@ -255,9 +255,6 @@ def lambda_handler(event, context):
         raise Exception
     except Exception as e:
         logger.error(e)
-        response_data = {}
-        response_data["Status"] = str(e)
+        response_data = {"Status": str(e)}
         cfnresponse_send(event, context, 'FAILED', response_data, "CustomResourcePhysicalID")
         return
-
-
