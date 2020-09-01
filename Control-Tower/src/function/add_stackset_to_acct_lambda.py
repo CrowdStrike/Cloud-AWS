@@ -1,7 +1,6 @@
-import json
-import boto3
 import logging
-from botocore.vendored import requests
+
+import boto3
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -10,7 +9,6 @@ result = {"ResponseMetadata": {"HTTPStatusCode": "400"}}
 
 
 def lambda_handler(event, context):
-
     masterAcct = event['account']
     eventDetails = event['detail']
     regionName = eventDetails['awsRegion']
