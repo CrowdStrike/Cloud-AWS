@@ -152,27 +152,24 @@ Setup consists of the following high-level tasks:
 
     Description of Parameters:
 
-    * **FalconClientId**: Your Falcon OAuth2 API Key from the CrowdStrike Console.
-
-    * **FalconSecret**: Your Falcon OAuth2 API Secret from the CrowdStrike Console.
-
-    * **ExternalID**: String of random characters. Reference [https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html).
-
     * **CSAccountNumber**: The number supplied in the template, ``292230061137``, should **NOT** be changed unless directed by CrowdStrike.
-
-    * **LambdaBucketName**: Name of the S3 bucket that was created by the script to run in Step 3.4.
-
-    * **RoleName**: This name may be modified as required.
 
     * **CSAssumingRoleName**: The name supplied in the template ``CS-Prod-HG-CSCloudconnectaws`` should **NOT** be changed unless directed by CrowdStrike.
 
-    * **LogArchiveAccount**: AWS account number where the log archive bucket that was created by Control Tower.
+    * **ExternalID**: String of random characters. Reference [https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html).
+    
+    * **FalconClientId**: Your Falcon OAuth2 API Key from the CrowdStrike Console.
 
-    * **LogArchiveBucketName**: CloudTrail log archive bucket that was created by Control Tower.
+    * **FalconSecret**: Your Falcon OAuth2 API Secret from the CrowdStrike Console.* **LogArchiveAccount**: AWS account number where the log archive bucket that was created by Control Tower.
 
+    * **LogArchiveAccount**: AWS account number where the log archive bucket that was created by Control Tower
+    
     * **LogArchiveBucketRegion**: Region where CloudTrail log archive bucket that was created by Control Tower.
 
+    * **RoleName**: This name may be modified as required.
+    
     The CloudFormation template will create the following resources in the account:
+    
 
     * StackSet will be applied to new accounts.
 
