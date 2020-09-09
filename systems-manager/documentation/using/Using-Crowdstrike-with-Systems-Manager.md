@@ -5,16 +5,14 @@ Check that your environment meets the prerequisites for Systems Manager
 
 <https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-prereqs.html>
 
-Installing the CrowdStrike Falcon agent on Systems Manager managed
-instances.
-
-From the AWS console under  AWS Systems Manager \> Distributor \> Third
-Party Apps > FalconSensor-(linux\|windows) can be selected 
+## Installing the CrowdStrike Falcon agent 
+From the AWS console can be select the automation document under AWS Systems Manager \> Distributor \> Third
+Party Apps > FalconSensor-(linux\|windows) 
 
 Select "Install one time"
 
 
-![](.//media/image1.tiff)
+![](.//media/image1.png)
 
 Complete the Input parameters form
 
@@ -23,18 +21,20 @@ Complete the Input parameters form
 The instances that will be targeted for install/uninstall can be
 selected using the InstanceIds tab OR the Targets tab.
 
-#### InstanceIds
+## InstanceIds
 
 Select the instances that you wish to perform the action on
 
 ![](.//media/image3.png)
 
-#### Action
+## Action
 
 Select either "Install" or "Uninstall" for the action to perform on the
 instance
 
-#### InstallerParams
+## InstallerParams
+
+**Windows installer parameters**
 
 Windows installer parameters are shown below (Note: CID and ProvTroken
 are already included)
@@ -47,7 +47,7 @@ Parameter     | Description
 /norestart     | Prevents the host from restarting at the end of he sensor installation.                           |
 
 
-Linux installation Parameters
+**Linux installation Parameters**
 
   Parameter   |         Description
 -------------- |-------------------
@@ -55,29 +55,29 @@ Linux installation Parameters
   \--app        |       Proxy port
   \--billing=metered  | Shows no UI and no prompts.
 
-[Package Name]{.ul}
+**Package Name**
 
 Enter either FalconSensor-Windows or FalconSensor-linux
 
-#### PackageVersion
+**PackageVersion**
 
 Leave blank unless you wish to specify a specific version
 
-#### APIGatewayHostKey
+**APIGatewayHostKey**
 
 Check the value of the key CS_API_GATEWAY_HOST in the parameter store
 
-#### APIGatewayClientIDKey
+**APIGatewayClientIDKey**
 
 Check the value of the key CS_API_GATEWAY_CLIENT_ID in the parameter
 store
 
-#### APIGatewayClientSecretKey
+**APIGatewayClientSecretKey**
 
 Check the value of the key CS_API_GATEWAY_CLIENT_SECRET in the parameter
 store
 
-#### Targets
+**Targets**
 
 The Targets tab will select the instances using a filter that is
 entered. For instance to target by tag enter
@@ -89,15 +89,17 @@ Targets
 Targets is required if you don\'t provide one or more instance IDs in
 the call.
 
-#### AutomationAssumeRole
+**AutomationAssumeRole**
 
 [Select a role that has the pre configured *AWS-SSM-ExecutionRole* policy
 bound to it. If you have used the supplied cloudformation template to
 setup the account select the role named
 *Crowdstrike-SSMExecutionRole*
 
-#### Troubleshooting
-======================
+
+
+## Troubleshooting
+
 
 SSM Agent writes information about executions, commands, scheduled
 actions, errors, and health statuses to log files on each instance. You
