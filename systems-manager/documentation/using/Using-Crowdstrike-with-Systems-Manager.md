@@ -9,11 +9,10 @@ Installing the CrowdStrike Falcon agent on Systems Manager managed
 instances.
 
 From the AWS console under  AWS Systems Manager \> Distributor \> Third
-Party Apps  page **FalconSensor-(linux\|windows) **can be selected 
+Party Apps > FalconSensor-(linux\|windows) can be selected 
 
 Select "Install one time"
 
-   
 
 ![](.//media/image1.tiff)
 
