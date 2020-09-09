@@ -17,8 +17,7 @@ height="2.8883278652668416in"}
 
 -   Adds parameters to the Systems Manager Parameter Store
 
-![](.//media/image2.png){width="6.004395231846019in"
-height="3.1553029308836393in"}
+![](.//media/image2.png)
 
 -   Checks for the existence of an installation token in the falcon
     console
@@ -41,8 +40,7 @@ CloudFormation template
 
 Upload the files to the S3 bucket
 
-![](.//media/image3.png){width="4.597222222222222in"
-height="2.9027777777777777in"}
+![](.//media/image3.png)
 
 3\) Create the OAuth2 API keys in the CrowdStrike Console
 
@@ -55,9 +53,7 @@ Tokens
 
 Add the API OAuth2 Client ID and Client secret
 
-![](.//media/image4.png){width="6.263888888888889in" height="3.45625in"}
-
+![](.//media/image4.png)
 5\) Verify that the template has created the resources
 
-![](.//media/image5.png){width="5.652777777777778in"
-height="4.138888888888889in"}
+![](.//media/image5.png)
