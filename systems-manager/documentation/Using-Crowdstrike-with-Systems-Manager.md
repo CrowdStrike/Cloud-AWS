@@ -1,0 +1,172 @@
+Using Systems Manager
+=====================
+
+Check that your environment meets the prerequisites for Systems Manager
+
+<https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-prereqs.html>
+
+Installing the CrowdStrike Falcon agent on Systems Manager managed
+instances.
+
+From the AWS console under  AWS Systems Manager \> Distributor \> Third
+Party Apps  page **FalconSensor-(linux\|windows) **can be selected 
+
+Select "Install one time"
+
+   
+
+![](.//media/image1.tiff){width="6.263888888888889in"
+height="3.1909722222222223in"}
+
+Complete the Input parameters form
+
+![](.//media/image2.png){width="6.263888888888889in"
+height="3.2270833333333333in"}
+
+The instances that will be targeted for install/uninstall can be
+selected using the InstanceIds tab OR the Targets tab.
+
+[InstanceIds]{.ul}
+
+Select the instances that you wish to perform the action on
+
+![](.//media/image3.png){width="6.263888888888889in"
+height="2.457638888888889in"}
+
+[Action]{.ul}
+
+Select either "Install" or "Uninstall" for the action to perform on the
+instance
+
+[InstallerParams]{.ul}
+
+Windows installer parameters are shown below (Note: CID and ProvTroken
+are already included)
+
++----------------+----------------------------------------------------+
+| Parameter      | Description                                        |
++================+====================================================+
+| /install       | Installs the sensor (default).                     |
++----------------+----------------------------------------------------+
+| /passive       | Shows a minimal UI with no prompts.                |
++----------------+----------------------------------------------------+
+| /quiet         | Shows no UI and no prompts.                        |
++----------------+----------------------------------------------------+
+| /norestart     | Prevents the host from restarting at the end of    |
+|                | the sensor installation.                           |
++----------------+----------------------------------------------------+
+| GROUPING_TAGS= | Assigns user-selected identifiers you can use to   |
+|                | group and filter hosts.                            |
++----------------+----------------------------------------------------+
+| BILLINGTYPE=   | Sets the sensor to use standard billing            |
+|                | or [Pay-As-You-Go                                  |
+|                | billing](https://falcon.crowdstrike.com/suppor     |
+|                | t/documentation/102/falcon-for-aws-pay-as-you-go). |
+|                |                                                    |
+|                | BILLINGTYPE=Default: standard billing per sensor   |
+|                |                                                    |
+|                | BILLINGTYPE=Metered: Pay-As-You-Go billing         |
++----------------+----------------------------------------------------+
+
+Linux installation Parameters
+
+  Parameter            Description
+  -------------------- -----------------------------
+  \--aph               Proxy host
+  \--app               Proxy port
+  \--billing=metered   Shows no UI and no prompts.
+
+[Package Name]{.ul}
+
+Enter either FalconSensor-Windows or FalconSensor-linux
+
+[PackageVersion]{.ul}
+
+Leave blank unless you wish to specify a specific version
+
+[APIGatewayHostKey]{.ul}
+
+Check the value of the key CS_API_GATEWAY_HOST in the parameter store
+
+[APIGatewayClientIDKey]{.ul}
+
+Check the value of the key CS_API_GATEWAY_CLIENT_ID in the parameter
+store
+
+[APIGatewayClientSecretKey]{.ul}
+
+Check the value of the key CS_API_GATEWAY_CLIENT_SECRET in the parameter
+store
+
+[Targets]{.ul}
+
+The Targets tab will select the instances using a filter that is
+entered. For instance to target by tag enter
+"Key=tag:Name,Values=January2018Backups". For more information regarding
+Targets
+
+<https://docs.aws.amazon.com/systems-manager/latest/userguide/automation-working-targets.html>.
+
+Targets is required if you don\'t provide one or more instance IDs in
+the call.
+
+[AutomationAssumeRole]{.ul}
+
+[Select a role that has the pre configured AWS-SSM-ExecutionRole policy
+bound to it. If you have used the supplied cloudformation template to
+setup the account select the role named
+"]{.ul}Crowdstrike-SSMExecutionRole"
+
+[\
+]{.ul}
+
+[Troubleshooting]{.ul}
+======================
+
+SSM Agent writes information about executions, commands, scheduled
+actions, errors, and health statuses to log files on each instance. You
+can view log files by manually connecting to an instance. Logs are
+written to the following locations.
+
+[Linux logs]{.ul}
+
+/var/log/amazon/ssm/amazon-ssm-agent.log
+
+/var/log/amazon/ssm/errors.log
+
+[Windows logs]{.ul}
+
+%PROGRAMDATA%\\Amazon\\SSM\\Logs\\amazon-ssm-agent.log
+
+%PROGRAMDATA%\\Amazon\\SSM\\Logs\\errors.log
+
+Installation of the CrowdStrike agent requires version x.xxx or later of
+the systems manager agent.
+
+1.  Check the version of the agent running on the host
+
+On Windows run
+
+***Get-WmiObject Win32_Product \| Where-Object {\$\_.Name -eq \'Amazon
+SSM Agent\'} \| Select-Object Name,Version***
+
+[On Amazon Linux and Amazon Linux 2]{.ul}
+
+***yum info amazon-ssm-agent***
+
+![](.//media/image4.png){width="5.430555555555555in"
+height="1.6527777777777777in"}
+
+2.  Check the Parameters Store
+
+Verify the api keys are correct
+
+![](.//media/image5.png){width="2.6166666666666667in"
+height="2.14250656167979in"}
+
+3.  Check the agent logs
+
+Look for the output in the log files
+
+![](.//media/image6.png){width="6.263888888888889in"
+height="3.5305555555555554in"}
