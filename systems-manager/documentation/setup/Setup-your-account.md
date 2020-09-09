@@ -14,7 +14,8 @@ operations
 The role has the Amazon managed policy AmazonSSMAutomationRole attached
 to it
 
-![](media/image1.tiff)
+![](media/image1.png)
+
 
 2.  Adds parameters to the Systems Manager Parameter Store
 
