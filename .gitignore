@@ -1,1 +1,12 @@
 /venv/
+Discover-for-Cloud-Templates/AWS/cloudformation-templates/.DS_Store
+Discover-for-Cloud-Templates/AWS/.DS_Store
+Discover-for-Cloud-Templates/AWS/terraform-templates/account_register.log
+Discover-for-Cloud-Templates/AWS/troubleshooting/.DS_Store
+Discover-for-Cloud-Templates/.DS_Store
+.idea/vcs.xml
+.idea/misc.xml
+.idea/modules.xml
+Control-Tower/.DS_Store
+Control-Tower/documentation/.DS_Store
+.idea/copyright/MIT.xml
