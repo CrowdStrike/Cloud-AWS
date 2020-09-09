@@ -9,29 +9,25 @@ Installing the CrowdStrike Falcon agent on Systems Manager managed
 instances.
 
 From the AWS console under  AWS Systems Manager \> Distributor \> Third
-Party Apps  page **FalconSensor-(linux\|windows) **can be selected 
+Party "FalconSensor-(linux\|windows)" can be selected
 
 Select "Install one time"
 
-   
 
-![](.//media/image1.tiff){width="6.263888888888889in"
-height="3.1909722222222223in"}
+![](.//media/image1.tiff)
 
 Complete the Input parameters form
 
-![](.//media/image2.png){width="6.263888888888889in"
-height="3.2270833333333333in"}
+![](.//media/image2.png)
 
 The instances that will be targeted for install/uninstall can be
 selected using the InstanceIds tab OR the Targets tab.
 
-[InstanceIds]{.ul}
+## InstanceIds
 
 Select the instances that you wish to perform the action on
 
-![](.//media/image3.png){width="6.263888888888889in"
-height="2.457638888888889in"}
+![](.//media/image3.png)
 
 [Action]{.ul}
 
