@@ -5,9 +5,11 @@ Introduction
 ------------
 
 CrowdStrike provide a CloudFormation template to assist with the setup
-of an account. The CloudFormation template performs three operations
+of an account so that systems manager can be used to push the Falcon
+agent to ec2 instances. The CloudFormation template performs three
+operations
 
--   Creates an IAM Role CrowdStrike-SSMExecutionRole
+1.  Creates an IAM Role CrowdStrike-SSMExecutionRole
 
 The role has the Amazon managed policy AmazonSSMAutomationRole attached
 to it
@@ -15,13 +17,16 @@ to it
 ![](.//media/image1.tiff){width="5.974025590551181in"
 height="2.8883278652668416in"}
 
--   Adds parameters to the Systems Manager Parameter Store
+2.  Adds parameters to the Systems Manager Parameter Store
 
 ![](.//media/image2.png){width="6.004395231846019in"
 height="3.1553029308836393in"}
 
--   Checks for the existence of an installation token in the falcon
+3.  Checks for the existence of a valid installation token in the falcon
     console
+
+If a valid installation token does not exist the template will create a
+valid token for use by the ssm installation agent.
 
 Deploy the cloudformation template
 ==================================
@@ -48,12 +53,22 @@ height="2.9027777777777777in"}
 
 <https://falcon.crowdstrike.com/support/documentation/93/oauth2-auth-token-apis#get-an-auth-token>
 
-Create an OAuth2 api key pair with permissions to "Read" Installation
-Tokens
+Create an OAuth2 api key pair with permissions to "Read" and "Write"
+Installation Tokens
 
 4\) Load the CloudFormation template
 
-Add the API OAuth2 Client ID and Client secret
+Add the CrowdStrike API OAuth2 Client ID and Client secret
+
+For information on how to create these goto
+
+<https://falcon.crowdstrike.com/support/documentation/93/oauth2-auth-token-apis>
+
+The API key will require
+
+-   "Installation Tokens" -- "Read" + "Write"
+
+-   
 
 ![](.//media/image4.png){width="6.263888888888889in" height="3.45625in"}
 
