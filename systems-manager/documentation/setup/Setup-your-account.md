@@ -32,17 +32,22 @@ Deploy the cloudformation template
 1\) Download the CloudFormation template from github
 
 Go to
-[https://github.com/crowdstrike/cloud-aws/systems-manager/](https://github.com/crowdstrike/cloud-aws/systems-manager/cloudformation)
+
+[https://github.com/CrowdStrike/Cloud-AWS/tree/master/systems-manager/cloudformation](https://github.com/crowdstrike/cloud-aws/systems-manager/cloudformation)
 
 Download the template *CrowdStrike-ssm-setup.yaml* from the
-cloudformation folder*\
+cloudformation folder
+
 *Download the lambda files "createSsmParams.zip" and "layer.zip from the
 lambda/staging folder
+
+[https://github.com/CrowdStrike/Cloud-AWS/tree/master/systems-manager/cloudformation/lambda/staging](https://github.com/CrowdStrike/Cloud-AWS/tree/master/systems-manager/cloudformation/lambda/staging)
+
 
 2\) Create an S3 Bucket in the region where you will be running the
 CloudFormation template
 
-Upload the files to the S3 bucket
+Upload the **createSsmParams.zip** and **layer.zip** files to the S3 bucket
 
 ![](media/image3.png)
 
