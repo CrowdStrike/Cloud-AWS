@@ -57,7 +57,9 @@ Upload the **createSsmParams.zip** and **layer.zip** files to the S3 bucket
 <https://falcon.crowdstrike.com/support/documentation/93/oauth2-auth-token-apis#get-an-auth-token>
 
 Create an OAuth2 api key pair with permissions to "Read" and "Write"
-Installation Tokens
+Installation Tokens and "Read" for Sensor Download.
+
+![](media/image6.png)
 
 4\) Load the CloudFormation template
 
