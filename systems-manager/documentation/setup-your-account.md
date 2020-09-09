@@ -12,8 +12,7 @@ of an account. The CloudFormation template performs three operations
 The role has the Amazon managed policy AmazonSSMAutomationRole attached
 to it
 
-![](.//media/image1.tiff){width="5.974025590551181in"
-height="2.8883278652668416in"}
+![](.//media/image1.tiff)
 
 -   Adds parameters to the Systems Manager Parameter Store
 
