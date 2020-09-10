@@ -112,31 +112,8 @@ aws ssm start-automation-execution --document-name "Crowdstrike-FalconSensorDepl
 
 AWS provides a boto3 client for interaction with Systems Manager [https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ssm.html#client](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ssm.html#client)
 The command [start_automation_execution(**kwargs)](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ssm.html#SSM.Client.start_automation_execution) will begin the execution of the automation document.
-```shell script
 
-ssm_client = boto3.client('ssm', region_name=config["aws_region"])
-instance_name = 'instance_name'
-parameters = {
-        "AmiId": [image_id],
-        "VpcId": ['vpc'],
-        "RoleName": ["SSMManagedInstanceProfileRole"],
-        "GroupName": ["Security_Group"],
-        "InstanceType": ["instance_type"],
-        "KeyPairName": ["key_pair"],
-        "RemoteAccessCidr": ["x.x.x.x/x"],
-        "StackName": ["CreateManagedInstanceStack{{automation:EXECUTION_ID}}"],
-        "AutomationAssumeRole": ["Automaiton_role"]],
-        "SubnetId": ["subnet_id"],
-        "InstanceName": ["instance_name"]
-    }    
-document_name = 
-document_version = 
-return client.start_automation_execution(
-        DocumentName=document_name,
-        DocumentVersion=document_version,
-        Parameters=parameters,
-    )
-```
+An example python script is included [here](python-example/example_aws_ssm_package_installation.py)
 
 
 
