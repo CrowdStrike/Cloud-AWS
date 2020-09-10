@@ -6,6 +6,7 @@ Check that your environment meets the prerequisites for Systems Manager
 <https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-prereqs.html>
 
 ## Installing the CrowdStrike Falcon agent 
+### Installing With the GUI
 From the AWS console can be select the automation document under AWS Systems Manager \> Distributor \> Third
 Party Apps > FalconSensor-(linux\|windows) 
 
@@ -96,6 +97,47 @@ bound to it. If you have used the supplied cloudformation template to
 setup the account select the role named
 *Crowdstrike-SSMExecutionRole*
 
+### Installing With the CLI
+
+The CrowdStrike agent is installed with a automation document as described in the earlier section.  The document is [Crowdstrike-FalconSensorDeploy.yml](./documents/Crowdstrike-FalconSensorDeploy.yml)
+
+To start the installation process via the cli use the **aws ssm start-automation-execution** command.
+ [https://docs.aws.amazon.com/cli/latest/reference/ssm/start-automation-execution.html](https://docs.aws.amazon.com/cli/latest/reference/ssm/start-automation-execution.html)
+ 
+ ```console
+aws ssm start-automation-execution --document-name "Crowdstrike-FalconSensorDeploy" -document-version "\$DEFAULT" --parameters '{"InstallerParams":["--tags=\"CrowdStrike SSMAutomationTest\""],"Action":["Install"],"InstallationType":["Uninstall and reinstall"],"PackageName":["FalconSensor-Windows"],"PackageVersion":["5.36.xxxx"],"APIGatewayHostKey":["CS_API_GATEWAY_HOST"],"APIGatewayClientIDKey":["CS_API_GATEWAY_CLIENT_ID"],"APIGatewayClientSecretKey":["CS_API_GATEWAY_CLIENT_SECRET"],"InstanceIds":["i-0axxxyyyzzzc12345"],"AutomationAssumeRole":["xxxxxxxxxxxxxxxxxxx"]}' --region us-east-1
+```
+
+### Installing With Python
+
+AWS provides a boto3 client for interaction with Systems Manager [https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ssm.html#client](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ssm.html#client)
+The command [start_automation_execution(**kwargs)](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ssm.html#SSM.Client.start_automation_execution) will begin the execution of the automation document.
+```shell script
+
+ssm_client = boto3.client('ssm', region_name=config["aws_region"])
+instance_name = 'instance_name'
+parameters = {
+        "AmiId": [image_id],
+        "VpcId": ['vpc'],
+        "RoleName": ["SSMManagedInstanceProfileRole"],
+        "GroupName": ["Security_Group"],
+        "InstanceType": ["instance_type"],
+        "KeyPairName": ["key_pair"],
+        "RemoteAccessCidr": ["x.x.x.x/x"],
+        "StackName": ["CreateManagedInstanceStack{{automation:EXECUTION_ID}}"],
+        "AutomationAssumeRole": ["Automaiton_role"]],
+        "SubnetId": ["subnet_id"],
+        "InstanceName": ["instance_name"]
+    }    
+document_name = 
+document_version = 
+return client.start_automation_execution(
+        DocumentName=document_name,
+        DocumentVersion=document_version,
+        Parameters=parameters,
+    )
+```
+
 
 
 ## Troubleshooting
@@ -107,16 +149,19 @@ can view log files by manually connecting to an instance. Logs are
 written to the following locations.
 
 #### Linux logs
-
+ ```console
 /var/log/amazon/ssm/amazon-ssm-agent.log
 
 /var/log/amazon/ssm/errors.log
+```
 
 #### Windows logs
+```powershell
 
 %PROGRAMDATA%\\Amazon\\SSM\\Logs\\amazon-ssm-agent.log
 
 %PROGRAMDATA%\\Amazon\\SSM\\Logs\\errors.log
+```
 
 Installation of the CrowdStrike agent requires version x.xxx or later of
 the systems manager agent.
@@ -125,12 +170,15 @@ the systems manager agent.
 
 On Windows run
 
-***Get-WmiObject Win32_Product \| Where-Object {\$\_.Name -eq \'Amazon
-SSM Agent\'} \| Select-Object Name,Version***
+```powershell
+Get-WmiObject Win32_Product \| Where-Object {\$\_.Name -eq \'Amazon SSM Agent\'} \| Select-Object Name,Version
+```
 
 On Amazon Linux and Amazon Linux 2
 
-***yum info amazon-ssm-agent***
+```shell script
+yum info amazon-ssm-agent
+```
 
 ![](.//media/image4.png)
 

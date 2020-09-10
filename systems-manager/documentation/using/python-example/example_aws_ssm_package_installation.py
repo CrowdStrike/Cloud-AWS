@@ -2,10 +2,10 @@
 
 #######################################################################################################################
 #######################################################################################################################
-##
-##  Usage Examples -
-##      python3 test_aws_ssm_package_installation.py --package_version 5.31.0-9606 --package_name FalconSensor-Windows [--target_instances=[]]
-##
+#
+# Usage Examples - python3 test_aws_ssm_package_installation.py --package_version 5.31.0-9606 --package_name
+# FalconSensor-Windows [--target_instances=[]]
+#
 #######################################################################################################################
 #######################################################################################################################
 
@@ -43,22 +43,22 @@ logger.setLevel(logging.INFO)
 ###########################
 
 
-def print_log_info(logger, message):
+def print_log_info(message):
     """Prints to std out and logs to log file."""
     print('[INFO] ' + message)
     logger.info(message)
 
 
-def print_log_error(logger, message, fatal):
+def print_log_error(message, fatal):
     """Prints to std out and logs to log file."""
 
     print('[ERROR] ' + message)
     logger.error(message)
-    if fatal:
+    if fatal == 'true':
         sys.exit(2)
 
 
-def print_log_warn(logger, message):
+def print_log_warn(message):
     """Prints to std out and logs to log file."""
 
     print('[WARNING] ' + message)
@@ -73,15 +73,16 @@ def __start_automation_execution(client, document_name, document_version, parame
     )
 
 
-def __get_automation_execution(client, id):
+def __get_automation_execution(client, exec_id):
     return client.get_automation_execution(
-        AutomationExecutionId=id
+        AutomationExecutionId=exec_id
     )
 
 
 def usage():
     print(
-        'Usage: python example_aws_ssm_package_installation.py --package_version=<package_version>  --package_name=<package_name> --target_instances=[]'
+        'Usage: python example_aws_ssm_package_installation.py --package_version=<package_version>  '
+        '--package_name=<package_name> --target_instances=[] '
     )
     print('  --package_name=<String>     [Required]  Sensor install version for which we are building the package')
     print('  --package_version=<String>  [Required]  Sensor type supported values are linux/windows ')
@@ -109,17 +110,17 @@ def build_automation_params(config, action, package_name, package_version, targe
     if len(target) > 0:
         parameters['InstanceIds'] = target
     else:
-        type = package_name.split('-')[1].lower()
+        ostype = package_name.split('-')[1].lower()
         #
         # No instance ids specified so filter by tag.
         # Assume instances have a tag 'os-platform' with value 'linux' or 'windows'
         #
-        parameters["Targets"] = ["{\"Key\": \"tag:os-platform\", \"Values\": [{}]}".format(type)]
+        parameters["Targets"] = ["{\"Key\": \"tag:os-platform\", \"Values\": [{}]}".format(ostype)]
 
     return parameters
 
 
-def trigger_automation_execution(logger, ssm_client, package_name, package_version, automation_config, target_instances,
+def trigger_automation_execution(ssm_client, package_name, package_version, automation_config, target_instances,
                                  action):
     start_time = time.time()
     document_name = automation_config['document_name']
@@ -127,8 +128,7 @@ def trigger_automation_execution(logger, ssm_client, package_name, package_versi
 
     logger.info(
         "Starting automation document {} version {} execution with {} action. Target pacakge {}, target version{}".format(
-            document_name, document_version,
-            action, package_name, package_version))
+            document_name, document_version, action, package_name, package_version))
 
     install_automation_resp = __start_automation_execution(
         ssm_client,
@@ -138,51 +138,50 @@ def trigger_automation_execution(logger, ssm_client, package_name, package_versi
     )
 
     if install_automation_resp['ResponseMetadata']['HTTPStatusCode'] != 200:
-        print_log_error(logger,
-                        "Failed to start automation execution  for install action. HTTP response from SSM : {}".format(
-                            install_automation_resp['ResponseMetadata']), True)
+        print_log_error(
+            "Failed to start automation execution  for install action. HTTP response from SSM : {}".format(
+                install_automation_resp['ResponseMetadata']), 'true')
 
     install_execution_id = install_automation_resp['AutomationExecutionId']
-    print_log_info(logger,
-                   "Successfully started automation execution for install action with automation id: {}".format(
-                       install_execution_id))
+    print_log_info(
+        "Successfully started automation execution for install action with automation id: {}".format(
+            install_execution_id))
 
-    status = ""
     install_status_resp = {}
     for i in range(RETRY_WAIT_COUNT):
         install_status_resp = ssm_client.get_automation_execution(AutomationExecutionId=install_execution_id)
 
         if install_status_resp['ResponseMetadata']['HTTPStatusCode'] != 200:
-            print_log_error(logger,
-                            "Failed to get automation execution info. HTTP response from SSM: {}".format(
-                                install_status_resp['ResponseMetadata']), True)
+            print_log_error(
+                "Failed to get automation execution info. HTTP response from SSM: {}".format(
+                    install_status_resp['ResponseMetadata']), 'true')
 
         # ['Pending', 'InProgress', 'Waiting', 'Success', 'TimedOut', 'Cancelling', 'Cancelled', 'Failed']:
         status = install_status_resp['AutomationExecution']['AutomationExecutionStatus']
         if status in ['Pending', 'InProgress', 'Waiting']:
-            print_log_info(logger,
-                           "... Automation execution shows status '{}', will check status again after {}s. Attempt {}/{}".format(
-                               status, RETRY_WAIT_SLEEP, i + 1, RETRY_WAIT_COUNT))
+            print_log_info(
+                "Automation execution shows status '{}', will check status again after {}s. Attempt {}/{}".
+                    format(status, RETRY_WAIT_SLEEP, i + 1, RETRY_WAIT_COUNT))
             time.sleep(RETRY_WAIT_SLEEP)
         else:
             break
 
         if i == RETRY_WAIT_COUNT:
-            print_log_error(logger,
-                            "Execution Timed Out. Status {} Response {}".format(status,
-                                                                                install_status_resp),
-                            True)
+            print_log_error(
+                "Execution Timed Out. Status {} Response {}".format(status,
+                                                                    install_status_resp),
+                'true')
 
     for eachStep in install_status_resp['AutomationExecution']['StepExecutions']:
         if eachStep['StepStatus'] in ['TimedOut', 'Cancelling', 'Cancelled', 'Failed']:
-            print_log_error(logger,
-                            "Automation execution exited with status '{}' for step '{}'. Failure message: {}".format(
-                                eachStep['StepStatus'], eachStep['StepName'],
-                                eachStep['FailureMessage']), True)
+            print_log_error(
+                "Automation execution exited with status '{}' for step '{}'. Failure message: {}".format(
+                    eachStep['StepStatus'], eachStep['StepName'],
+                    eachStep['FailureMessage']), 'true')
 
-    print_log_info(logger,
-                   "Successfully finished automation for {} action. Took {}m".format(action, (
-                           time.time() - start_time) / 60))
+    print_log_info(
+        "Successfully finished automation for {} action. Took {}m".format(action, (
+                time.time() - start_time) / 60))
 
 
 def main():
@@ -194,8 +193,8 @@ def main():
                                     "target_instances="])
 
     except getopt.GetoptError as err:
-        print_log_error(logger, "Failed read command line arguments : {}".format(err), False)
         usage()
+        print_log_error("Failed read command line arguments : {}".format(err), 'true')
 
     package_name = ""
     package_version = ""
@@ -211,12 +210,12 @@ def main():
     # Validating input params
     if len(package_name) == 0 \
             or len(package_version) == 0:
-        print_log_error(logger, "Command line arguments failed validation.", False)
+        print_log_error("Command line arguments failed validation.", 'false')
         usage()
 
-    print_log_info(logger,
-                   "Starting automation automation test for package {} version{}".format(
-                       package_name, package_version))
+    print_log_info(
+        "Starting automation automation test for package {} version{}".format(
+            package_name, package_version))
     # Loading config.ini file
     config_object = ConfigParser()
     config_object.read('config.ini')
@@ -225,16 +224,16 @@ def main():
 
     # Setting AWS client
     session = boto3.Session()
-    print_log_info(logger, "Successfully established AWS session")
+    print_log_info("Successfully established AWS session")
 
     execution_region = automation_config['aws_region']
 
     ssm_client = session.client('ssm', region_name=execution_region)
 
     # install action
-    trigger_automation_execution(logger, ssm_client, package_name, package_version, automation_config,
+    trigger_automation_execution(ssm_client, package_name, package_version, automation_config,
                                  target_instances, DOCUMENT_INSTALL_ACTION)
-    print(logger, "Sleeping for 60 seconds ... ")
+    print("Sleeping for 60 seconds ... ")
     time.sleep(60)
 
 
