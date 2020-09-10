@@ -37,6 +37,10 @@ instance
 
 **Windows installer parameters**
 
+Addtional information for installing the Windows sensor [https://falcon.crowdstrike.com/support/documentation/23/falcon-sensor-for-windows](https://falcon.crowdstrike.com/support/documentation/23/falcon-sensor-for-windows)
+Addtional information for installing the Linux sensor [https://falcon.crowdstrike.com/support/documentation/20/falcon-sensor-for-linux](https://falcon.crowdstrike.com/support/documentation/20/falcon-sensor-for-linux)
+
+
 Windows installer parameters are shown below (Note: CID and ProvTroken
 are already included)
 
@@ -102,6 +106,7 @@ setup the account select the role named
 The CrowdStrike agent is installed with a automation document as described in the earlier section.  The document is
  
 [Crowdstrike-FalconSensorDeploy.yml](./documents/Crowdstrike-FalconSensorDeploy.yml)
+
 
 To start the installation process via the cli use the **aws ssm start-automation-execution** command.
  [https://docs.aws.amazon.com/cli/latest/reference/ssm/start-automation-execution.html](https://docs.aws.amazon.com/cli/latest/reference/ssm/start-automation-execution.html)
