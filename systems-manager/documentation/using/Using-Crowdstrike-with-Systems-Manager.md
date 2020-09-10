@@ -38,6 +38,7 @@ instance
 **Windows installer parameters**
 
 Addtional information for installing the Windows sensor [https://falcon.crowdstrike.com/support/documentation/23/falcon-sensor-for-windows](https://falcon.crowdstrike.com/support/documentation/23/falcon-sensor-for-windows)
+
 Addtional information for installing the Linux sensor [https://falcon.crowdstrike.com/support/documentation/20/falcon-sensor-for-linux](https://falcon.crowdstrike.com/support/documentation/20/falcon-sensor-for-linux)
 
 
