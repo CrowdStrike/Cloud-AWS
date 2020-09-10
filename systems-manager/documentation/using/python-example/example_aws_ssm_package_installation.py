@@ -3,7 +3,7 @@
 #######################################################################################################################
 #######################################################################################################################
 #
-# Usage Examples - python3 test_aws_ssm_package_installation.py --package_version 5.31.0-9606 --package_name
+# Usage Examples - python3 example_aws_ssm_package_installation.py --package_version 5.31.0-9606 --package_name
 # FalconSensor-Windows [--target_instances=[]]
 #
 #######################################################################################################################
