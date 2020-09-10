@@ -99,7 +99,8 @@ setup the account select the role named
 
 ### Installing With the CLI
 
-The CrowdStrike agent is installed with a automation document as described in the earlier section.  The document is 
+The CrowdStrike agent is installed with a automation document as described in the earlier section.  The document is
+ 
 [Crowdstrike-FalconSensorDeploy.yml](./documents/Crowdstrike-FalconSensorDeploy.yml)
 
 To start the installation process via the cli use the **aws ssm start-automation-execution** command.
