@@ -1,9 +1,25 @@
 Using Systems Manager
 =====================
+# Important Information: 
+* The solution requires version *2.3.1550.0* or later of the AWS Sytems Manager agent installed on the host.
 
+* The DEFAULT version of the package will be <latest-release>-2. For example
+if the latest release of the linux sensor is 5.34.9918 the DEFAULT version installed would be 5.33.9808.  
+It is expected that once installed, sensor versions will be managed via the falcon console.
+![](./documentation/using/media/downloads.png) 
 Check that your environment meets the prerequisites for Systems Manager
 
 <https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-prereqs.html>
+
+# Managing Sytems Agent Versions
+AWS releases a new version of SSM Agent when we they update Systems Manager capabilities. This solution requires version 2.3.1550.0 or later. We recommend that you automate the process of updating SSM Agent on your instances using any of the following methods.
+
+[https://docs.aws.amazon.com/systems-manager/latest/userguide/ssm-agent-automatic-updates.html](https://docs.aws.amazon.com/systems-manager/latest/userguide/ssm-agent-automatic-updates.html)
+* You can configure all instances in your AWS account to automatically check for and download new versions of SSM Agent. To do this, choose Agent auto update on the Managed instances page in the AWS Systems Manager console (Recommended)
+
+* You can use State Manager to create an association that automatically downloads and installs SSM Agent on your instances. If you want to limit the disruption to your workloads, you can create a Systems Manager maintenance window to perform the installation during designated time periods.
+
+
 
 ## Installing the CrowdStrike Falcon agent 
 ### Installing With the GUI
