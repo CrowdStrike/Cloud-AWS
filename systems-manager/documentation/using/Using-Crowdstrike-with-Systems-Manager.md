@@ -1,5 +1,11 @@
 Using Systems Manager
 =====================
+
+Check that your environment meets the prerequisites for Systems Manager
+
+<https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-prereqs.html>
+
+
 # Important Information: 
 
 * The DEFAULT version of the package will be (latest-release)-2. For example
@@ -7,11 +13,6 @@ if the latest release of the linux sensor is 5.34.9918 the DEFAULT version insta
 It is expected that once installed, sensor versions will be managed via the falcon console.
 
 ![](./media/downloads.png) 
-
-
-Check that your environment meets the prerequisites for Systems Manager
-
-<https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-prereqs.html>
 
 # Managing Sytems Agent Versions
 AWS releases a new version of SSM Agent when we they update Systems Manager capabilities. This solution requires version 2.3.1550.0 or later. We recommend that you automate the process of updating SSM Agent on your instances using any of the following methods.
