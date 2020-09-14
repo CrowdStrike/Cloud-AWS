@@ -92,7 +92,7 @@ Leave blank unless you wish to specify a specific version
 
 Check the value of the key CS_API_GATEWAY_HOST in the parameter store
 
-çAPIGatewayClientIDKey**
+**APIGatewayClientIDKey**
 
 Check the value of the key CS_API_GATEWAY_CLIENT_ID in the parameter
 store
@@ -106,7 +106,7 @@ store
 
 The Targets tab will select the instances using a filter that is
 entered. For instance to target by tag enter
-"Key=tag:Name,Values=January2018Backups". For more information regarding
+"Key=tag:Name,Values=tag_value". For more information regarding
 Targets
 
 <https://docs.aws.amazon.com/systems-manager/latest/userguide/automation-working-targets.html>.
