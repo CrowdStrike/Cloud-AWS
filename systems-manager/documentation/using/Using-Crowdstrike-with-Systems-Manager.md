@@ -34,25 +34,25 @@ Select "Install one time"
 
 ![](.//media/image1.png)
 
-Complete the Input parameters form
+## Complete the Input parameters form
 
 ![](.//media/image2.png)
 
 The instances that will be targeted for install/uninstall can be
 selected using the InstanceIds tab OR the Targets tab.
 
-## InstanceIds
+**InstanceIds**
 
 Select the instances that you wish to perform the action on
 
 ![](.//media/image3.png)
 
-## Action
+**Action**
 
 Select either "Install" or "Uninstall" for the action to perform on the
 instance
 
-## InstallerParams
+#### InstallerParams
 
 **Windows installer parameters**
 
@@ -92,7 +92,7 @@ Leave blank unless you wish to specify a specific version
 
 Check the value of the key CS_API_GATEWAY_HOST in the parameter store
 
-**APIGatewayClientIDKey**
+çAPIGatewayClientIDKey**
 
 Check the value of the key CS_API_GATEWAY_CLIENT_ID in the parameter
 store
