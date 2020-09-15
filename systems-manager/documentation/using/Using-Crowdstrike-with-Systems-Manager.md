@@ -43,6 +43,8 @@ selected using the InstanceIds tab OR the Targets tab.
 
 **InstanceIds**
 
+Select either InstanceIds or Targets.
+
 Select the instances that you wish to perform the action on
 
 ![](.//media/image3.png)
