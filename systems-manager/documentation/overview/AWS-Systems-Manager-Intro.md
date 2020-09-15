@@ -83,72 +83,12 @@ specify.
 There are currently six types of document with Systems Manager but only
 three directly relate to CrowdStrike Falcon agent.
 
-+---------------------+----------------------+----------------------+
-| **Type**            | **Use with**         | **Details**          |
-+=====================+======================+======================+
-| Command document    | [Run                 | Run Command uses     |
-|                     | Command](https://do  | command documents to |
-|                     | cs.aws.amazon.com/sy | run commands. State  |
-|                     | stems-manager/latest | Manager uses command |
-|                     | /userguide/execute-r | documents to apply a |
-|                     | emote-commands.html) | configuration. These |
-|                     |                      | actions can be run   |
-|                     | [State               | on one or more       |
-|                     | Manager](https://    | targets at any point |
-|                     | docs.aws.amazon.com/ | during the lifecycle |
-|                     | systems-manager/late | of an instance.      |
-|                     | st/userguide/systems | Maintenance Windows  |
-|                     | -manager-state.html) | uses command         |
-|                     |                      | documents to apply a |
-|                     | [Maintenance         | configuration based  |
-|                     | Win                  | on the specified     |
-|                     | dows](https://docs.a | schedule.            |
-|                     | ws.amazon.com/system |                      |
-|                     | s-manager/latest/use |                      |
-|                     | rguide/systems-manag |                      |
-|                     | er-maintenance.html) |                      |
-+---------------------+----------------------+----------------------+
-| Automation document | [Autom               | Use automation       |
-|                     | ation](https://docs. | documents when       |
-|                     | aws.amazon.com/syste | performing common    |
-|                     | ms-manager/latest/us | maintenance and      |
-|                     | erguide/systems-mana | deployment tasks     |
-|                     | ger-automation.html) | such as creating or  |
-|                     |                      | updating an Amazon   |
-|                     | [State               | Machine Image (AMI). |
-|                     | Manager](https://    | State Manager uses   |
-|                     | docs.aws.amazon.com/ | automation documents |
-|                     | systems-manager/late | to apply a           |
-|                     | st/userguide/systems | configuration. These |
-|                     | -manager-state.html) | actions can be run   |
-|                     |                      | on one or more       |
-|                     | [Maintenance         | targets at any point |
-|                     | Win                  | during the lifecycle |
-|                     | dows](https://docs.a | of an instance.      |
-|                     | ws.amazon.com/system | Maintenance Windows  |
-|                     | s-manager/latest/use | uses automation      |
-|                     | rguide/systems-manag | documents to perform |
-|                     | er-maintenance.html) | common maintenance   |
-|                     |                      | and deployment tasks |
-|                     |                      | based on the         |
-|                     |                      | specified schedule.  |
-+---------------------+----------------------+----------------------+
-| Package document    | [Distributor         | In Distributor, a    |
-|                     | ](https://docs.aws.a | package is           |
-|                     | mazon.com/systems-ma | represented by an    |
-|                     | nager/latest/usergui | SSM document. A      |
-|                     | de/distributor.html) | package document     |
-|                     |                      | includes attached    |
-|                     |                      | ZIP archive files    |
-|                     |                      | that contain         |
-|                     |                      | software or assets   |
-|                     |                      | to install on        |
-|                     |                      | managed instances.   |
-|                     |                      | Creating a package   |
-|                     |                      | in Distributor       |
-|                     |                      | creates the package  |
-|                     |                      | document.            |
-+---------------------+----------------------+----------------------+
+| **Type** | **Use with** | **Details** |
+| --- | --- | --- |
+| Command document | [Run Command](https://docs.aws.amazon.com/systems-manager/latest/userguide/execute-remote-commands.html)[State Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-state.html)[Maintenance Windows](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-maintenance.html) | Run Command uses command documents to run commands. State Manager uses command documents to apply a configuration. These actions can be run on one or more targets at any point during the lifecycle of an instance. Maintenance Windows uses command documents to apply a configuration based on the specified schedule. |
+| --- | --- | --- |
+| Automation document | [Automation](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-automation.html)[State Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-state.html)[Maintenance Windows](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-maintenance.html) | Use automation documents when performing common maintenance and deployment tasks such as creating or updating an Amazon Machine Image (AMI). State Manager uses automation documents to apply a configuration. These actions can be run on one or more targets at any point during the lifecycle of an instance. Maintenance Windows uses automation documents to perform common maintenance and deployment tasks based on the specified schedule. |
+| Package document | [Distributor](https://docs.aws.amazon.com/systems-manager/latest/userguide/distributor.html) | In Distributor, a package is represented by an SSM document. A package document includes attached ZIP archive files that contain software or assets to install on managed instances. Creating a package in Distributor creates the package document. |
 
 Package Documents
 -----------------
