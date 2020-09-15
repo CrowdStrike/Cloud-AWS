@@ -116,7 +116,7 @@ the call.
 
 **AutomationAssumeRole**
 
-[Select a role that has the pre configured *AWS-SSM-ExecutionRole* policy
+Select a role that has the pre configured *AWS-SSM-ExecutionRole* policy
 bound to it. If you have used the supplied cloudformation template to
 setup the account select the role named
 *Crowdstrike-SSMExecutionRole*
