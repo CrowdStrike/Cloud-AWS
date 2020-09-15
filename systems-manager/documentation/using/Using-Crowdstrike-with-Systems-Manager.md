@@ -8,7 +8,7 @@ Check that your environment meets the prerequisites for Systems Manager
 
 # Important Information: 
 
-* The DEFAULT version of the package will be (latest-release)-2. For example
+* The DEFAULT version referred to in the package will be a version that is two versions behind the latest published by CrowdStrike. For example (see screenshot below)
 if the latest release of the linux sensor is 5.34.9918 the DEFAULT version installed would be 5.33.9808.  
 It is expected that once installed, sensor versions will be managed via the falcon console.
 
