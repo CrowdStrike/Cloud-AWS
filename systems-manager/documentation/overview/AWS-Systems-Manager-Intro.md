@@ -96,11 +96,11 @@ After you create a package in Distributor, which creates an AWS Systems
 Manager document, you can install the package in one of the following
 ways.
 
--   One time by using [[AWS Systems Manager Run
-    Command]{.ul}](https://docs.aws.amazon.com/systems-manager/latest/userguide/execute-remote-commands.html).
+-   One time by using [AWS Systems Manager Run
+    Command](https://docs.aws.amazon.com/systems-manager/latest/userguide/execute-remote-commands.html).
 
--   On a schedule by using [[AWS Systems Manager State
-    Manager]{.ul}](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-state.html).
+-   On a schedule by using [AWS Systems Manager State
+    Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-state.html).
 
 You can use Run Command or State Manager to control which of your
 managed instances get a package and which version of that package.
@@ -108,37 +108,22 @@ Managed instances can be grouped by instance IDs, AWS account numbers,
 tags, or AWS Regions.
 
 ### Package document contents
-
-A package is a collection of installable software or assets that
+A package is a collection of installable software or assets that
 includes the following.
 
--   A .zip file of software per target operating system platform. Each
-    .zip file must include the following.
+-   A zip file of software per target operating system platform. Each
+    zip file must include the following.
 
-```{=html}
-<!-- -->
-```
--   An **install** and an **uninstall** script. Windows Server-based
-    instances require PowerShell scripts (scripts
-    named install.ps1 and uninstall.ps1). Linux-based instances require
-    shell scripts (scripts named install.sh and uninstall.sh). SSM Agent
-    reads and carries out the instructions in
-    the **install** and **uninstall** scripts.
+    An install and an uninstall script. Windows Server-based instances require PowerShell scripts (scripts named install.ps1 and uninstall.ps1). Linux-based instances require shell scripts (scripts named install.sh and uninstall.sh).  SSM Agent reads and carries out the instructions in the install and uninstall scripts.
 
--   An executable file. SSM Agent must find this executable to install
-    the package on target instances.
-
-```{=html}
-<!-- -->
-```
 -   A JSON-formatted manifest file that describes the package contents.
     The manifest is not included in the .zip file, but it is stored in
     the same Amazon S3 bucket as the .zip files that form the package.
     The manifest identifies the package version and maps the .zip files
     in the package to target instance attributes, such as operating
     system version or architecture. For information about how to create
-    the manifest, see [[Step 2: Create the JSON package
-    manifest]{.ul}](https://docs.aws.amazon.com/systems-manager/latest/userguide/distributor-working-with-packages-create.html#packages-manifest).
+    the manifest, see [Step 2: Create the JSON package
+    manifest](https://docs.aws.amazon.com/systems-manager/latest/userguide/distributor-working-with-packages-create.html#packages-manifest).
 
 CrowdStrike will generate the required Package files and AWS will manage
 the distribution of these packages so that they are available in
