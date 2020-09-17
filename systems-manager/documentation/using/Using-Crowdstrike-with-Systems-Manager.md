@@ -27,7 +27,7 @@ AWS releases a new version of SSM Agent when we they update Systems Manager capa
 ## Installing the CrowdStrike Falcon agent 
 ### Installing With the GUI
 From the AWS console can be select the automation document under AWS Systems Manager \> Distributor \> Third
-Party Apps > FalconSensor-(linux\|windows) 
+Party Apps > FalconSensor-(Linux\|Windows) 
 
 Select "Install one time"
 
@@ -36,92 +36,55 @@ Select "Install one time"
 
 ## Complete the Input parameters form
 
+
 ![](.//media/image2.png)
 
-The instances that will be targeted for install/uninstall can be
-selected using the InstanceIds tab OR the Targets tab.
+      
 
-**InstanceIds**
+1. Select the **Action** that you wish to perform
 
-Select either InstanceIds or Targets.
+    Select either "**Install**" or "**Uninstall**" for the action to perform on the instance
 
-Select the instances that you wish to perform the action on
+2. Select the correct package name and optional package version.
 
-![](.//media/image3.png)
+   Package Name - The package name should **FalconSensor-Windows** or **FalconSensor-Linux**
 
-**Action**
+   PackageVersion - Leave blank unless you wish to specify a specific version
+    
+3. Enter the parameters that you wish to send to the CrowdStrike agent
+    
+    Note: No additional parameters are required in most situations
+    
+    Addtional information for installing the Windows sensor [https://falcon.crowdstrike.com/support/documentation/23/falcon-sensor-for-windows](https://falcon.crowdstrike.com/support/documentation/23/falcon-sensor-for-windows)
 
-Select either "Install" or "Uninstall" for the action to perform on the
-instance
+    Addtional information for installing the Linux sensor [https://falcon.crowdstrike.com/support/documentation/20/falcon-sensor-for-linux](https://falcon.crowdstrike.com/support/documentation/20/falcon-sensor-for-linux)
+    
+4. Check the additional parameters
 
-#### InstallerParams
+   APIGatewayHostKey - The value should be **CS_API_GATEWAY_HOST** and is the key name for the url of the CrowdStrike API Gateway secret in the parameter store.  This value was created by the cloudformation template described in the setup guide.
 
-**Windows installer parameters**
+   APIGatewayClientID - The value should be **CS_API_GATEWAY_CLIENT_ID** and is the key name for the CrowdStrike API ClientID in the parameter store.  This value was created by the cloudformation template described in the setup guide.
+   
+   APIGatewayClientSecret - The value should be **CS_API_GATEWAY_CLIENT_SECRET** and is the key name for the CrowdStrike API ClientSecret in the parameter store.  This value was created by the cloudformation template described in the setup guide.
+   
+   AutomationAssumeRole - Select a role that has the pre configured *AWS-SSM-ExecutionRole* policy
+    bound to it. If you have used the supplied cloudformation template to setup the account select the role named
+    **Crowdstrike-SSMExecutionRole**
 
-Addtional information for installing the Windows sensor [https://falcon.crowdstrike.com/support/documentation/23/falcon-sensor-for-windows](https://falcon.crowdstrike.com/support/documentation/23/falcon-sensor-for-windows)
+5. Select from either the InstanceIds or Targets field. Targets is required if you don\'t select one or more InstanceIds.
 
-Addtional information for installing the Linux sensor [https://falcon.crowdstrike.com/support/documentation/20/falcon-sensor-for-linux](https://falcon.crowdstrike.com/support/documentation/20/falcon-sensor-for-linux)
+    - InstanceIds
 
+        Select the instances that you wish to perform the action on
 
-Windows installer parameters are shown below (Note: CID and ProvTroken
-are already included)
+        ![](.//media/image3.png)
 
-Parameter     | Description                                        
--------------- |-------------------
- /install       | Installs the sensor (default)
- /passive       | Shows a minimal UI with no prompts.                
-/quiet         | Shows no UI and no prompts
-/norestart     | Prevents the host from restarting at the end of he sensor installation.                           |
+    - Targets
 
+        The Targets tab will select the instances using a filter that is entered. For instance to target by tag enter "Key=tag:Name,Values=tag_value". For more information regarding Targets
 
-**Linux installation Parameters**
-
-  Parameter   |         Description
--------------- |-------------------
-  \--aph       |        Proxy host
-  \--app        |       Proxy port
-  \--billing=metered  | Shows no UI and no prompts.
-
-**Package Name**
-
-Enter either FalconSensor-Windows or FalconSensor-linux
-
-**PackageVersion**
-
-Leave blank unless you wish to specify a specific version
-
-**APIGatewayHostKey**
-
-Check the value of the key CS_API_GATEWAY_HOST in the parameter store
-
-**APIGatewayClientIDKey**
-
-Check the value of the key CS_API_GATEWAY_CLIENT_ID in the parameter
-store
-
-**APIGatewayClientSecretKey**
-
-Check the value of the key CS_API_GATEWAY_CLIENT_SECRET in the parameter
-store
-
-**Targets**
-
-The Targets tab will select the instances using a filter that is
-entered. For instance to target by tag enter
-"Key=tag:Name,Values=tag_value". For more information regarding
-Targets
-
-<https://docs.aws.amazon.com/systems-manager/latest/userguide/automation-working-targets.html>.
-
-Targets is required if you don\'t provide one or more instance IDs in
-the call.
-
-**AutomationAssumeRole**
-
-Select a role that has the pre configured *AWS-SSM-ExecutionRole* policy
-bound to it. If you have used the supplied cloudformation template to
-setup the account select the role named
-*Crowdstrike-SSMExecutionRole*
+        <https://docs.aws.amazon.com/systems-manager/latest/userguide/automation-working-targets.html>.
+  
 
 ### Installing With the CLI
 
