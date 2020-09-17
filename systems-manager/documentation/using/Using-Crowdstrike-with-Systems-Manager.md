@@ -17,7 +17,8 @@ It is expected that once installed, sensor versions will be managed via the falc
 ![](./media/downloads.png) 
 
 # Managing Sytems Agent Versions
-AWS releases a new version of SSM Agent when we they update Systems Manager capabilities. This solution requires version 2.3.1550.0 or later. We recommend that you automate the process of updating SSM Agent on your instances using any of the following methods.
+AWS releases a new version of SSM Agent when we they update Systems Manager capabilities. This solution requires version 2.3.1550.0 or later of the systems manager agent. At the time of writing, the Amazon AMIs that have the systems manager agent pre installed have an earlier version of the agent installed.  The host will therefore require that the systems manager agent is upgraded before it can be used to deploy the CrowdStrike agent.
+We recommend that you automate the process of updating SSM Agent on your instances using any of the following methods.
 
 [https://docs.aws.amazon.com/systems-manager/latest/userguide/ssm-agent-automatic-updates.html](https://docs.aws.amazon.com/systems-manager/latest/userguide/ssm-agent-automatic-updates.html)
 * You can configure all instances in your AWS account to automatically check for and download new versions of SSM Agent. To do this, choose Agent auto update on the Managed instances page in the AWS Systems Manager console (Recommended)
