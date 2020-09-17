@@ -2,9 +2,11 @@ Using Systems Manager
 =====================
 
 Check that your environment meets the prerequisites for Systems Manager
-
 <https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-prereqs.html>
 
+Use the supplied CloudFormation template to setup your account to setup the required IAM Role and parameters in the Systems Manager parameter store.
+
+<https://github.com/CrowdStrike/Cloud-AWS/blob/master/systems-manager/documentation/setup/Setup-your-account.md>
 
 # Important Information: 
 
@@ -25,33 +27,27 @@ AWS releases a new version of SSM Agent when we they update Systems Manager capa
 
 
 ## Installing the CrowdStrike Falcon agent 
-### Installing With the GUI
-From the AWS console can be select the automation document under AWS Systems Manager \> Distributor \> Third
-Party Apps > FalconSensor-(Linux\|Windows) 
+## Installing With the GUI
 
-Select "Install one time"
+1. From the AWS console can be select the automation document under AWS Systems Manager \> Distributor \> Third
+    Party > FalconSensor-(Linux\|Windows) 
 
+   Select "Install one time"
 
-![](.//media/image1.png)
-
-## Complete the Input parameters form
-
-
-![](.//media/image2.png)
-
-      
-
-1. Select the **Action** that you wish to perform
+2. Complete the Input parameters form
+   ![](.//media/image2.png)
+   
+3. Select the **Action** that you wish to perform
 
     Select either "**Install**" or "**Uninstall**" for the action to perform on the instance
 
-2. Select the correct package name and optional package version.
+4. Select the correct package name and optional package version.
 
    Package Name - The package name should **FalconSensor-Windows** or **FalconSensor-Linux**
 
    PackageVersion - Leave blank unless you wish to specify a specific version
     
-3. Enter the parameters that you wish to send to the CrowdStrike agent
+5. Enter the parameters that you wish to send to the CrowdStrike agent
     
     Note: No additional parameters are required in most situations
     
@@ -59,11 +55,11 @@ Select "Install one time"
 
     Addtional information for installing the Linux sensor [https://falcon.crowdstrike.com/support/documentation/20/falcon-sensor-for-linux](https://falcon.crowdstrike.com/support/documentation/20/falcon-sensor-for-linux)
     
-4. AutomationAssumeRole - Select a role that has the pre configured *AWS-SSM-ExecutionRole* policy
+6. AutomationAssumeRole - Select a role that has the pre configured *AWS-SSM-ExecutionRole* policy
     bound to it. If you have used the supplied cloudformation template to setup the account select the role named
     **Crowdstrike-SSMExecutionRole**
 
-5. Check the additional parameters
+7. Check the additional parameters
 
    APIGatewayHostKey - The value should be **CS_API_GATEWAY_HOST** and is the key name for the url of the CrowdStrike API Gateway secret in the parameter store.  This value was created by the cloudformation template described in the setup guide.
 
@@ -71,7 +67,7 @@ Select "Install one time"
    
    APIGatewayClientSecret - The value should be **CS_API_GATEWAY_CLIENT_SECRET** and is the key name for the CrowdStrike API ClientSecret in the parameter store.  This value was created by the cloudformation template described in the setup guide.
    
-6. Select from either the InstanceIds or Targets field. Targets is required if you don\'t select one or more InstanceIds.
+8. Select from either the InstanceIds or Targets field. Targets is required if you don\'t select one or more InstanceIds.
 
     - InstanceIds
 
