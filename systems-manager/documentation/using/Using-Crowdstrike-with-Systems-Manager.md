@@ -59,7 +59,11 @@ Select "Install one time"
 
     Addtional information for installing the Linux sensor [https://falcon.crowdstrike.com/support/documentation/20/falcon-sensor-for-linux](https://falcon.crowdstrike.com/support/documentation/20/falcon-sensor-for-linux)
     
-4. Check the additional parameters
+4. AutomationAssumeRole - Select a role that has the pre configured *AWS-SSM-ExecutionRole* policy
+    bound to it. If you have used the supplied cloudformation template to setup the account select the role named
+    **Crowdstrike-SSMExecutionRole**
+
+5. Check the additional parameters
 
    APIGatewayHostKey - The value should be **CS_API_GATEWAY_HOST** and is the key name for the url of the CrowdStrike API Gateway secret in the parameter store.  This value was created by the cloudformation template described in the setup guide.
 
@@ -67,11 +71,7 @@ Select "Install one time"
    
    APIGatewayClientSecret - The value should be **CS_API_GATEWAY_CLIENT_SECRET** and is the key name for the CrowdStrike API ClientSecret in the parameter store.  This value was created by the cloudformation template described in the setup guide.
    
-   AutomationAssumeRole - Select a role that has the pre configured *AWS-SSM-ExecutionRole* policy
-    bound to it. If you have used the supplied cloudformation template to setup the account select the role named
-    **Crowdstrike-SSMExecutionRole**
-
-5. Select from either the InstanceIds or Targets field. Targets is required if you don\'t select one or more InstanceIds.
+6. Select from either the InstanceIds or Targets field. Targets is required if you don\'t select one or more InstanceIds.
 
     - InstanceIds
 
