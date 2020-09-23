@@ -4,28 +4,18 @@ Setup Systems Manager
 Introduction
 ------------
 
-CrowdStrike provide a CloudFormation template to assist with the setup
-of an account so that systems manager can be used to push the Falcon
-agent to ec2 instances. The CloudFormation template performs three
-operations
+CrowdStrike provide a CloudFormation template to assist with the setup of an account so that systems manager can be used to push the Falcon agent to ec2 instances. The CloudFormation template performs three operations
 
-1.  Creates an IAM Role CrowdStrike-SSMExecutionRole
-
-The role has the Amazon managed policy AmazonSSMAutomationRole attached
-to it
-
-![](media/image1.png)
-
+1.  Creates an IAM Role CrowdStrike-SSMExecutionRole.  
+    The role has the Amazon managed policy AmazonSSMAutomationRole attached to it
+    ![](media/image1.png)
 
 2.  Adds parameters to the Systems Manager Parameter Store
 
-![](media/image2.png)
+    ![](media/image2.png)
 
 3.  Checks for the existence of a valid installation token in the falcon
-    console
-
-If a valid installation token does not exist the template will create a
-valid token for use by the ssm installation agent.
+    console. If a valid installation token does not exist the template will create a valid token for use by the ssm installation agent.
 
 Deploy the cloudformation template
 ==================================
