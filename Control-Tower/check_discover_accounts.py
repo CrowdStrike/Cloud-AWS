@@ -1,3 +1,4 @@
+
 #  This script will call the Crowdstrike API to perform checks to ensure that the configured IAM role,
 #  its associated permission, and external ID are set up correctly. '
 #
@@ -63,8 +64,10 @@ def check_account_access(auth_token: str, accounts: list) -> list:
         r.raise_for_status()
     except requests.exceptions.HTTPError as err:
         logger.debug("HTTP error {} calling {}".format(err, url))
+        return
     except Exception as e:
-        logger.debug("Failed to create accounts")
+        logger.debug("Failed to verify accounts")
+        return
     r_content = json.loads(r.text)
     # accounts are listed in response[]
     return r_content["resources"]
@@ -85,7 +88,7 @@ def get_falcon_discover_accounts(sortby=None, filterby=None) -> bool:
     if auth_token:
         auth_header = get_auth_header(auth_token)
     else:
-        print("Failed to auth token")
+        print("Failed to get auth token")
         sys.exit(1)
     headers = {
         "Content-Type": "application/json",
@@ -96,18 +99,26 @@ def get_falcon_discover_accounts(sortby=None, filterby=None) -> bool:
         response = requests.request("GET", url, headers=headers, params=PARAMS)
         response_content = json.loads(response.text)
         logger.debug("Response to register = {}".format(response_content))
+        return response_content
     except Exception as e:
         logger.debug("Got exception {}".format(e))
         return
 
-    good_exit = 200
-    if response.status_code == good_exit:
+
+def check_accounts():
+    response_content = get_falcon_discover_accounts()
+    if response_content:
         accounts_list = response_content["resources"]
         accounts_to_test = []
         for account in accounts_list:
             accounts_to_test.append(account['id'])
             # print(json.dumps(account, indent=4))
-        results = check_account_access(auth_token, accounts_to_test)
+        auth_token = get_auth_token()
+        if auth_token:
+            results = check_account_access(auth_token, accounts_to_test)
+        else:
+            print("Failed to get auth token")
+            sys.exit(1)
 
         for result in results:
             if result.get('successful'):
@@ -123,7 +134,7 @@ def get_falcon_discover_accounts(sortby=None, filterby=None) -> bool:
                 }
                 print(f'Current settings {json.dumps(account_values_to_check, indent=4)}')
     else:
-        error_code = response.status_code
+        error_code = response_content.status_code
         error_msg = response_content["errors"][0]["message"]
         logger.info(
             "Got response error code {} message {}".format(error_code, error_msg)
@@ -165,4 +176,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     falcon_client_id = args.falcon_client_id
     falcon_client_secret = args.falcon_client_secret
-    get_falcon_discover_accounts()
+    check_accounts()
