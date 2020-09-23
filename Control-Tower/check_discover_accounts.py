@@ -1,3 +1,10 @@
+#  This script will call the Crowdstrike API to perform checks to ensure that the configured IAM role,
+#  its associated permission, and external ID are set up correctly. '
+#
+#  This validates that the IAM role ARN and external ID provided for the account are configured '
+#  and have all the required permissions in order for CrowdStrike to query the AWS API’s for your account.
+#  Note that this does not currently validate access to the S3 bucket for CloudTrail logs.\n\n')
+
 import argparse
 import json
 import logging
@@ -88,9 +95,9 @@ def get_falcon_discover_accounts(sortby=None, filterby=None) -> bool:
     try:
         response = requests.request("GET", url, headers=headers, params=PARAMS)
         response_content = json.loads(response.text)
-        logger.info("Response to register = {}".format(response_content))
+        logger.debug("Response to register = {}".format(response_content))
     except Exception as e:
-        logger.info("Got exception {}".format(e))
+        logger.debug("Got exception {}".format(e))
         return
 
     good_exit = 200
@@ -101,6 +108,7 @@ def get_falcon_discover_accounts(sortby=None, filterby=None) -> bool:
             accounts_to_test.append(account['id'])
             # print(json.dumps(account, indent=4))
         results = check_account_access(auth_token, accounts_to_test)
+
         for result in results:
             if result.get('successful'):
                 print(f'Account {result.get("id")} is ok!')
