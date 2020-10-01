@@ -169,15 +169,12 @@ def lambda_handler(event, context):
         LogArchiveBucketRegion = os.environ['LogArchiveBucketRegion']
         LogArchiveAccount = os.environ['LogArchiveAccount']
         CredentialsSecret = os.environ['CrowdstrikeCredentialsSecret']
-        if AwsRegion == 'us-east-1':
-            CrowdstrikeTemplateUrl = 'https://crowdstrike-sa-resources-ct-' \
-                                     + AwsRegion + '.s3.amazonaws.com/ct_crowdstrike_stackset.yaml'
-        elif AwsRegion == 'us-east-2':
-            CrowdstrikeTemplateUrl = 'https://crowdstrike-sa-resources-ct-' + AwsRegion + '.s3.' \
-                                     + AwsRegion + '.amazonaws.com/ct_crowdstrike_stackset.yaml'
-        else:
-            CrowdstrikeTemplateUrl = 'https://crowdstrike-sa-resources-ct-' + AwsRegion + '.s3-' \
-                                     + AwsRegion + '.amazonaws.com/ct_crowdstrike_stackset.yaml'
+        #
+        # Moved to virtual hosted-style URLs.
+        # See https://aws.amazon.com/fr/blogs/aws/amazon-s3-path-deprecation-plan-the-rest-of-the-story/
+        # path-style URLs to be depricated
+        #
+        CrowdstrikeTemplateUrl = f'https://crowdstrike-sa-resources-ct-{AwsRegion}.s3.amazonaws.com/falcon',
         AccountId = get_master_id()
         cList = ['CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND']
         ExecRole = 'AWSControlTowerExecution'
