@@ -33,7 +33,7 @@ import boto3
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-topic_arns = os.environ[topic_arns]
+topic_arns = os.environ['topic_arns'].split(',')
 
 s3 = boto3.client('s3')
 
