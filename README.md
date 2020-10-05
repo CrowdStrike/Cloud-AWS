@@ -8,6 +8,7 @@ Cloud Formation Templates and lambda functions to integrate Falcon Discover with
 
 [Files](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Control-Tower)
 
+[Multiple Providers Require SNS notifications](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Control-Tower/multiple-sns)
 
 ## Discover for Cloud
 
