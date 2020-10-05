@@ -131,7 +131,6 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSLambdaExecute
 
-
   lambdaLayer:
     Type: AWS::Lambda::LayerVersion
     Properties:
