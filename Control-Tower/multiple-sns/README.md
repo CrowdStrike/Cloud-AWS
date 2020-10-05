@@ -17,6 +17,6 @@ This is easily achived by adding a lambda function to the log archive account an
 
 Example modified S3 notification forwarding to a lambda function
 
-![AWS Roles for Falcon Discover)](images/s3-to-lambda.png)
-
 The lambda funciton can be found here.
+[s3-lambda-sns](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Control-Tower/multiple-sns/lambda)
+
