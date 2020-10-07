@@ -33,6 +33,7 @@ import boto3
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+# SNS topics should be a comma seperated list sns-a,sns-b,sns-c e
 topic_arns = os.environ['topic_arns'].split(',')
 
 s3 = boto3.client('s3')
