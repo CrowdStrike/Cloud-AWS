@@ -93,14 +93,17 @@ def format_notification_message(rate_limit_reqs=0, rate_limit_time=0):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Get Params to send notification to CRWD topic')
-    parser.add_argument('-r', '--cloudtrail_bucket_region', help='AWS Region where bucket is hosted', required=True)
-    parser.add_argument('-o', '--cloudtrail_bucket_owner_id', help='Account where bucket is hosted', required=True)
+    parser.add_argument('-r', '--cloudtrail_bucket_region', help='AWS Region where the S3 bucket is hosted',
+                        required=True)
+    parser.add_argument('-o', '--cloudtrail_bucket_owner_id', help='Account where the S3 bucket is hosted',
+                        required=True)
     parser.add_argument('-a', '--local_account', help='This AWS Account', required=True)
     parser.add_argument('-e', '--external_id', help='External ID used to assume role in account', required=True)
-    parser.add_argument('-i', '--iam_role_arn', help='IAM Role', required=True)
-    parser.add_argument('-f', '--falcon_client_id', help='Falcon CID', required=True)
-    parser.add_argument('-s', '--falcon_client_secret', help='Falcon CID', required=True)
-
+    parser.add_argument('-i', '--iam_role_arn',
+                        help='IAM AWS IAM Role ARN that grants access to resources for Crowdstrike', required=True)
+    parser.add_argument('-f', '--falcon_client_id', help='Falcon API key Client ID', required=True)
+    parser.add_argument('-s', '--falcon_client_secret', help='Falcon API key Client Secret', required=True)
+    
     args = parser.parse_args()
 
     cloudtrail_bucket_region = args.cloudtrail_bucket_region
