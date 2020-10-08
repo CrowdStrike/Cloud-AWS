@@ -109,6 +109,8 @@ def check_accounts():
     response_content = get_falcon_discover_accounts()
     if response_content:
         accounts_list = response_content["resources"]
+        with open('accounts-status.json', 'w+') as f:
+            json.dump(accounts_list, f)
         accounts_to_test = []
         for account in accounts_list:
             accounts_to_test.append(account['id'])

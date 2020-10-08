@@ -109,30 +109,34 @@ def check_accounts():
     response_content = get_falcon_discover_accounts()
     if response_content:
         accounts_list = response_content["resources"]
+        with open('accounts-status.json', 'w+') as f:
+            json.dump(accounts_list, f)
         accounts_to_test = []
         for account in accounts_list:
             accounts_to_test.append(account['id'])
             # print(json.dumps(account, indent=4))
         auth_token = get_auth_token()
         if auth_token:
-            results = check_account_access(auth_token, accounts_to_test)
+            pass
+            # results = check_account_access(auth_token, accounts_to_test)
         else:
             print("Failed to get auth token")
             sys.exit(1)
-
-        for result in results:
-            if result.get('successful'):
-                print(f'Account {result.get("id")} is ok!')
-            else:
-                print(f'Account {result.get("id")} has a problem {result.get("reason")}')
-                account_values_to_check = {
-                    'id': account.get('id'),
-                    'iam_role_arn': account.get('iam_role_arn'),
-                    'external_id': account.get('external_id'),
-                    'cloudtrail_bucket_owner_id': account.get('cloudtrail_bucket_owner_id'),
-                    'cloudtrail_bucket_region': account.get('cloudtrail_bucket_region'),
-                }
-                print(f'Current settings {json.dumps(account_values_to_check, indent=4)}')
+        # Waiting for API Fix
+        #
+        # for result in results:
+        #     if result.get('successful'):
+        #         print(f'Account {result.get("id")} is ok!')
+        #     else:
+        #         print(f'Account {result.get("id")} has a problem {result.get("reason")}')
+        #         account_values_to_check = {
+        #             'id': account.get('id'),
+        #             'iam_role_arn': account.get('iam_role_arn'),
+        #             'external_id': account.get('external_id'),
+        #             'cloudtrail_bucket_owner_id': account.get('cloudtrail_bucket_owner_id'),
+        #             'cloudtrail_bucket_region': account.get('cloudtrail_bucket_region'),
+        #         }
+        #         print(f'Current settings {json.dumps(account_values_to_check, indent=4)}')
     else:
         error_code = response_content.status_code
         error_msg = response_content["errors"][0]["message"]
