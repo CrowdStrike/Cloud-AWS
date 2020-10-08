@@ -168,10 +168,10 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "-f", "--falcon_client_id", help="Falcon Client ID from the Falcon Console", required=True
+        "-f", "--falcon_client_id", help="Falcon Client ID", required=True
     )
     parser.add_argument(
-        "-s", "--falcon_client_secret", help="Falcon Client Secret for the Falcon Console", required=True
+        "-s", "--falcon_client_secret", help="Falcon Client Secret", required=True
     )
     args = parser.parse_args()
     falcon_client_id = args.falcon_client_id
