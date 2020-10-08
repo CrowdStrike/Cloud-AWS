@@ -36,6 +36,7 @@ def register_falcon_discover_account(payload) -> bool:
     try:
         response = requests.request("POST", url, headers=headers, data=payload)
         if response.status_code == 201:
+            print('Successfully registered account')
             return True
         else:
             print('Registration failed with response \n {} \n{}'
@@ -87,7 +88,7 @@ def format_notification_message(rate_limit_reqs=0, rate_limit_time=0):
             }
         ]
     }
-    message = json.dumps({'default': json.dumps(data)})
+    message = json.dumps(data)
     return message
 
 
