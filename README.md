@@ -29,3 +29,6 @@ The python script "register_account.py" is included as an example of a script th
 ### CloudFormation
 
 [See the README.md file here](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Discover-for-Cloud-Templates/AWS/cloudformation-templates)
+
+## Agent Install Examples
+[AWS Autoscale]()
