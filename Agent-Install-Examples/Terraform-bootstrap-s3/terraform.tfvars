@@ -24,6 +24,6 @@ ServerKeyName = "Add Region Keypair"
 crwd_cid = "Place CID Here"
 
 #CrowdStrike Sensor Version (ex falcon-sensor_5.27.0-9104_amd64.deb)
-crwd_sensor = "falcon-sensor_5.43.0-10803_amd64.deb"
+crwd_sensor = "Place Sensor Version Here"
 
 
