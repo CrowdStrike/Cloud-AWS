@@ -1,6 +1,8 @@
 # Instructions 
 
-* Create s3 bucket and upload lambda files and agent install file for Amazon AMI
+* Create s3 bucket and upload lambda files contained in the lambda directory to the bucket
+
+* Upload the agent install file for Amazon AMI to the same bucket
 
 * Create API keys in falcon console for managing hosts
 
