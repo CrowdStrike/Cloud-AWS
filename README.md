@@ -1,6 +1,9 @@
 # Cloud-AWS
 A collection of projects supporting AWS Integration
 
+## Agent Install Examples
+[AWS Autoscale]()
+
 ## Control Tower
 Cloud Formation Templates and lambda functions to integrate Falcon Discover with AWS Control Tower
 
