@@ -1,3 +1,5 @@
-Directory containing code examples for installing falcon sensor onto AWS workloads
+# Falcon Install Examples
 
-AWS Autoscale Groups
+A collection of scripts and templates providing examples of how to install and manage Falcon Sensor in AWS
+
+[1. AWS Autoscale Groups]()
