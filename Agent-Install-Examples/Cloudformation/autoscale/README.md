@@ -1,6 +1,6 @@
 # Background
 
-An example of an autoscale group consisting and Amazon Linux 2 instances in an autoscale group.
+An example of an autoscale group consisting and Amazon Linux 2 instances.
 
 We use user-data scripts to install the sensor during intialisation and autoscale Lifecycle hooks to remove the instance from the Falcon Console when it is terminated. 
 
