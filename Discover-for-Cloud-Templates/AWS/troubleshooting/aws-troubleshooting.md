@@ -107,41 +107,28 @@ Check the s3 Bucket ACL
 
 From the aws cli tool
 
-*aws s3api get-bucket-acl \--bucket \<bucket-name\>*
+```bash
+aws s3api get-bucket-acl --bucket <bucket-name>
+```
 
+```json
 {
-
-\"Owner\": {
-
-\"DisplayName\": \"bd_integ\",
-
-\"ID\":
-\"7d137abc41d6d3455663518126c28df027f25c1709f269239010f71bff0e9839\"
-
-},
-
-\"Grants\": \[
-
-{
-
-\"Grantee\": {
-
-\"Type\": \"CanonicalUser\",
-
-\"DisplayName\": \"bd_integ\",
-
-\"ID\":
-\"7d137abc41d6d3455663518126c28df027f25c1709f269239010f71bff0e9839\"
-
-},
-
-\"Permission\": \"FULL_CONTROL\"
-
+    "Owner": {
+        "DisplayName": "bd_integ",
+        "ID": "7d137abc41d6d3455663518126c28df027f25c1709f269239010f71bff0e9839"
+    },
+    "Grants": [
+        {
+            "Grantee": {
+                "Type": "CanonicalUser",
+                "DisplayName": "bd_integ",
+                "ID": "7d137abc41d6d3455663518126c28df027f25c1709f269239010f71bff0e9839"
+            },
+            "Permission": "FULL_CONTROL"
+        }
+    ]
 }
-
-\]
-
-}
+```
 
 From the output the bucket *"Owner"* is *"bd_integ"* and has
 *"FULL_CONTROL"* over the bucket
@@ -151,60 +138,36 @@ Check s3 Object Permissions
 
 From the aws cli tool
 
-*aws s3api get-object-acl \--bucket \<bucket-name\> \--key
-\<log-file-key\>*
+```bash
+aws s3api get-object-acl --bucket <bucket-name> --key <log-file-key>
+```
 
-*{*
-
-*\"Owner\": {*
-
-*\"DisplayName\": \"aws_cloudtrail_us-east-1\",*
-
-*\"ID\":
-\"65e03a8a45a3aaaa881ada217702e0ad77152fe0196a8a14c44aa3bc4f11d2ae\"*
-
-*},*
-
-*\"Grants\": \[*
-
-*{*
-
-*\"Grantee\": {*
-
-*\"Type\": \"CanonicalUser\",*
-
-*\"DisplayName\": \"aws_cloudtrail_us-east-1\",*
-
-*\"ID\":
-\"65e03a8a45a3aaaa881ada217702e0ad77152fe0196a8a14c44aa3bc4f11d2ae\"*
-
-*},*
-
-*\"Permission\": \"FULL_CONTROL\"*
-
-*},*
-
-*{*
-
-*\"Grantee\": {*
-
-*\"Type\": \"CanonicalUser\",*
-
-*\"DisplayName\": \"bd_integ\",*
-
-*\"ID\":
-\"7d137abc41d6d3455663518126c28df027f25c1709f269239010f71bff0e9839\"*
-
-*},*
-
-*\"Permission\": \"FULL_CONTROL\"*
-
-*}*
-
-*\]*
-
-*}*
-
-The log "Owner" is "*aws_cloudtrail_us-east-1" and the "Grantee"
-"bd_integ"* who has ownership of the bucket has been granted
-*"FULL_CONTROL*
+```json
+{
+    "Owner": {
+        "DisplayName": "aws_cloudtrail_us-east-1",
+        "ID": "65e03a8a45a3aaaa881ada217702e0ad77152fe0196a8a14c44aa3bc4f11d2ae"
+    },
+    "Grants": [
+        {
+            "Grantee": {
+                "Type": "CanonicalUser",
+                "DisplayName": "aws_cloudtrail_us-east-1",
+                "ID": "65e03a8a45a3aaaa881ada217702e0ad77152fe0196a8a14c44aa3bc4f11d2ae"
+            },
+            "Permission": "FULL_CONTROL"
+        },
+        {
+            "Grantee": {
+                "Type": "CanonicalUser",
+                "DisplayName": "bd_integ",
+                "ID": "7d137abc41d6d3455663518126c28df027f25c1709f269239010f71bff0e9839"
+            },
+            "Permission": "FULL_CONTROL"
+        }
+    ]
+}
+```
+The log "Owner" is *"aws_cloudtrail_us-east-1"* and the "Grantee", 
+*"bd_integ"*, who has ownership of the bucket, has been granted
+**FULL_CONTROL**.
