@@ -33,43 +33,44 @@ Figure 1 - Example Notification
     "TopicArn":"arn:aws:sns:us-west-1:106xxxxxxx53:discovernotification",
     "Subject":"Amazon S3 Notification",
     "Message":"{
-        "Records":[
-            {
-                "eventVersion":"2.1",
-                "eventSource":"aws:s3",
-                "awsRegion":"us-west-1",
-                "eventTime":"2020-06-07T15:29:24.373Z",
-                "eventName":"ObjectCreated:Put",
-                "userIdentity":{
-                    "principalId":"AWS:AROAIF4JELG3VJGB7GNKM:regionalDeliverySession"
-                },
-                "requestParameters":{
-                    "sourceIPAddress":"34.255.117.103"
-                },
-                "responseElements":{
-                    "x-amz-request-id":"8B31967DB0022DB8",
-                    "x-amz-id-2":"BBP1gx85O/IPBAt46K2nrDP5Se+e0rFZvoBgW/zpVk0bmdjgN0hqdEyvukVyPKUG28Txu5SrdVmydazKoPpCP4nuXzKJv3vt"
-                },
-                "s3":{
-                    "s3SchemaVersion":"1.0",
-                    "configurationId":"YTIxZGZmMDUtYzhiZi00NmQ4LThkN2YtODE2MzBmNzAwMjhi",
-                    "bucket":{
-                        "name":"discovertrailbucket1",
-                        "ownerIdentity":{
-                            "principalId":"A3B7CH7GNBQZO9"
-                        },
-                        "arn":"arn:aws:s3:::discovertrailbucket1"
+                "Records":[
+                {
+                    "eventVersion":"2.1",
+                    "eventSource":"aws:s3",
+                    "awsRegion":"us-west-1",
+                    "eventTime":"2020-06-07T15:29:24.373Z",
+                    "eventName":"ObjectCreated:Put",
+                    "userIdentity":{
+                        "principalId":"AWS:AROAIF4JELG3VJGB7GNKM:regionalDeliverySession"
                     },
-                    "object":{
-                        "key":"AWSLogs/106xxxxxxx53/CloudTrail/eu-west-1/2020/06/07/106xxxxxxx53_CloudTrail_eu-west-1_20200607T1525Z_M4JIQrtGMS4b1qWd.json.gz",
-                        "size":3261,
-                        "eTag":"0e3ec1b908e5c5524cee6372b31abd0a",
-                        "sequencer":"005EDD07D60CBC821F"
+                    "requestParameters":{
+                        "sourceIPAddress":"34.255.117.103"
+                    },
+                    "responseElements":{
+                        "x-amz-request-id":"8B31967DB0022DB8",
+                        "x-amz-id-2":"BBP1gx85O/IPBAt46K2nrDP5Se+e0rFZvoBgW/zpVk0bmdjgN0hqdEyvukVyPKUG28Txu5SrdVmydazKoPpCP4nuXzKJv3vt"
+                    },
+                    "s3":{
+                        "s3SchemaVersion":"1.0",
+                        "configurationId":"YTIxZGZmMDUtYzhiZi00NmQ4LThkN2YtODE2MzBmNzAwMjhi",
+                        "bucket":{
+                            "name":"discovertrailbucket1",
+                            "ownerIdentity":{
+                                "principalId":"A3B7CH7GNBQZO9"
+                            },
+                            "arn":"arn:aws:s3:::discovertrailbucket1"
+                        },
+                        "object":{
+                            "key":"AWSLogs/106xxxxxxx53/CloudTrail/eu-west-1/2020/06/07/106xxxxxxx53_CloudTrail_eu-west-1_20200607T1525Z_M4JIQrtGMS4b1qWd.json.gz",
+                            "size":3261,
+                            "eTag":"0e3ec1b908e5c5524cee6372b31abd0a",
+                            "sequencer":"005EDD07D60CBC821F"
+                        }
                     }
                 }
+                ]
             }
-        ]
-    }",
+    ",
     "Timestamp":"2020-06-07T15:29:27.734Z",
     "SignatureVersion":"1",
     "Signature":"hMazOWuY/wHZFO6n6Ph9eJ6YeywGZ1SuWjuE5q7yxJf1ZiV9JOW36BfNAUu67U20RJEpKy+2SgO12/EkEMJVqh8OIuMWtDyjDaccDUzma+uFcMK3fBvwnESakGmKh8cOTZ054VJ7LQfTf/XL/kDxr26lMI7xcjoPbIcrlbzEUQJ+2pehaDJEFzDkSW7nqCWnWU8voA7cQV9p3jws8+McrqWqv9vb58jVGBE7C6e6BPoVZ9+rjwQUznZS/qZ9G4i5kMpZrJMcXymT8A8SIrtaK9AAd8VBpM7IYipE5B/2IumqfpbfHtbbNqisIlTLFJMFsj1kC/l+nM0Vl67y+/fzcA==",
