@@ -26,7 +26,7 @@ Via the console *Bucket --\> Properties -\> Events*
 
 Figure 1 - Example Notification
 
-```json
+```python
 {
     "Type":"Notification",
     "MessageId":"5caad601-303a-5424-8360-81563a2dd550",
