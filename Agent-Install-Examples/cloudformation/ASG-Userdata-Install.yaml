@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: This template creates the two VP  for an isolated testing
+Description: This template creates the two VP for an isolated testing
   environment. It will deploy tow EC2 hosts running docker which will run an 'attacker and 'victim'.
-  The environment will demontrate how cloud security requires multiple approaches including cloud native and third party
+  The environment will demonstrate how cloud security requires multiple approaches including cloud native and third party
   Services.
 Metadata:
   AWS::CloudFormation::Interface:
