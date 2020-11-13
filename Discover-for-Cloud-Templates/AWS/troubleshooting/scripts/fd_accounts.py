@@ -35,7 +35,7 @@ def format_api_payload(rate_limit_reqs=0, rate_limit_time=0):
 ############### CHECK ACCOUNTS
 def check_account():
     #Retrieve the account list
-    account_list = falcon.command(action="QueryAWSAccounts", parameters={"limit":"100"})["body"]["resources"]
+    account_list = falcon.command(action="QueryAWSAccounts", parameters={"limit":"{}".format(str(query_limit))})["body"]["resources"]
     #Log the results of the account query to a file if logging is enabled
     if log_enabled:
         with open('falcon-discover-accounts.json', 'w+') as f:
@@ -68,7 +68,7 @@ def check_account():
                 except:
                     #The above call will produce an error if we're running check immediately after registering an account as 
                     #the access_health branch hasn't been populated yet. Requery the API for the account_list when this happens.
-                    account_list = falcon_discover.QueryAWSAccounts(parameters={"limit":f"{str(query_limit)}"})["body"]["resources"]
+                    account_list = falcon.command(action="QueryAWSAccounts", parameters={"limit":"{}".format(str(query_limit))})["body"]["resources"]
                     print(f'Account {result["id"]} has a problem: {account_value(result["id"],"access_health")["api"]["reason"]}')
                 #Output the account details to the user to assist with troubleshooting the account
                 print(f'Current settings {json.dumps(account_values_to_check, indent=4)}\n')
