@@ -1,11 +1,16 @@
-# falcon_discover_accounts
-This python script provides an example for how to leverage the CrowdStrike API to perform development operations within your CrowdStrike deployment.
+# Troubleshooting scripts
+These python scripts provide examples for how to leverage the CrowdStrike API to perform development operations within your CrowdStrike deployment. There are two current examples, that leverage different components of the [FalconPy SDK](https://github.com/CrowdStrike/falconpy). Command line usage for these two examples is exactly the same and detailed below.
 
 ## Usage
-This script must be executed using python.
+These scripts must be executed using python.
 ```bash
 $ python3 falcon_discover_accounts.py -f [falcon_client_id] -s [falcon_client_secret] -c [command] --external_id {external_id} -a {local_account} -r {cloudtrail_bucket_region} -o {cloudtrail_bucket_owner_id} -i {iam_role_arn} -q 100 -l
 ```
+__*or*__
+```bash
+$ python3 fd_accounts.py -f [falcon_client_id] -s [falcon_client_secret] -c [command] --external_id {external_id} -a {local_account} -r {cloudtrail_bucket_region} -o {cloudtrail_bucket_owner_id} -i {iam_role_arn} -q 100 -l
+```
+
 ### Required arguments
 + `falcon_client_id` - Falcon Client API key ID
 + `falcon_client_secret` - Falcon Client API key secret
@@ -27,7 +32,7 @@ $ python3 falcon_discover_accounts.py -f [falcon_client_id] -s [falcon_client_se
 
 #### Checking all accounts in your environment (and outputting the results to a file)
 ```bash
-$ python3 falcon_discover_accounts.py -f CLIENT_ID -s CLIENT_SECRET -c check -l
+$ python3 fd_accounts.py -f CLIENT_ID -s CLIENT_SECRET -c check -l
 ```
 ##### Result
 ```json
@@ -64,7 +69,7 @@ Successfully deleted account.
 
 #### Registering an account
 ```bash
-$ python3 falcon_discover_accounts.py -f CLIENT_ID -s CLIENT_SECRET -c register --external_id IwXs93to -a 123456789012 -r eu-west-1 -o 123456789012 -i arn:aws:iam::123456789012:role/FalconDiscover
+$ python3 fd_accounts.py -f CLIENT_ID -s CLIENT_SECRET -c register --external_id IwXs93to -a 123456789012 -r eu-west-1 -o 123456789012 -i arn:aws:iam::123456789012:role/FalconDiscover
 ```
 
 ##### Result
