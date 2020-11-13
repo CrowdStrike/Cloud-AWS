@@ -1,5 +1,5 @@
 # Troubleshooting scripts
-These python scripts provide examples for how to leverage the CrowdStrike API to perform development operations within your CrowdStrike deployment. There are two current examples, that leverage different components of the [FalconPy SDK](https://github.com/CrowdStrike/falconpy). Command line usage for these two examples is exactly the same and detailed below.
+These python scripts provide examples for how to leverage the CrowdStrike API to perform development operations within your CrowdStrike deployment. There are two current examples that leverage different components of the [FalconPy SDK](https://github.com/CrowdStrike/falconpy). Command line usage for these two examples is exactly the same and detailed below.
 
 ## Usage
 These scripts must be executed using python.
@@ -69,7 +69,7 @@ Successfully deleted account.
 
 #### Registering an account
 ```bash
-$ python3 fd_accounts.py -f CLIENT_ID -s CLIENT_SECRET -c register --external_id IwXs93to -a 123456789012 -r eu-west-1 -o 123456789012 -i arn:aws:iam::123456789012:role/FalconDiscover
+$ python3 fd_accounts.py -f CLIENT_ID -s CLIENT_SECRET -c register --external_id IwXs93to8iHEkl0 -a 123456789012 -r eu-west-1 -o 123456789012 -i arn:aws:iam::123456789012:role/FalconDiscover
 ```
 
 ##### Result
@@ -79,7 +79,7 @@ Successfully registered account.
 
 #### Updating an account
 ```bash
-$ python3 falcon_discover_accounts.py -f CLIENT_ID -s CLIENT_SECRET -c update --external_id IwXs93to -a 123456789012 -r eu-west-1 -o 123456789012 -i arn:aws:iam::123456789012:role/FalconDiscover
+$ python3 falcon_discover_accounts.py -f CLIENT_ID -s CLIENT_SECRET -c update --external_id IwXs93to8iHEkl0 -a 123456789012 -r eu-west-1 -o 123456789012 -i arn:aws:iam::123456789012:role/FalconDiscover
 ```
 
 ##### Result
