@@ -31,7 +31,7 @@ example_workload.tf (creates the Ubuntu EC2 instance with Falcon Sensor installe
 bootstrap (folder where the falcon sensor installer resides)
 ```
 
-### Deployment of the template
+## Deployment of the template
 
 ### Step 1 Edit the terraform.tfvars file
 #### terraform.tfvars
