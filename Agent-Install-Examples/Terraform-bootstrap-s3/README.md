@@ -23,7 +23,7 @@ Terraform version 0.12.21 (version used to build and validate template)
 ## Contents
 The template will build the above architecture. The template consists of five Terraform files and a bootstrap folder:
 ```bash
-aws_vars.tf (input variables for the tempate)
+aws_vars.tf (input variables)
 terraform.tfvars (define input variables)
 network.tf (set the terraform provider, create the VPC with route tables, subnets, and gateways)
 s3bucket.tf (create the private s3 bucket with folder structure and upload falcon sensor installer file)
