@@ -3,13 +3,15 @@ This template provides a sample Terraform template to build a test VPC with a sa
 
 ## Prerequisites
 You will need the following from AWS:
-AWS account with permissions to create VPCs, route tables, subnets, IAM roles, deploy EC2 instances and deploy IGW
-AWS API keys for deployment
+* AWS API Keys
+* AWS account with permissions to create VPCs, Route tables and subnets
+* Permission to create IAM roles, deploy EC2 instances, deploy IGW, and
+* Available Elastic IP (EIP)
 
 You will need the following from CrowdStrike:
-CrowdStrike account with Cusotmer Identification (CID)
+CrowdStrike account with Customer Identification (CID)
 Login to Falcon console to download sensor installer file
-Falcon CID with hash for installation
+Falcon CID for sensor installation
 
 You will need from Terraform:
 Terraform version 0.12.21 (version used to build and validate template)
@@ -19,13 +21,15 @@ Terraform version 0.12.21 (version used to build and validate template)
 ![Falcon Sample BootStrap)](Images/Falcon-Bootstrap-S3.jpg)
 
 ## Contents
-The template will build the above architecture. the template consists of five Terraform files and a bootstrap folder:
-* aws_vars.tf (input variables for the tempate)
-* terraform.tfvars (define input variables)
-* network.tf (set the terraform provider, create the VPC with route tables, subnets, and gateways)
-* s3bucket.tf (create the private s3 bucket with folder structure and upload falcon sensor installer file)
-* example_workload.tf (creates the Ubuntu EC2 instance with Falcon Sensor installed)
-* bootstrap (folder where the falcon sensor installer resides)
+The template will build the above architecture. The template consists of five Terraform files and a bootstrap folder:
+```bash
+aws_vars.tf (input variables for the tempate)
+terraform.tfvars (define input variables)
+network.tf (set the terraform provider, create the VPC with route tables, subnets, and gateways)
+s3bucket.tf (create the private s3 bucket with folder structure and upload falcon sensor installer file)
+example_workload.tf (creates the Ubuntu EC2 instance with Falcon Sensor installed)
+bootstrap (folder where the falcon sensor installer resides)
+```
 
 ### Deployment of the template
 
