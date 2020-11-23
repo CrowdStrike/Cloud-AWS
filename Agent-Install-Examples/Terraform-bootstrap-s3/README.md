@@ -109,9 +109,7 @@ crwd_sensor = "falcon-sensor_5.43.0-10803_amd64.deb"
 ### Step 2 Deploy the template:
 Once the terraform.tfvars file has been updated and the sensor download file added to the bootstrap folder, you are ready to deploy the terraform template.
 
-* Run terraform init
-
-from the command line of your local machine cd to the directory where the template folder structure resides and run the following command:
+From the command line of your local machine cd to the directory where the template folder structure resides and run the following command:
 ```bash
 terraform init
 ```
