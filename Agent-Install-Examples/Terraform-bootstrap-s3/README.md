@@ -64,7 +64,7 @@ crwd_cid = "Place CID Here"
 #CrowdStrike Sensor Version (ex falcon-sensor_5.27.0-9104_amd64.deb)
 crwd_sensor = "falcon-sensor_5.43.0-10803_amd64.deb"
 ```
-API credentials must be supplied for the AWS account that you are planning to deploy the template into.  However you choose to supply credentials with a cred file/profile or manually add the API key and secret key in the tfvars file.  If you choose to use the manual method, you will also need to uncomment the following lines from the network.tf file:
+API credentials must be supplied for the AWS account where the template will be deployed.  However you can choose to supply credentials with a cred file/profile or manually add the API key and secret key into the terraform.tfvars file.  If you choose to use the manual method, you will also need to uncomment the following lines from the network.tf file:
 ```bash
 #access_key = var.aws_access_key
 #secret_key = var.aws_secret_key
@@ -72,7 +72,7 @@ API credentials must be supplied for the AWS account that you are planning to de
 For more help with using API keys in AWS, please see the following document:
 [https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html).
 
-In addition to the API keys, you will also need to set the region you would like to deplo the template into.  edit the following line:
+In addition to the API keys, you will also need to set the region where you would like to deploy the template.  Edit the following line:
 ```bash
 aws_region = ""
 ```
@@ -86,7 +86,7 @@ You must also add a unique S3 bucketname.  S3 bucket names must be globally uniq
 bucket_name = "Add Unique s3 Bucket Name"
 ```
 
-To access the Ubuntu EC2 instance, you must create or use an existing EC2 keypair for the region that you are deploying the template.  The keypair is region specific and must come from the region you are deploying or the template deployment will fail.  Edit the following line:
+To access the Ubuntu EC2 instance, you must create or use an existing EC2 keypair for the region where you are deploying the template.  The keypair is region specific and must come from the region you are deploying or the template deployment will fail.  Edit the following line:
 ```bash
 ServerKeyName = "Add Region Keypair"
 ```
@@ -96,13 +96,14 @@ Next, you must add the CrowdStrike Falcon CID to the file.  Edit the following l
 crwd_cid = "Place CID Here"
 ```
 
-Finally, you must download a falcon sensor installer file from the CrowdStrike Falcon console.  You must make sure to download the correct versio of the sensor downloader based on the version of the OS.  For this demo, we are using an Ubuntu 16.X version of OS for the sample instance, thus the installer downloaded should be Ubuntu 14/16/18/20 from the falcon console.  Place the installerfile into the download folder in the template directory.  Once the file is in place, edit the CrowdStrike Sensor version in the file.  Edit the following line:
+Finally, you must download a falcon sensor installer from the CrowdStrike Falcon console.  You must make sure to download the correct version of the sensor downloader based on the version of the OS.  For this demo, we are using an Ubuntu 16.X version of OS for the sample EC2 instance. Thus, the installer downloaded should be Ubuntu 14/16/18/20 from the falcon console.  Place the installer file into the download folder in the template directory.  Once the file is in place, edit the CrowdStrike Sensor version in the file.  Edit the following line:
 ```bash
 crwd_sensor = "add version here" 
 ``` 
 
+#### example
 ```bash
-example- crwd_sensor = "falcon-sensor_5.43.0-10803_amd64.deb"
+crwd_sensor = "falcon-sensor_5.43.0-10803_amd64.deb"
 ```
 
 ### Step 2 Deploy the template:
