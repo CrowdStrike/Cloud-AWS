@@ -28,8 +28,11 @@ The template will build the above architecture. the template consists of five Te
 * bootstrap (folder where the falcon sensor installer resides)
 
 ### Deployment of the template
-Step 1 Edit the terraform.tfvars file:
-\\\terraform
+*Step 1 Edit the terraform.tfvars file
+
+### Step 1 Edit the terraform.tfvars file
+#### terraform.tfvars
+```bash
 #Used only if you do not have a AWS profile set (recommended to use a creds file or profile)
 #Key variables are commented out of the network.tf file
 #aws_access_key = "place access key here"
@@ -57,7 +60,7 @@ crwd_cid = "Place CID Here"
 
 #CrowdStrike Sensor Version (ex falcon-sensor_5.27.0-9104_amd64.deb)
 crwd_sensor = "falcon-sensor_5.43.0-10803_amd64.deb"
-
+```
 API credentials must be supplied for the AWS account that you are planning to deploy the template into.  However you choose to supply credentials with a cred file/profile or manually add the API key and secret key in the tfvars file.  If you choose to use the manual method, you will also need to uncomment the following lines from the network.tf file:
 
 #access_key = var.aws_access_key
@@ -83,7 +86,7 @@ crwd_cid = "Place CID Here"
 Finally, you must download a falcon sensor installer file from the CrowdStrike Falcon console.  You must make sure to download the correct versio of the sensor downloader based on the version of the OS.  For this demo, we are using an Ubuntu 16.X version of OS for the sample instance, thus the installer downloaded should be Ubuntu 14/16/18/20 from the falcon console.  Place the installerfile into the download folder in the template directory.  Once the file is in place, edit the CrowdStrike Sensor version in the file.  Edit the following line:
 crwd_sensor = "add version here"  example- crwd_sensor = "falcon-sensor_5.43.0-10803_amd64.deb"
 
-Step 2 Deploy the template:
+*Step 2 Deploy the template:
 Once the terraform.tfvars file has been updated and the sensor download file added to the bootstrap folder, you are ready to deploy the terraform template.
 
 * Run terraform init
@@ -99,10 +102,10 @@ terraform apply
 
 Once the terraform apply command successfully completes, you will have the new demo environment build in your AWS account.
 
-Step 3 Validate the sensor is registered with the CrowdStrike Falcon console:
+*Step 3 Validate the sensor is registered with the CrowdStrike Falcon console:
 Once the terraform build has completed, after about 5 to 10 minutes, the new AWS EC2 workload should be listed as a managed host in the Falcon console CID.  You can validate the host is being managed by connecting to your Falcon console and selecting the Host\Dashboard menu.  In the main Hosts Dashboard, the new EC2 worload will show up under Servers(hosts).
 
-Step 4 Delete the architecture build:
+*Step 4 Delete the architecture build:
 Once you are done with the AWS architecture build, you can delete the build from the command line of your local host.  From your local host, again from the root of the template folder structure, issue the following command:
 terraform destroy
 
