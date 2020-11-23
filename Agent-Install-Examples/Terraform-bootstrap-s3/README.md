@@ -2,18 +2,18 @@
 This template provides a sample Terraform template to build a test VPC with a sample EC2 ubuntu webserver with the CrowdStrike sensor installed.
 
 ## Prerequisites
-You will need the following from AWS:
+#### You will need the following from AWS:
 * AWS API Keys
 * AWS account with permissions to create VPCs, Route tables and subnets
 * Permission to create IAM roles, deploy EC2 instances, deploy IGW, and
 * Available Elastic IP (EIP)
 
-You will need the following from CrowdStrike:
+#### You will need the following from CrowdStrike:
 * CrowdStrike account with Customer Identification (CID)
 * Login to Falcon console to download sensor installer file
 * Falcon CID for sensor installation
 
-You will need from Terraform:
+#### You will need from Terraform:
 * Terraform version 0.12.21 (version used to build and validate template)
 
 ## Template Architecture Build
