@@ -9,12 +9,12 @@ You will need the following from AWS:
 * Available Elastic IP (EIP)
 
 You will need the following from CrowdStrike:
-CrowdStrike account with Customer Identification (CID)
-Login to Falcon console to download sensor installer file
-Falcon CID for sensor installation
+* CrowdStrike account with Customer Identification (CID)
+* Login to Falcon console to download sensor installer file
+* Falcon CID for sensor installation
 
 You will need from Terraform:
-Terraform version 0.12.21 (version used to build and validate template)
+* Terraform version 0.12.21 (version used to build and validate template)
 
 ## Template Architecture Build
 
