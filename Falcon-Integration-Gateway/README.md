@@ -28,7 +28,7 @@ The solution can be run stand-alone, but is not recommended for production deplo
     + Create SQS queue
     + Create IAM role
     + Create SSM parameters
-+ If you are not using SSM parameters to store application settings then you will also need a properly formatted _[config.json](Falcon-Integration-Gateway#configjson)_ file.
++ If you are not using SSM parameters to store application settings then you will also need a properly formatted _[config.json](#configjson)_ file.
 
 ### Installing during instance creation
 This solution supports execution via a User Data script, which allows for deployment via CloudFormation or Terraform.
