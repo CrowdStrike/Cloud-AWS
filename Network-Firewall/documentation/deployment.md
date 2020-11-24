@@ -1,6 +1,6 @@
 # Deployment
 
-Please not the following when running the demo.
+Please note the following when running the demo.
 
 * _*This Template will take 15-20mins to fully deploy in your VPC*_
 
