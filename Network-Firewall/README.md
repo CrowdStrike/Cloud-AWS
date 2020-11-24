@@ -3,7 +3,7 @@
 ## Documentation
 [About the Demo](documentation/overview.md)
 
-[Setting up the Demo](documentation/setup.md)
+[Setting up the Demo](documentation/deployment.md)
 
 [Running the Demo](documenation/testing.md)
 
