@@ -128,11 +128,14 @@ Additional policy attachments
 ![Additional lambda execution permission policy requirements](images/fig-lambda-execution-role-additional-policies.png)
 
 #### Lambda function settings
+![Runtime settings](images/fig-lambda-runtime-settings.png)
+
+![Basic settings](images/fig-lambda-basic-settings.png)
 
 #### Uploading the source code
+![Uploading the source code](images/fig-upload-source-code-zip-file.png)
 
 #### Creating the SQS trigger
-
 ![Add trigger](images/fig-add-lambda-trigger-button.png)
 
 ![Adding the SQS trigger](images/fig-add-lambda-sqs-trigger.png)
