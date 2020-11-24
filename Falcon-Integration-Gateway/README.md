@@ -42,11 +42,13 @@ The solution can be run stand-alone, but is not recommended for production deplo
 
 ### Installing the FIG detections SQS queue
 
-#### Creating the Dead-letter queue (DLQ)
+#### Creating the dead-letter queue (DLQ)
 
 #### Creating the main queue
 
 ### Installing the FIG publishing lambda handler
+
+#### Lambda execution permissions
 
 #### Lambda function settings
 
@@ -76,19 +78,30 @@ chmod 755 fig-2.0.10-install.run
 #### Manual installation of the FIG servoce
 
 ### Configuration
+The FIG service application allows for customer configuration via application parameters that can be provided in multiple ways. These parameters control
+several aspects of the service application's behavior. This includes; the credentials utilized to access the CrowdStrike Falcon API, the application ID utilized 
+to connect to the CrowdStrike Falcon API, the severity threshold used to filter out unwanted detections, the SQS queue to target for alerts being published,
+and the AWS Region to report to.
 
 #### Parameters
-The Falcon Integration Gateway requires six parameters be defined in order to successfully operate.
+The Falcon Integration Gateway service application requires six parameters be defined in order to successfully operate.
 + `falcon_client_id` - The API client ID for the API key used to access your Falcon environment.
 + `falcon_client_secret` - The API client secret for the API key used to access your Falcon environment.
 + `app_id` - A unique string value that describes the name of the application you are connecting to Falcon. Most string values are supported.
 + `severity_threshold` - An integer representing the threshold for detections you want published to AWS Security Hub.
++ `sqs_queue_name` - Name of the SQS queue to publish detections to. This must reside in the region specified below.
 + `region` - The region we will be publishing to in AWS Security Hub. This will need to match the region the SQS queue resides in.
 
 > Even though detections are published to AWS Security Hub within a single AWS region, they represent detections for instances found within _all_ AWS regions.
 
-##### SSM
+##### Using AWS Systems Manager _Parameter Store_
+By default, service application configuration parameters are stored within AWS Systems Manager _Parameter Store_.
+
+> For deployments running multiple instances of FIG on the same instance (in order to stream events from multiple Falcon environments, this is __*not*__ recommended), you _must_ use a config.json file.
+
+###### Parameter Store Example
 ![FIG SSM Parameter Store](images/fig-ssm-parameter-store.png)
+
 ##### config.json
 These values can also be specified to the application within a _config.json_ file. This file **must** reside within the same directory the FIG application is installed.
 ```json
