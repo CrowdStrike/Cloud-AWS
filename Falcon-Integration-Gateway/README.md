@@ -141,6 +141,18 @@ Additional policy attachments
 ![Adding the SQS trigger](images/fig-add-lambda-sqs-trigger.png)
 
 ### Installing the FIG service application
+To expedite setup, a service application installer has been developed and is detailed below. For users that wish to deploy the service manually, several steps must be performed:
+1. Create the EC2 instance
+2. Assign the necessary IAM permissions
+3. Create the FIG service account
+4. Install Python 3
+5. Install the boto3 and request client packages
+6. Install the FIG service application files
+7. Confirm service account permissions
+8. Configure the FIG service in systemd 
+9. Start the service
+
+> The FIG service application has been tested to function on Amazon Linux 2, and should run on CentOS 7.
 
 #### Creating the FIG instance IAM role
 ![Instance IAM role permissions](images/fig-instance-role-policies.png)
@@ -173,6 +185,7 @@ chmod 755 fig-2.0.latest-install.run
 ./fig-2.0.latest-install.run --target /usr/share/fig
 ```
 ##### Running the FIG automated service installer
+> For security reasons, it is recommended the FIG service run under a stand-alone user account. This user account is created automatically if you are using the installer package, and is called _fig_. If this user exists, an error may be thrown during installation but the service should still operate properly as long as the fig user has permissions to the service.
 
 ##### Manual installation of the FIG service
 
@@ -196,10 +209,8 @@ The Falcon Integration Gateway service application requires six parameters be de
 ##### Using AWS Systems Manager _Parameter Store_
 By default, service application configuration parameters are stored within AWS Systems Manager _Parameter Store_ but can be overridden by using a config.json file. 
 
-SSM Parameter Store parameters are _case-sensitive_ and must reside within the same region as the FIG instance you are configuring. Please note the naming convention of the
-parameters displayed below, as the variable names must match exactly.
-
-> For deployments running multiple instances of FIG on the same instance, you _must_ use a config.json file.
+> SSM Parameter Store parameters are _case-sensitive_ and must reside within the same region as the FIG instance you are configuring. Please note the naming convention of the
+parameters displayed below, as the variable names must match exactly. (All upper case, spaces are underscores, precursed with "**FIG_**").
 
 ###### Parameter Store Example
 ![FIG SSM Parameter Store](images/fig-ssm-parameter-store.png)
@@ -209,6 +220,7 @@ AWS Systems Manager Parameter Store, check the [AWS Systems Manager Parameter St
 
 ##### config.json
 Service application parameter values can also be specified within a _config.json_ file. This file **must** reside within the same directory the FIG application is installed. When present, values stored within a config.json file _take precedence_ over values provided via the AWS Systems Manager Parameter Store.
+> For deployments running multiple instances of FIG on the same instance, you _must_ use a config.json file.
 ```json
 {
     "falcon_client_id":"FALCON_CLIENT_ID_GOES_HERE",
