@@ -2,8 +2,18 @@
 The Falcon Integration Gateway publishes detections identified by CrowdStrike Falcon for instances
 residing within Amazon Web Services (AWS) to AWS Security Hub.
 
+## Table of Contents
++ [Architecture and Data Flow](##fig-architecture-and-data-flow)
++ [Installation](##installation)
+    - [Installing the SQS queue](###installing-the-fig-detections-sqs-queue)
+    - [Installing the findings publishing lambda](###installing-the-fig-publishing-lambda-handler)
+    - [Installing the service application](###installing-the-fig-service-application)
++ [Troubleshooting](##troubleshooting)
+
 ## FIG Architecture and Data Flow
 ![Falcon Integration Gateway Architecture Diagram)](images/fig-data-flow-architecture.png)
+
+---
 
 ## Installation
 The Falcon Integration Gateway is intended to be deployed as a service on a Linux instance. 
@@ -30,11 +40,27 @@ The solution can be run stand-alone, but is not recommended for production deplo
     + Create SSM parameters
 + If you are not using SSM parameters to store application settings then you will also need a properly formatted _[config.json](#configjson)_ file.
 
-### Installing during instance creation
+### Installing the FIG detections SQS queue
+
+#### Creating the Dead-letter queue (DLQ)
+
+#### Creating the main queue
+
+### Installing the FIG publishing lambda handler
+
+#### Lambda function settings
+
+#### Uploading the source code
+
+#### Creating the SQS trigger
+
+### Installing the FIG service application
+
+#### Installing the FIG service during instance creation
 This solution supports execution via a User Data script, which allows for deployment via CloudFormation or Terraform.
 > Since User Data scripts execute as the root user, this script should not include references to _sudo_.
 
-#### Example
+##### Example
 ```bash
 #!/bin/bash
 # version 3.0
@@ -45,13 +71,13 @@ wget -O fig-2.0.10-install.run https://raw.githubusercontent.com/CrowdStrike/Clo
 chmod 755 fig-2.0.10-install.run
 ./fig-2.0.10-install.run --target /usr/share/fig
 ```
-### Running the automated installer
+#### Running the FIG automated service installer
 
-### Manual installation
+#### Manual installation of the FIG servoce
 
-## Configuration
+### Configuration
 
-### Parameters
+#### Parameters
 The Falcon Integration Gateway requires six parameters be defined in order to successfully operate.
 + `falcon_client_id` - The API client ID for the API key used to access your Falcon environment.
 + `falcon_client_secret` - The API client secret for the API key used to access your Falcon environment.
@@ -61,9 +87,9 @@ The Falcon Integration Gateway requires six parameters be defined in order to su
 
 > Even though detections are published to AWS Security Hub within a single AWS region, they represent detections for instances found within _all_ AWS regions.
 
-#### SSM
+##### SSM
 ![FIG SSM Parameter Store](images/fig-ssm-parameter-store.png)
-#### config.json
+##### config.json
 These values can also be specified to the application within a _config.json_ file. This file **must** reside within the same directory the FIG application is installed.
 ```json
 {
@@ -75,6 +101,8 @@ These values can also be specified to the application within a _config.json_ fil
     "region":"REGION_GOES_HERE"
 }
 ```
+
+---
 
 ## Troubleshooting
 
