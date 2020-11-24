@@ -61,7 +61,7 @@ The solution can be run stand-alone, but is not recommended for production deplo
 + If you are not using SSM parameters to store application settings then you will also need a properly formatted _[config.json](#configjson)_ file.
 
 ### Installing the FIG detections SQS queue
-FIG leverages AWS Simple Queue Service to handle message queuing for detections identified by the CrowdStrike Falcon API. This allows for signicant scaling capacity without impacting the size of the FIG service application instance and provides a secure mechanism for delivering these detections from our AWS EC2 instance over to our AWS Lambda function.
+FIG leverages the AWS Simple Queue Service to handle message queuing for detections identified by the CrowdStrike Falcon API. This allows for signicant scaling capacity without impacting the size of the FIG service application instance and provides a secure mechanism for delivering these detections from our AWS EC2 instance over to our AWS Lambda function.
 
 Two queues will be created as part of this deployment, a primary detections queue, and a dead-letter queue for malformed message traffic.
 
@@ -264,9 +264,29 @@ Service application parameter values can also be specified within a _config.json
 ## Troubleshooting
 
 ### Checking service status
+The FIG service can be checked directly from the instance by issuing the following command:
+```bash
+$ sudo service fig status
+```
+This is actually a redirection to the systemctl utility. This function can also be performed with the command:
+```bash
+$ sudo systemctl status fig
+```
+This should result in a display similar to the following:
+![FIG service status](images/fig-service-status-example.png)
 
 ### Log files
++ `fig-service.log` - The FIG service log contains debug information related to the startup of the service and loading of credentials. Review this log for failures related to the starting and stopping of the service application.
++ `{app_id}_{partition_number}.log` - Each stream opened by FIG has it's own rotating log that contains details regarding the detections discovered. Review this log to confirm detections are being discovered within the event stream and are properly formatted / meeting severity threshold requirements. This file is named after the value used for the __*app_id*__ parameter and the partition number.
 
+### Offsets
+Your current position within the event stream is referred to as your _offset_. FIG tracks your offset per stream in a file maintained within the FIG directory. This file is hidden and named after the value used for the __*app_id*__ parameter and the partition number. (Example: _.fig-demo_0.offset_)
 
+You can read this file to find your position within the event stream. If you wish to reset your positions in the event stream, remove this file.
+
+### Lambda debugging
+When your lambda function was created, basic logging was enabled to CloudTrail as a stand-alone log group, named after the name of your lambda function. Successful submissions and regular event activity is tracked in this log. If you wish to increase log verbosity, you may do so by creating the DEBUG environmental variable on your lambda.
+
+![Enabling Lambda debugging](images/fig-enable-lambda-debug.png)
 
 
