@@ -3,14 +3,15 @@ The Falcon Integration Gateway publishes detections identified by CrowdStrike Fa
 residing within Amazon Web Services (AWS) to AWS Security Hub.
 
 ## Table of Contents
-+ [Architecture and Data Flow](##fig-architecture-and-data-flow)
++ [Architecture and Data Flow](##architecture-and-data-flow)
 + [Installation](##installation)
     - [Installing the SQS queue](###installing-the-fig-detections-sqs-queue)
     - [Installing the findings publishing lambda](###installing-the-fig-publishing-lambda-handler)
     - [Installing the service application](###installing-the-fig-service-application)
+    - [Configuring the application](###configuring-the-application)
 + [Troubleshooting](##troubleshooting)
 
-## FIG Architecture and Data Flow
+## Architecture and Data Flow
 ![Falcon Integration Gateway Architecture Diagram)](images/fig-data-flow-architecture.png)
 
 ---
@@ -48,7 +49,64 @@ The solution can be run stand-alone, but is not recommended for production deplo
 
 ### Installing the FIG publishing lambda handler
 
-#### Lambda execution permissions
+#### Lambda IAM role execution permissions
+Basic lambda execution permissions
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "logs:CreateLogGroup",
+            "Resource": "arn:aws:logs:{AWS-REGION}:{AWS-ACCOUNT-ID}:*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": [
+                "arn:aws:logs:{AWS-REGION}:{AWS-ACCOUNT-ID}:log-group:/aws/lambda/{AWS-LAMBDA-FUNCTION-NAME}:*"
+            ]
+        }
+    ]
+}
+```
+
+Security hub related permissions
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "securityhub:BatchUpdateFindings",
+                "securityhub:BatchImportFindings"
+            ],
+            "Resource": [
+                "arn:aws:securityhub:{AWS-REGION}:{AWS-ACCOUNT-ID}:hub/default",
+                "arn:aws:securityhub:{AWS-REGION}:{AWS-ACCOUNT-ID}:product/*/*"
+            ]
+        },
+        {
+            "Action": "securityhub:*",
+            "Resource": "arn:aws:securityhub:{AWS-REGION}:{AWS-ACCOUNT-ID}:/findings",
+            "Effect": "Allow"
+        },
+        {
+            "Action": "securityhub:*",
+            "Resource": "arn:aws:securityhub:{AWS-REGION}:{AWS-ACCOUNT-ID}:hub/default",
+            "Effect": "Allow"
+        }
+    ]
+}
+```
+
+Additional policy attachments
+
+![Additional lambda execution permission policy requirements](images/fig-lambda-execution-role-additional-policies.png)
 
 #### Lambda function settings
 
@@ -56,13 +114,22 @@ The solution can be run stand-alone, but is not recommended for production deplo
 
 #### Creating the SQS trigger
 
+![Add trigger](images/fig-add-lambda-trigger-button.png)
+
+![Adding the SQS trigger](images/fig-add-lambda-sqs-trigger.png)
+
 ### Installing the FIG service application
 
-#### Installing the FIG service during instance creation
+#### Creating the FIG instance IAM role
+![Instance IAM role permissions](images/fig-instance-role-policies.png)
+
+#### Creating the FIG instance and installing the service application
+
+##### Installing the FIG service during instance creation
 This solution supports execution via a User Data script, which allows for deployment via CloudFormation or Terraform.
 > Since User Data scripts execute as the root user, this script should not include references to _sudo_.
 
-##### Example
+###### Example
 ```bash
 #!/bin/bash
 # version 3.0
@@ -73,11 +140,11 @@ wget -O fig-2.0.10-install.run https://raw.githubusercontent.com/CrowdStrike/Clo
 chmod 755 fig-2.0.10-install.run
 ./fig-2.0.10-install.run --target /usr/share/fig
 ```
-#### Running the FIG automated service installer
+##### Running the FIG automated service installer
 
-#### Manual installation of the FIG servoce
+##### Manual installation of the FIG service
 
-### Configuration
+### Configuring the application
 The FIG service application allows for customer configuration via application parameters that can be provided in multiple ways. These parameters control
 several aspects of the service application's behavior. This includes; the credentials utilized to access the CrowdStrike Falcon API, the application ID utilized 
 to connect to the CrowdStrike Falcon API, the severity threshold used to filter out unwanted detections, the SQS queue to target for alerts being published,
@@ -97,10 +164,13 @@ The Falcon Integration Gateway service application requires six parameters be de
 ##### Using AWS Systems Manager _Parameter Store_
 By default, service application configuration parameters are stored within AWS Systems Manager _Parameter Store_.
 
-> For deployments running multiple instances of FIG on the same instance (in order to stream events from multiple Falcon environments, this is __*not*__ recommended), you _must_ use a config.json file.
+> For deployments running multiple instances of FIG on the same instance, you _must_ use a config.json file.
 
 ###### Parameter Store Example
 ![FIG SSM Parameter Store](images/fig-ssm-parameter-store.png)
+
+For more detail regarding [creating parameters](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) within the 
+AWS Systems Manager Parameter Store, check the [AWS Systems Manager Parameter Store documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html).
 
 ##### config.json
 These values can also be specified to the application within a _config.json_ file. This file **must** reside within the same directory the FIG application is installed.
