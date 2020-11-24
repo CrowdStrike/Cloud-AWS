@@ -189,7 +189,7 @@ The Falcon Integration Gateway service application requires six parameters be de
 + `app_id` - A unique string value that describes the name of the application you are connecting to Falcon. Most string values are supported.
 + `severity_threshold` - An integer representing the threshold for detections you want published to AWS Security Hub.
 + `sqs_queue_name` - Name of the SQS queue to publish detections to. This must reside in the region specified below.
-+ `region` - The region we will be publishing to in AWS Security Hub. This will need to match the region the SQS queue resides in. For deployments leveraging SSM, this parameter does not need to be specified.
++ `region` - The region we will be publishing to in AWS Security Hub. This will need to match the region the SQS queue resides in. For deployments leveraging SSM, this parameter does not need to be specified. 
 
 > Even though detections are published to AWS Security Hub within a single AWS region, they represent detections for instances found within _all_ AWS regions.
 
