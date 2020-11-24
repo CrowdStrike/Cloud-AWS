@@ -14,6 +14,14 @@ residing within Amazon Web Services (AWS) to AWS Security Hub.
 + [Troubleshooting](##troubleshooting)
 
 ## Overview
+This solution makes use of small EC2 instances to consume detections published to the CrowdStrike Falcon _event-stream_ API and then publishes detection events that align
+to instances that exist within AWS to a pre-existing SQS queue. A lambda function consumes these messages, confirms that the detection matches a valid instance in a valid
+AWS region, and then publishes the detection as a new finding in AWS Security Hub.
+
+There are several benefits to this architecture:
++ Reduced compute cost as a large portion of the compute cycles are consumed as on-demand lambda function executions
++ Easily scalable depending upon need
++ Can be deployed quickly
 
 ### Architecture 
 ![Falcon Integration Gateway Architecture Diagram)](images/fig-data-flow-architecture.png)
