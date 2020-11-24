@@ -146,6 +146,17 @@ Additional policy attachments
 ![Instance IAM role permissions](images/fig-instance-role-policies.png)
 
 #### Creating the FIG instance and installing the service application
+The FIG service application was developed to run efficiently as a service on a small Linux EC2 instance. 
+> This instance can be scaled up as necessary. 
+
+The minimum requirements for this instance are:
++ t2.micro (or better) - 1 vCPU, 2 GB RAM
++ Amazon Linux 2 or CentOS 7
++ Python 3 and PIP3 installed
+    - boto3 client library installed via PIP (--user)
+    - requests client library installed via PIP (--user)
++ The necessary IAM permissions to access SSM parameters and publish messages to our SQS queue
++ A route to the Internet
 
 ##### Installing the FIG service during instance creation
 This solution supports execution via a User Data script, which allows for deployment via CloudFormation or Terraform.
@@ -156,11 +167,10 @@ This solution supports execution via a User Data script, which allows for deploy
 #!/bin/bash
 # version 3.0
 # This is the userdata script for newly created EC2 instances. 
-# This script should not be executed manually
 cd /var/tmp
-wget -O fig-2.0.10-install.run https://raw.githubusercontent.com/CrowdStrike/Cloud-AWS/master/Falcon-Integration-Gateway/install/fig-2.0.10-install.run
-chmod 755 fig-2.0.10-install.run
-./fig-2.0.10-install.run --target /usr/share/fig
+wget -O fig-2.0.latest-install.run https://raw.githubusercontent.com/CrowdStrike/Cloud-AWS/master/Falcon-Integration-Gateway/install/fig-2.0.latest-install.run
+chmod 755 fig-2.0.latest-install.run
+./fig-2.0.latest-install.run --target /usr/share/fig
 ```
 ##### Running the FIG automated service installer
 
@@ -179,12 +189,15 @@ The Falcon Integration Gateway service application requires six parameters be de
 + `app_id` - A unique string value that describes the name of the application you are connecting to Falcon. Most string values are supported.
 + `severity_threshold` - An integer representing the threshold for detections you want published to AWS Security Hub.
 + `sqs_queue_name` - Name of the SQS queue to publish detections to. This must reside in the region specified below.
-+ `region` - The region we will be publishing to in AWS Security Hub. This will need to match the region the SQS queue resides in.
++ `region` - The region we will be publishing to in AWS Security Hub. This will need to match the region the SQS queue resides in. For deployments leveraging SSM, this parameter does not need to be specified.
 
 > Even though detections are published to AWS Security Hub within a single AWS region, they represent detections for instances found within _all_ AWS regions.
 
 ##### Using AWS Systems Manager _Parameter Store_
-By default, service application configuration parameters are stored within AWS Systems Manager _Parameter Store_.
+By default, service application configuration parameters are stored within AWS Systems Manager _Parameter Store_ but can be overridden by using a config.json file. 
+
+SSM Parameter Store parameters are _case-sensitive_ and must reside within the same region as the FIG instance you are configuring. Please note the naming convention of the
+parameters displayed below, as the variable names must match exactly.
 
 > For deployments running multiple instances of FIG on the same instance, you _must_ use a config.json file.
 
@@ -195,7 +208,7 @@ For more detail regarding [creating parameters](https://docs.aws.amazon.com/syst
 AWS Systems Manager Parameter Store, check the [AWS Systems Manager Parameter Store documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html).
 
 ##### config.json
-These values can also be specified to the application within a _config.json_ file. This file **must** reside within the same directory the FIG application is installed.
+Service application parameter values can also be specified within a _config.json_ file. This file **must** reside within the same directory the FIG application is installed. When present, values stored within a config.json file _take precedence_ over values provided via the AWS Systems Manager Parameter Store.
 ```json
 {
     "falcon_client_id":"FALCON_CLIENT_ID_GOES_HERE",
