@@ -61,8 +61,23 @@ The solution can be run stand-alone, but is not recommended for production deplo
 + If you are not using SSM parameters to store application settings then you will also need a properly formatted _[config.json](#configjson)_ file.
 
 ### Installing the FIG detections SQS queue
+FIG leverages AWS Simple Queue Service to handle message queuing for detections identified by the CrowdStrike Falcon API. This allows for signicant scaling capacity without impacting the size of the FIG service application instance and provides a secure mechanism for delivering these detections from our AWS EC2 instance over to our AWS Lambda function.
+
+Two queues will be created as part of this deployment, a primary detections queue, and a dead-letter queue for malformed message traffic.
 
 #### Creating the dead-letter queue (DLQ)
+The dead-letter queue is the repository for messages received by our primary queue that are either malformed or incapable of being handled. Messages arrive in this queue after first failing processing within our primary detection queue. Messages retained in the dead-message queue are available for up to 7 days after failing. (This setting can be changed within the dead-letter queue message retention configuration.)
+
+The dead-letter queue can have any name, and should have the following characteristics:
++ Type: __Standard__
++ Dead-letter queue: __Disabled__
+
+The following characteristics can be customized per deployment requirements:
++ Maximum message size: __256 KB__
++ Default visibility timeout: __30 Seconds__
++ Message retention period: __7 days__
++ Delivery delay: __0 Seconds__
++ Receive message wait time: __0 Seconds__
 
 #### Creating the main queue
 
