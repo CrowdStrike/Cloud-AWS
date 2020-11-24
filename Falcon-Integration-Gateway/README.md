@@ -3,7 +3,9 @@ The Falcon Integration Gateway publishes detections identified by CrowdStrike Fa
 residing within Amazon Web Services (AWS) to AWS Security Hub.
 
 ## Table of Contents
-+ [Architecture and Data Flow](##architecture-and-data-flow)
++ [Overview](##overview)
+    + [Architecture](###architecture)
+    + [Data Flow](###data-flow)
 + [Installation](##installation)
     - [Installing the SQS queue](###installing-the-fig-detections-sqs-queue)
     - [Installing the findings publishing lambda](###installing-the-fig-publishing-lambda-handler)
@@ -11,9 +13,18 @@ residing within Amazon Web Services (AWS) to AWS Security Hub.
     - [Configuring the application](###configuring-the-application)
 + [Troubleshooting](##troubleshooting)
 
-## Architecture and Data Flow
+## Overview
+
+### Architecture 
 ![Falcon Integration Gateway Architecture Diagram)](images/fig-data-flow-architecture.png)
 
+### Data Flow
+1. Falcon Integration Gateway contacts the CrowdStrike Falcon API to request a list of available event streams.
+2. A connection is opened to each available event stream. As new events are received within CrowdStrike, these events are published to the event stream, which are then consumed by the Falcon Integration Gateway.
+3. Detection events are reviewed, with requests to the CrowdStrike Falcon API being performed to confirm these instances are deployed to AWS.
+4. Detection events that meet severity threshold settings and are initially confirmed to exist within AWS are published to a SQS queue.
+5. A lambda function is triggered that reviews the detection, and identifies the region the instance is located in. The instance is confirmed by matching the mac address to the address reported in the detection.
+6. Confirmed detections that are positively identified as attached to valid instances are then published as a finding to AWS Security Hub.
 ---
 
 ## Installation
