@@ -1,0 +1,27 @@
+{
+    "RulesSource": {
+        "StatelessRulesAndCustomActions": {
+            "StatelessRules": [{
+                "RuleDefinition": {
+                    "MatchAttributes": {
+                        "Sources": [{
+                            "AddressDefinition": "0.0.0.0/0"
+                        }],
+                        "Destinations": [{
+                            "AddressDefinition": "0.0.0.0/0"
+                        }],
+                        "Protocols": [
+                            1,
+                            6,
+                            17
+                        ]
+                    },
+                    "Actions": [
+                        "aws:forward_to_sfe"
+                    ]
+                },
+                "Priority": 100
+            }]
+        }
+    }
+}
