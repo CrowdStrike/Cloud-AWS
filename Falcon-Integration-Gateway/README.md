@@ -66,7 +66,7 @@ FIG leverages AWS Simple Queue Service to handle message queuing for detections 
 Two queues will be created as part of this deployment, a primary detections queue, and a dead-letter queue for malformed message traffic.
 
 #### Creating the dead-letter queue (DLQ)
-The dead-letter queue is the repository for messages received by our primary queue that are either malformed or incapable of being handled. Messages arrive in this queue after first failing processing within our primary detection queue. Messages retained in the dead-message queue are available for up to 7 days after failing. (This setting can be changed within the dead-letter queue message retention configuration.)
+The dead-letter queue is the repository for messages received by our primary queue that are either malformed, have timed out or are incapable of being handled. Messages arrive in this queue after first failing processing within our primary detection queue. Messages retained in the dead-message queue are available for up to 7 days after failing. (This setting can be changed within the dead-letter queue message retention configuration.)
 
 The dead-letter queue can have any name, and should have the following characteristics:
 + Type: __Standard__
@@ -79,7 +79,19 @@ The following characteristics can be customized per deployment requirements:
 + Delivery delay: __0 Seconds__
 + Receive message wait time: __0 Seconds__
 
-#### Creating the main queue
+#### Creating the primary detections queue
+The primary detections queue is the repository for detections identified by FIG as potentially active within your AWS environment. These messages are consumed by a lambda function that further confirms the instance's region and MAC address and then publishes the finding to AWS Security Hub.
+
+The primary detection queue can have any name, and should have the following characteristics:
++ Type: __Standard__
++ Dead-letter queue: __*ARN of the queue defined above*__
+
+The following characteristics can be customized per deployment requirements:
++ Maximum message size: __256 KB__
++ Default visibility timeout: __30 Seconds__
++ Message retention period: __4 hours__
++ Delivery delay: __0 Seconds__
++ Receive message wait time: __0 Seconds__
 
 ### Installing the FIG publishing lambda handler
 
