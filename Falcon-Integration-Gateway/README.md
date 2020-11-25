@@ -190,6 +190,7 @@ The FIG service application was developed to run efficiently as a service on a s
 
 The minimum requirements for this instance are:
 + t2.micro (or better) - 1 vCPU, 2 GB RAM
+    - 20 GB or greater EBS volume
 + Amazon Linux 2 or CentOS 7
 + Python 3 and PIP3 installed
     - boto3 client library installed via PIP (--user)
@@ -198,8 +199,10 @@ The minimum requirements for this instance are:
 + A route to the Internet
 
 ##### Installing the FIG service during instance creation
-This solution supports execution via a User Data script, which allows for deployment via CloudFormation or Terraform.
+This solution provides an installer that supports execution via a User Data script, which allows for deployment via CloudFormation or Terraform.
 > Since User Data scripts execute as the root user, this script should not include references to _sudo_.
+
+> It is recommended you use the latest version of the installer as shown below. Older versions are available within this repository should you need to install a previous version.
 
 ###### Example
 ```bash
@@ -211,10 +214,58 @@ wget -O fig-2.0.latest-install.run https://raw.githubusercontent.com/CrowdStrike
 chmod 755 fig-2.0.latest-install.run
 ./fig-2.0.latest-install.run --target /usr/share/fig
 ```
-##### Running the FIG automated service installer
-> For security reasons, it is recommended the FIG service run under a stand-alone user account. This user account is created automatically if you are using the installer package, and is called _fig_. If this user exists, an error may be thrown during installation but the service should still operate properly as long as the fig user has permissions to the service.
+##### Running the FIG service automated installer
+If necessary, the FIG service automated installer can be executed from the command line directly. When doing so, you should make use of _sudo_ so that the installer has the necessary permissions to create the folder, user and service. 
+
+Executing the installer can be performed with the following command:
+```bash
+$ ./{FIG_INSTALLER_FILE} --target {TARGET_DIRECTORY}
+```
+Where {FIG_INSTALLER_FILE} is the filename for the installer you've uploaded to your instance and {TARGET_DIRECTORY} is the directory where you wish to install the service.
+###### Example
+```bash
+$ ./fig-2.0.latest-install.run --target /usr/share/fig
+```
+###### Installing without setting up the service
+If you want to execute the installer _without_ executing the post-installation script that creates users and sets up the service within systemd, then pass the _--noexec_ flag as follows:
+```bash
+./{FIG_INSTALLER_FILE} --target {TARGET_DIRECTORY} --noexec
+```
+
+> For security reasons, it is recommended the FIG service run under a stand-alone user account. This user account is created automatically if you are using the installer package, and is called _fig_. If this user exists, an error may be thrown during installation, but the service should still operate properly as long as the fig user has permissions to the service application folder.
 
 ##### Manual installation of the FIG service
+The service automated installer uses systemd to create and manage the FIG service. The following steps can be performed to install the service manually.
+
+###### Create the service definition
+First create the service definition file. The service file used in the installer is shown below. If you install FIG to a location other than _/usr/share/fig_, then you will need to update the directory listed in the ExecStart line to point to the new location.
+
+The file should be named _fig.service_ and saved in /lib/systemd/system.
+```bash
+[Unit]
+Description=Falcon Integration Gateway
+After=multi-user.target
+
+[Service]
+WorkingDirectory=/usr/share/fig
+User=fig
+Type=idle
+ExecStart=/usr/bin/python3 /usr/share/fig/main.py &> /dev/null
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+Once you have created the service definition file, execute the two following commands.
+
+Reload the system deamons.
+```bash
+$ sudo systemctl daemon-reload
+```
+Enable the service
+```bash
+$ sudo systemctl enable fig
+```
 
 ### Configuring the application
 The FIG service application allows for customer configuration via application parameters that can be provided in multiple ways. These parameters control
@@ -262,6 +313,7 @@ Service application parameter values can also be specified within a _config.json
 ---
 
 ## Troubleshooting
+When deploying manually, there are several aspects where an error could prevent FIG from operating as expected. Since FIG is intended to run as a service, you have all of the standard Linux server troubleshooting tools (Example: _journalctl -xe_) available to you. In order to assist with resolving issues that cannot be readily solved using Linux-native tools, the solution provides debug logs for review.
 
 ### Checking service status
 The FIG service can be checked directly from the instance by issuing the following command:
