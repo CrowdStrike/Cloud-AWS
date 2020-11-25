@@ -32,6 +32,17 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 ssm_client = boto3.client('ssm')
 
+def delete_ssm_params(parameter_names):
+    try:
+        response = ssm_client.delete_parameters(
+            Names=parameter_names
+        )
+        if response['ResponseMetadata']['HTTPStatusCode'] == 200:
+            return True
+        else:
+            return False
+    except:
+        logger.error("Unidentified error")
 
 def create_ssm_param(parameter_name, parameter_description, parameter_value, parameter_type, overwrite):
     try:
@@ -68,6 +79,12 @@ def lambda_handler(event, context):
         elif event['RequestType'] == 'Update':
             cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
         elif event['RequestType'] == 'Delete':
+            if "ResourceProperties" in event:
+                parameter_list = []
+                keys = event["ResourceProperties"]
+                for key in keys:
+                    parameter_list.append(key)
+                delete_ssm_params(parameter_list)
             cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
     except Exception as e:
         logger.error(str(e))
