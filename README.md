@@ -7,8 +7,8 @@ A collection of projects supporting AWS Integration
 [Running the Demo](https://github.com/CrowdStrike/Cloud-AWS/blob/master/Network-Firewall/documentation/testing.md)
 
 ## Agent Install Examples
-[AWS Autoscale](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Agent-Install-Examples/Cloudformation/autoscale)
 [AWS Terraform BootStrap S3](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Agent-Install-Examples/Terraform-bootstrap-s3)
+[AWS Autoscale](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Agent-Install-Examples/Cloudformation/autoscale)
 
 ## Control Tower
 Cloud Formation Templates and lambda functions to integrate Falcon Discover with AWS Control Tower
