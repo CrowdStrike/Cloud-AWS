@@ -5,5 +5,5 @@
 
 [Setting up the Demo](documentation/deployment.md)
 
-[Running the Demo](documenation/testing.md)
+[Running the Demo](documentation/testing.md)
 
