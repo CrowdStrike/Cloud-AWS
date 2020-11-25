@@ -1,8 +1,14 @@
 # Cloud-AWS
 A collection of projects supporting AWS Integration
 
+## AWS Network Firewall Integration
+[About the Demo](https://github.com/CrowdStrike/Cloud-AWS/blob/master/Network-Firewall/documentation/overview.md)
+[Setting up the Demo](https://github.com/CrowdStrike/Cloud-AWS/blob/master/Network-Firewall/documentation/deployment.md)
+[Running the Demo](https://github.com/CrowdStrike/Cloud-AWS/blob/master/Network-Firewall/documentation/testing.md)
+
 ## Agent Install Examples
-[AWS Autoscale]()
+[AWS Autoscale](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Agent-Install-Examples/Cloudformation/autoscale)
+[AWS Terraform BootStrap S3](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Agent-Install-Examples/Terraform-bootstrap-s3)
 
 ## Control Tower
 Cloud Formation Templates and lambda functions to integrate Falcon Discover with AWS Control Tower
@@ -12,6 +18,9 @@ Cloud Formation Templates and lambda functions to integrate Falcon Discover with
 [Files](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Control-Tower)
 
 [Multiple Providers Require SNS notifications](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Control-Tower/multiple-sns)
+
+## AWS Security Hub Integration/ Falcon Integration Gateway
+[CrowdStrike FIG](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Falcon-Integration-Gateway)
 
 ## Discover for Cloud
 
@@ -33,5 +42,3 @@ The python script "register_account.py" is included as an example of a script th
 
 [See the README.md file here](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Discover-for-Cloud-Templates/AWS/cloudformation-templates)
 
-## Agent Install Examples
-[AWS Autoscale]()
