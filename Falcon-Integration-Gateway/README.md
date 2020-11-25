@@ -163,15 +163,19 @@ Additional policy attachments
 ![Uploading the source code](images/fig-upload-source-code-zip-file.png)
 
 #### Creating the SQS trigger
+You must add a SQS trigger to your lambda in order for it to consume messages from the queue. Open your lambda function in the AWS console and click the _Add Trigger_ button.
 ![Add trigger](images/fig-add-lambda-trigger-button.png)
 
+Select _SQS_ for the service, you should then be able to select the primary detection queue you created previously from the drop down labeled **SQS queue**. 
+
+You may choose to create the trigger without enabling it by clearing the **Enable trigger** checkbox. Doing so will prevent new messages from being consumed until the trigger is enabled.
 ![Adding the SQS trigger](images/fig-add-lambda-sqs-trigger.png)
 
 ### Installing the FIG service application
 To expedite setup, a service application installer has been developed and is detailed below. For users that wish to deploy the service manually, several steps must be performed:
 1. Create the EC2 instance
 2. Assign the necessary IAM permissions
-3. Create the FIG service account
+3. Create the FIG user account
 4. Install Python 3
 5. Install the boto3 and request client packages
 6. Install the FIG service application files
@@ -190,6 +194,7 @@ The FIG service application was developed to run efficiently as a service on a s
 
 The minimum requirements for this instance are:
 + t2.micro (or better) - 1 vCPU, 2 GB RAM
+    - 20 GB or greater EBS volume
 + Amazon Linux 2 or CentOS 7
 + Python 3 and PIP3 installed
     - boto3 client library installed via PIP (--user)
@@ -197,9 +202,49 @@ The minimum requirements for this instance are:
 + The necessary IAM permissions to access SSM parameters and publish messages to our SQS queue
 + A route to the Internet
 
+> If you wish to use the automated service installer, either during instance creation or manually afterwards, skip to [Automated Installation Documentation](#installing-the-fig-service-during-instance-creation).
+
+After your instance is created (or during initial setup) assign the instance IAM role you created previously.
+
+###### Creating the user account
+The fig user account is used for running the service only. While it does have a home directory and profile, it does not need to have a password. This user account can be named whatever meets the requirements for deployment but if it is named anything other than _fig_ than the service definition file described later in this documented should be updated to reflect this change.
+
+Execute the following commands to create the user account.
+```bash
+$ sudo groupadd fig
+
+$ sudo adduser -g fig fig
+```
+
+###### Installing Python 3 and necessary packages
+FIG requires Python 3, the boto3 package and the requests package in order to be able to run. These can be installed with the following commands.
+```bash
+$ sudo yum -y install python3
+
+$ sudo -u fig pip3 install --user requests
+
+$ sudo -u fig pip3 install --user boto3
+```
+
+###### Copying files and necessary permissions
+By default, FIG installs to the _/usr/share/fig_ folder. This can be changed during installation, but the service definition you will create later will need to be updated to reflect the new location. 
+
+If you are installing from source, copy the files located in the [source folder](src) to your installation folder on your new instance.
+
+In order to execute properly, FIG will need to own and be able to write to this installation folder. An example of setting the necessary permissions can be seen below.
+
+```bash
+$ sudo chown -R fig:fig /usr/share/fig
+
+$ sudo chmod 644 /usr/share/fig/*.py
+```
+
+
 ##### Installing the FIG service during instance creation
-This solution supports execution via a User Data script, which allows for deployment via CloudFormation or Terraform.
+This solution provides an installer that supports execution via a User Data script, which allows for deployment via CloudFormation or Terraform.
 > Since User Data scripts execute as the root user, this script should not include references to _sudo_.
+
+> It is recommended you use the latest version of the installer as shown below. Older versions are available within this repository should you need to install a previous version.
 
 ###### Example
 ```bash
@@ -211,10 +256,58 @@ wget -O fig-2.0.latest-install.run https://raw.githubusercontent.com/CrowdStrike
 chmod 755 fig-2.0.latest-install.run
 ./fig-2.0.latest-install.run --target /usr/share/fig
 ```
-##### Running the FIG automated service installer
-> For security reasons, it is recommended the FIG service run under a stand-alone user account. This user account is created automatically if you are using the installer package, and is called _fig_. If this user exists, an error may be thrown during installation but the service should still operate properly as long as the fig user has permissions to the service.
+##### Running the FIG service automated installer
+If necessary, the FIG service automated installer can be executed from the command line directly. When doing so, you should make use of _sudo_ so that the installer has the necessary permissions to create the folder, user and service. 
+
+Executing the installer can be performed with the following command:
+```bash
+$ ./{FIG_INSTALLER_FILE} --target {TARGET_DIRECTORY}
+```
+Where {FIG_INSTALLER_FILE} is the filename for the installer you've uploaded to your instance and {TARGET_DIRECTORY} is the directory where you wish to install the service.
+###### Example
+```bash
+$ ./fig-2.0.latest-install.run --target /usr/share/fig
+```
+###### Running the installer without setting up the service
+If you want to execute the installer _without_ executing the post-installation script that creates users and sets up the service within systemd, then pass the _--noexec_ flag as follows:
+```bash
+./{FIG_INSTALLER_FILE} --target {TARGET_DIRECTORY} --noexec
+```
+
+> For security reasons, it is recommended the FIG service run under a stand-alone user account. This user account is created automatically if you are using the installer package, and is called _fig_. If this user exists, an error may be thrown during installation, but the service should still operate properly as long as the fig user has permissions to the service application folder.
 
 ##### Manual installation of the FIG service
+The service automated installer uses systemd to create and manage the FIG service. The following steps can be performed to install the service manually.
+
+###### Create the service definition
+First create the service definition file. The service file used in the installer is shown below. If you install FIG to a location other than _/usr/share/fig_, then you will need to update the directory listed in the ExecStart line to point to the new location.
+
+The file should be named _fig.service_ and saved in /lib/systemd/system.
+```bash
+[Unit]
+Description=Falcon Integration Gateway
+After=multi-user.target
+
+[Service]
+WorkingDirectory=/usr/share/fig
+User=fig
+Type=idle
+ExecStart=/usr/bin/python3 /usr/share/fig/main.py &> /dev/null
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+Once you have created the service definition file, execute the two following commands.
+
+Reload the system deamons.
+```bash
+$ sudo systemctl daemon-reload
+```
+Enable the service
+```bash
+$ sudo systemctl enable fig
+```
 
 ### Configuring the application
 The FIG service application allows for customer configuration via application parameters that can be provided in multiple ways. These parameters control
@@ -262,6 +355,7 @@ Service application parameter values can also be specified within a _config.json
 ---
 
 ## Troubleshooting
+When deploying manually, there are several aspects where an error could prevent FIG from operating as expected. Since FIG is intended to run as a service, you have all of the standard Linux server troubleshooting tools (Example: _journalctl -xe_) available to you. In order to assist with resolving issues that cannot be readily solved using Linux-native tools, the solution provides debug logs for review.
 
 ### Checking service status
 The FIG service can be checked directly from the instance by issuing the following command:
@@ -285,8 +379,16 @@ Your current position within the event stream is referred to as your _offset_. F
 You can read this file to find your position within the event stream. If you wish to reset your positions in the event stream, remove this file.
 
 ### Lambda debugging
-When your lambda function was created, basic logging was enabled to CloudTrail as a stand-alone log group, named after the name of your lambda function. Successful submissions and regular event activity is tracked in this log. If you wish to increase log verbosity, you may do so by creating the DEBUG environmental variable on your lambda.
+When your lambda function was created, basic logging was enabled to CloudTrail as a stand-alone log group, named after the name of your lambda function. Successful submissions and regular events are tracked in this log. 
+
+If you wish to increase log verbosity, you may do so by creating the DEBUG environmental variable on your lambda.
 
 ![Enabling Lambda debugging](images/fig-enable-lambda-debug.png)
+
+### Running the service in stand-alone mode
+You may run FIG in stand-alone mode to review any errors that are sent to stdout. To do so, navigate to the FIG service application folder and execute the following command.
+```bash
+$ sudo -u fig python3 main.py
+```
 
 
