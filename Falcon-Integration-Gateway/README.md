@@ -351,7 +351,25 @@ Service application parameter values can also be specified within a _config.json
     "region":"REGION_GOES_HERE"
 }
 ```
+### Starting the service
+Once all configuration and installation steps have been performed, you may start and stop the fig service with the following commands.
 
+Starting the service
+```bash
+$ sudo service fig start
+```
+or
+```bash
+$ sudo systemctl start fig
+```
+Stopping the service
+```bash
+$ sudo service fig stop
+```
+or
+```bash
+$ sudo systemctl stop fig
+```
 ---
 
 ## Troubleshooting
