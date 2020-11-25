@@ -63,7 +63,7 @@ def lambda_handler(event, context):
             if "ResourceProperties" in event:
                 keys = event["ResourceProperties"]
                 for key in keys:
-                    create_ssm_param(key, "", keys[key], "String", False)
+                    create_ssm_param(key, "", keys[key], "SecureString", True)
             cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
         elif event['RequestType'] == 'Update':
             cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
