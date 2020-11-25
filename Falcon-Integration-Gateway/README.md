@@ -163,8 +163,12 @@ Additional policy attachments
 ![Uploading the source code](images/fig-upload-source-code-zip-file.png)
 
 #### Creating the SQS trigger
+You must add a SQS trigger to your lambda in order for it to consume messages from the queue. Open your lambda function in the AWS console and click the _Add Trigger_ button.
 ![Add trigger](images/fig-add-lambda-trigger-button.png)
 
+Select _SQS_ for the service, you should then be able to select the primary detection queue you created previously from the drop down labeled **SQS queue**. 
+
+You may choose to create the trigger without enabling it by clearing the **Enable trigger** checkbox. Doing so will prevent new messages from being consumed until the trigger is enabled.
 ![Adding the SQS trigger](images/fig-add-lambda-sqs-trigger.png)
 
 ### Installing the FIG service application
@@ -380,5 +384,11 @@ When your lambda function was created, basic logging was enabled to CloudTrail a
 If you wish to increase log verbosity, you may do so by creating the DEBUG environmental variable on your lambda.
 
 ![Enabling Lambda debugging](images/fig-enable-lambda-debug.png)
+
+### Running the service in stand-alone mode
+You may run FIG in stand-alone mode to review any errors that are sent to stdout. To do so, navigate to the FIG service application folder and execute the following command.
+```bash
+$ sudo -u fig python3 main.py
+```
 
 
