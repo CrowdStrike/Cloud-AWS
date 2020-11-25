@@ -171,7 +171,7 @@ Additional policy attachments
 To expedite setup, a service application installer has been developed and is detailed below. For users that wish to deploy the service manually, several steps must be performed:
 1. Create the EC2 instance
 2. Assign the necessary IAM permissions
-3. Create the FIG service account
+3. Create the FIG user account
 4. Install Python 3
 5. Install the boto3 and request client packages
 6. Install the FIG service application files
@@ -197,6 +197,44 @@ The minimum requirements for this instance are:
     - requests client library installed via PIP (--user)
 + The necessary IAM permissions to access SSM parameters and publish messages to our SQS queue
 + A route to the Internet
+
+> If you wish to use the automated service installer, either during instance creation or manually afterwards, skip to [Automated Installation Documentation](#installing-the-fig-service-during-instance-creation).
+
+After your instance is created (or during initial setup) assign the instance IAM role you created previously.
+
+###### Creating the user account
+The fig user account is used for running the service only. While it does have a home directory and profile, it does not need to have a password. This user account can be named whatever meets the requirements for deployment but if it is named anything other than _fig_ than the service definition file described later in this documented should be updated to reflect this change.
+
+Execute the following commands to create the user account.
+```bash
+$ sudo groupadd fig
+
+$ sudo adduser -g fig fig
+```
+
+###### Installing Python 3 and necessary packages
+FIG requires Python 3, the boto3 package and the requests package in order to be able to run. These can be installed with the following commands.
+```bash
+$ sudo yum -y install python3
+
+$ sudo -u fig pip3 install --user requests
+
+$ sudo -u fig pip3 install --user boto3
+```
+
+###### Copying files and necessary permissions
+By default, FIG installs to the _/usr/share/fig_ folder. This can be changed during installation, but the service definition you will create later will need to be updated to reflect the new location. 
+
+If you are installing from source, copy the files located in the [source folder](src) to your installation folder on your new instance.
+
+In order to execute properly, FIG will need to own and be able to write to this installation folder. An example of setting the necessary permissions can be seen below.
+
+```bash
+$ sudo chown -R fig:fig /usr/share/fig
+
+$ sudo chmod 644 /usr/share/fig/*.py
+```
+
 
 ##### Installing the FIG service during instance creation
 This solution provides an installer that supports execution via a User Data script, which allows for deployment via CloudFormation or Terraform.
@@ -226,7 +264,7 @@ Where {FIG_INSTALLER_FILE} is the filename for the installer you've uploaded to 
 ```bash
 $ ./fig-2.0.latest-install.run --target /usr/share/fig
 ```
-###### Installing without setting up the service
+###### Running the installer without setting up the service
 If you want to execute the installer _without_ executing the post-installation script that creates users and sets up the service within systemd, then pass the _--noexec_ flag as follows:
 ```bash
 ./{FIG_INSTALLER_FILE} --target {TARGET_DIRECTORY} --noexec
@@ -337,7 +375,9 @@ Your current position within the event stream is referred to as your _offset_. F
 You can read this file to find your position within the event stream. If you wish to reset your positions in the event stream, remove this file.
 
 ### Lambda debugging
-When your lambda function was created, basic logging was enabled to CloudTrail as a stand-alone log group, named after the name of your lambda function. Successful submissions and regular event activity is tracked in this log. If you wish to increase log verbosity, you may do so by creating the DEBUG environmental variable on your lambda.
+When your lambda function was created, basic logging was enabled to CloudTrail as a stand-alone log group, named after the name of your lambda function. Successful submissions and regular events are tracked in this log. 
+
+If you wish to increase log verbosity, you may do so by creating the DEBUG environmental variable on your lambda.
 
 ![Enabling Lambda debugging](images/fig-enable-lambda-debug.png)
 
