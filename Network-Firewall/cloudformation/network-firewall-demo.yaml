@@ -1,0 +1,1180 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This template creates a VPC for testing CrowdStrikes integration with the VPC Firewall.
+  It will deploy a windows host.  You can generate a detection on the protected windows host.  View the detection in the
+  CrowdStrike console and in AWS Security Hub.  Using a custom action in Security Hub you can add the domain to the domain
+  block list of the VPC Firewall.
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Tagging Information
+        Parameters:
+          - Reason
+          - Owner
+      - Label:
+          default: Network Configuration
+        Parameters:
+          - AvailabilityZones
+          - VPCCIDR
+          - PrivateSubnetCIDR
+          - PublicSubnetCIDR
+      - Label:
+          default: Amazon EC2 Configuration
+        Parameters:
+          - KeyPairName
+      - Label:
+          default: Crowdstrike Falcon API keys.
+        Parameters:
+          - FalconClientId
+          - FalconSecret
+          - CCID
+      - Label:
+          default: Firewall Configuration
+        Parameters:
+          - StatelessRGName
+          - DomainRGName
+          - StatefulRGName
+          - PolicyName
+          - FirewallName
+          - FirewallDescription
+      - Label:
+          default: Security Hub Parameters
+        Parameters:
+          - FigFileName
+          - LinuxInstanceType
+    ParameterLabels:
+      AvailabilityZones:
+        default: Availability Zones
+      KeyPairName:
+        default: Key Pair Name
+      PrivateSubnetCIDR:
+        default: Private Subnet CIDR
+      PublicSubnetCIDR:
+        default: Public Subnet CIDR
+      VPCCIDR:
+        default: VPC CIDR
+Parameters:
+  StatelessRGName:
+    Description: Stateless Rule Group Name
+    Default: CRWD-Demo-Stateless-rg
+    Type: String
+  DomainRGName:
+    Description: Domain Rule Group Name.
+    Default: CRWD-Demo-Domain-rg
+    Type: String
+  StatefulRGName:
+    Description: Stateful Rule Group Name
+    Default: CRWD-Demo-Stateful-rg
+    Type: String
+  PolicyName:
+    Description: Firewall Policy Name
+    Default: CRWD-Demo-Fw-Policy
+    Type: String
+  FirewallName:
+    Description: Firewall Name.
+    Default: CRWD-Demo-Net-Fw
+    Type: String
+  FirewallDescription:
+    Description: Crowdstrike demo firewall name.
+    Default: Crowdstrike integration demo firewall
+    Type: String
+  CCID:
+    Description: CrowdStrike Customer ID
+    Type: String
+    NoEcho: 'true'
+  FalconClientId:
+    Description: Falcon OAuth2 Client ID.
+    Type: String
+    NoEcho: 'true'
+  FalconSecret:
+    Description: Falcon Oath2 API secret.
+    Type: String
+    NoEcho: 'true'
+  FWConfigBucket:
+    Type: String
+    Description: S3 Bucket containing firewall policy config files
+  #    CrowdStrike Mandatory Tagging - Remove before release
+  Owner:
+    Type: String
+    Description: Owner/Creator of resource
+    MaxLength: 20
+  Reason:
+    Type: String
+    Description: Reason for Deployment eg Testing
+    MaxLength: 20
+    Default: Demo
+  AvailabilityZones:
+    Description: Availability Zone to use for the subnets in the VPC. You should select
+      two so that we can deploy the ALB, but we just use 1 (the first).
+    Type: List<AWS::EC2::AvailabilityZone::Name>
+  KeyPairName:
+    Description: Public/private key pairs allow you to securely connect to your instance
+      after it launches
+    Type: AWS::EC2::KeyPair::KeyName
+  PrivateSubnetCIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.1.32/28
+    Description: CIDR block for isolated private subnet.
+    Type: String
+  PublicSubnetCIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.1.0/28
+    Description: CIDR Block for the public DMZ subnet for secure administrative entry
+    Type: String
+  trustedSource:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
+    Default: '0.0.0.0/0'
+    Description: CIDR from which access to bastion is to be permitted
+    Type: String
+  VPCCIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.1.0/24
+    Description: CIDR Block for the VPC
+    Type: String
+  LatestLinuxAMI:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+  LatestWindowsAMI:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-windows-latest/Windows_Server-2016-English-Full-Base
+  WindowsInstanceType:
+    Type: String
+    AllowedValues:
+      - t2.small
+      - t2.micro
+    Default: t2.small
+  LinuxInstanceType:
+    Type: String
+    AllowedValues:
+      - t2.small
+      - t2.micro
+    Default: t2.small
+  FigFileName:
+    Type: String
+    Description: The version of the FIG that you wish to install.
+    Default: fig-2.0.latest-install.run
+Resources:
+  # Setup Parameter Store for Falcon API keys used by Firewall integration lambda and by Security Hub Client (FIG)
+  #  SSMFalconSecret:
+  #    Type: AWS::SSM::Parameter
+  #    Properties:
+  #      Name: falcon_client_secret1
+  #      Type: String
+  #      Value: !Ref FalconSecret
+  #      Description: Falcon API ClientID.
+  #  SSMFalconClientId:
+  #    Type: AWS::SSM::Parameter
+  #    Properties:
+  #      Name: falcon_client_id1
+  #      Type: String
+  #      Value: !Ref FalconClientId
+  #      Description: Falcon API ClientID.
+  #  SSMAppId:
+  #    Type: AWS::SSM::Parameter
+  #    Properties:
+  #      Name: app_id1
+  #      Type: String
+  #      Value: !Join
+  #        - '-'
+  #        - - !Ref 'AWS::StackName'
+  #          - 'CRWD-AppID1'
+  #      Description: App ID.
+  #  SSMFigSeverityThreshold:
+  #    Type: AWS::SSM::Parameter
+  #    Properties:
+  #      Name: severity_threshold1
+  #      Type: String
+  #      Value: 3
+  #  SSMFigSQSQueueParma:
+  #    Type: AWS::SSM::Parameter
+  #    Properties:
+  #      Name: FIG_SQS_QUEUE_NAME
+  #      Type: String
+  #      Value:
+  #        Fn::GetAtt:
+  #          - 'FigQueue'
+  #          - 'Arn'
+  # Create the VPC
+  AWSNetFWDemoVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref 'VPCCIDR'
+      InstanceTenancy: default
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Ref 'AWS::StackName'
+        - Key: Reason
+          Value: !Ref Reason
+        - Key: Owner
+          Value: !Ref Owner
+  AWSNetFWInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref 'AWS::StackName'
+              - 'VPC-IGW'
+        - Key: Reason
+          Value: !Ref Reason
+        - Key: Owner
+          Value: !Ref Owner
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: AWSNetFWDemoVPC
+      InternetGatewayId: !Ref 'AWSNetFWInternetGateway'
+  IGWRouteTableAssociation:
+    Type: AWS::EC2::GatewayRouteTableAssociation
+    Properties:
+      GatewayId: !Ref AWSNetFWInternetGateway
+      RouteTableId: !Ref IGWRouteTable
+  AWSNetFWPrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: AWSNetFWDemoVPC
+      CidrBlock: !Ref 'PrivateSubnetCIDR'
+      AvailabilityZone: !Select
+        - '0'
+        - !Ref 'AvailabilityZones'
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref 'AWS::StackName'
+              - AWS-Net-FW-Priv
+        - Key: Network
+          Value: Private
+        - Key: Reason
+          Value: !Ref Reason
+        - Key: Owner
+          Value: !Ref Owner
+  AWSNetFWPrivateSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: AWSNetFWDemoVPC
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref 'AWS::StackName'
+              - Private-RT
+        - Key: Network
+          Value: Public
+  AWSNetFWPrivateSubnetRoute:
+    DependsOn:
+      - VPCGatewayAttachment
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: AWSNetFWPrivateSubnetRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId:
+        Ref: AWSNetFWInternetGateway
+  AWSNetFWPrivateSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: AWSNetFWPrivateSubnet
+      RouteTableId:
+        Ref: AWSNetFWPrivateSubnetRouteTable
+  IGWRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: AWSNetFWDemoVPC
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref 'AWS::StackName'
+              - IGW-RT
+        - Key: Network
+          Value: Public
+  AWSNetFWPublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: AWSNetFWDemoVPC
+      CidrBlock: !Ref 'PublicSubnetCIDR'
+      AvailabilityZone: !Select
+        - '0'
+        - !Ref 'AvailabilityZones'
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref 'AWS::StackName'
+              - AWS-Net-FW-Pub
+        - Key: Network
+          Value: Public
+        - Key: Reason
+          Value: !Ref Reason
+        - Key: Owner
+          Value: !Ref Owner
+      MapPublicIpOnLaunch: true
+  AWSNetFWPublicSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: AWSNetFWDemoVPC
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref 'AWS::StackName'
+              - Public-RT
+        - Key: Network
+          Value: Public
+        - Key: Owner
+          Value: !Ref Owner
+  AWSNetFWPublicSubnetRoute:
+    DependsOn:
+      - VPCGatewayAttachment
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: AWSNetFWPublicSubnetRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId:
+        Ref: AWSNetFWInternetGateway
+  AWSNetFWPublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: AWSNetFWPublicSubnet
+      RouteTableId:
+        Ref: AWSNetFWPublicSubnetRouteTable
+  AWSNetFWSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref 'AWS::StackName'
+              - private-sg
+      GroupDescription: Enables Admin Access to basic linux hosts
+      VpcId:
+        Ref: AWSNetFWDemoVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref 'trustedSource'
+        - IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: !Ref 'trustedSource'
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: '0.0.0.0/0'
+  #
+  #  Lambda Functions and IAM Role
+  #  Used to create the AWS Network Firewall.  We do this in boto3 as CFT is not available yet
+  #  When CFT is available this can be removed
+  #  Called during stack creation and deletion
+  #  Has to wait for Firewall to complete provisioning and is the cause of most delay in creation/deletion
+  #
+  launchLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - LambdaRoleToCreateFW
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+            Condition: { }
+      Path: /
+      Policies:
+        - PolicyName: Get_Values
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: VisualEditor0
+                Effect: Allow
+                Action:
+                  - logs:ListLogDeliveries
+                  - ec2:ModifyNetworkInterfaceAttribute
+                  - ec2:DeleteNetworkInterface
+                  - ec2:CreateRoute
+                  - ec2:DeleteRoute
+                  - ec2:DescribeRouteTables
+                  - ssm:GetParameters
+                  - ssm:GetParameter
+                  - ssm:GetParametersByPath
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:DescribeNetworkInterfaceAttribute
+                  - ec2:DescribeVpcs
+                  - ec2:DescribeSubnets
+                Resource: '*'
+              - Sid: VisualEditor1
+                Effect: Allow
+                Action:
+                  - network-firewall:*
+                Resource: '*'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLambdaExecute
+  # Lambda layer provides python request library
+  lambdaLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.7
+      Content:
+        S3Bucket: !Ref FWConfigBucket
+        S3Key: network_firewall_layer.zip
+      Description: Layer for requests package
+      LayerName: requests-package
+  # Lambda function to add the AWS Network Firewall
+  AddNetworkFirewall:
+    Type: AWS::Lambda::Function
+    Properties:
+      Environment:
+        Variables:
+          private_subnet_cidr: !Ref PrivateSubnetCIDR
+          fw_subnet_id: !Ref AWSNetFWPrivateSubnet
+          route_table_id: !Ref AWSNetFWPrivateSubnetRouteTable
+          gw_route_table_id: !Ref IGWRouteTable
+          destination_cidr_block: '0.0.0.0/0'
+          s3_bucket: !Ref FWConfigBucket
+          aws_region: !Ref AWS::Region
+          FalconClientId: !Ref FalconClientId
+          FalconSecret: !Ref FalconSecret
+          vpc_id: !Ref AWSNetFWDemoVPC
+          fw_stateless_rg_name: !Ref StatelessRGName
+          fw_domain_rg_name: !Ref DomainRGName
+          fw_stateful_rg_name: !Ref StatefulRGName
+          fw_policy_name: !Ref PolicyName
+          fw_name: !Ref FirewallName
+          fw_description: !Ref FirewallDescription
+      Code:
+        S3Bucket: !Ref FWConfigBucket
+        S3Key: create_fw_lambda.zip
+      Layers:
+        - !Ref lambdaLayer
+      Handler: create_fw_lambda.lambda_handler
+      MemorySize: 128
+      Role: !GetAtt launchLambdaRole.Arn
+      Runtime: python3.7
+      Timeout: 720
+  # Trigger the lambda function.
+  CreateFWTriggerLambda:
+    Type: 'Custom::TriggerLambda'
+    DependsOn:
+      - launchLambdaRole
+    Properties:
+      ServiceToken: !GetAtt
+        - AddNetworkFirewall
+        - Arn
+  #
+  # Windows test instance used to generate detection that we send to Security Hub
+  #
+  WinInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: !Ref 'KeyPairName'
+      NetworkInterfaces:
+        - NetworkInterfaceId: !Ref 'WinNetInt'
+          DeviceIndex: '0'
+      UserData:
+        'Fn::Base64': !Sub |
+          <powershell>
+          <#
+          .SYNOPSIS
+              Download and install the Falcon Sensor for Windows
+          .NOTES
+              Version:        1.5
+              Authors:        Brendan Kremian, Roman Aparisi
+              Last Updater:   Brendan Kremian
+              Creation Date:  2020-04-20
+              Update Date:    2020-09-18
+              Purpose/Change: Added support for 'member_cid'
+          #>
+          [CmdletBinding()]
+          param()
+          begin {
+              <# USER CONFIG ###############################################################################>
+
+              ## OAuth 2 API Client/Secret
+              # Permissions required: sensor-installers:read, sensor-update-policies:read (if defining $PolicyName)
+              [string] $ApiClient = "${FalconClientId}"
+              [string] $ApiSecret = "${FalconSecret}"
+
+              ## 'Member CID' if working in MSSP or Parent/Child CID environments. Default: $null.
+              [string] $MemberCID = $null
+
+              ## API Host
+              # EU-1     : 'https://api.eu-1.crowdstrike.com'
+              # GovCloud : 'https://api.laggar.gcw.crowdstrike.com'
+              # US-1     : 'https://api.crowdstrike.com'
+              # US-2     : 'https://api.us-2.crowdstrike.com'
+              [string] $ApiHost = 'https://api.crowdstrike.com'
+
+              ## Installer Options
+
+              # The policy name to check to find which version to install. If defining a specific
+              # version or using the newest version, input $null. If using 'Default (<OS>)', input 'platform_default'.
+              [string] $PolicyName = $null
+
+              # A specific version to install. If checking a policy or using the newest version, input $null.
+              [string] $Version = $null
+
+              # Installation parameters beyond '/install', '/quiet', '/noreboot' and 'CCID='. If no
+              # additional parameters are required, input $null.
+              [string] $InstallParams = "/install CCID=${CCID}"
+
+              # Input `$true` or `$false` to delete the script and/or installer after installation.
+              [boolean] $DeleteInstaller = $false
+              [boolean] $DeleteScript = $false
+
+              <############################################################################### USER CONFIG #>
+
+              # Regex pattern for finding build from /policy/combined/sensor-update/v2
+              [regex] $BuildRegex = '^\d*'
+
+              # Create 'PSFalcon' Windows Event Log, if not present
+              if (-not([System.Diagnostics.EventLog]::SourceExists('PSFalcon'))) {
+                  New-EventLog -LogName PSFalcon -Source PSFalcon
+              }
+              # Basic Windows Event logging function
+              function Add-Log ([string] $EntryType, [string] $Message) {
+                  $Param = @{
+                      LogName   = 'PSFalcon'
+                      Source    = 'PSFalcon'
+                      EventId   = 2793
+                      EntryType = $EntryType
+                      Message   = $Message
+                  }
+                  Write-EventLog @Param
+
+                  # If error was logged, output error and end script
+                  if ($EntryType -eq 'Error') {
+                      Write-Error $Message
+                      break
+                  }
+              }
+              # Create $PSScriptRoot (PSv2 compatible)
+              if (-not($PSScriptRoot)) {
+                  $PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
+              }
+              # Calculate SHA256 hash value (PSv2 compatible)
+              function Get-SHA256 ([string] $Path) {
+                  $Algorithm = [System.Security.Cryptography.HashAlgorithm]::Create("SHA256")
+                  $Value = [System.BitConverter]::ToString($Algorithm.ComputeHash([System.IO.File]::ReadAllBytes($Path)))
+                  return ($Value.Replace('-', ''))
+              }
+              # Convert Json from API into an array (PSv2 compatible)
+              function Convert-Result ([object] $Json, [string] $Uri) {
+                  $Serializer = New-Object System.Web.Script.Serialization.JavascriptSerializer
+                  $Result = ,$Serializer.DeserializeObject($Json)
+
+                  # Log result
+                  if ($Result.errors) {
+                      $EntryType = 'Error'
+                      $Message   = "$($Result.errors.code): $($Result.errors.message)`n$($Result.meta.trace_id) $Uri"
+                  } else {
+                      $EntryType = 'Information'
+                      $Message   = "$($Result.meta.trace_id) $Uri"
+                  }
+                  Add-Log -EntryType $EntryType -Message $Message
+
+                  # Output result
+                  return $Result
+              }
+              # CrowdStrike Falcon API request and conversion (PSv2 compatible)
+              function Invoke-Falcon ($Uri, $Method, $Body, $Outfile) {
+                  if ($OutFile) {
+                      # Download request for installer package
+                      $Download = New-Object System.Net.WebClient
+                      $Download.Headers.Add('Authorization', $Authorization)
+                      $Download.DownloadFile(($ApiHost + $Uri), $Outfile)
+                  } else {
+                      # Create .NET WebRequest
+                      $WebRequest = [System.Net.WebRequest]::Create(($ApiHost + $Uri))
+                      $WebRequest.Method = $Method
+                      $WebRequest.Accept = 'application/json'
+                      $WebRequest.UserAgent = "InstallFalcon Powershell Script/1.5"
+
+                      if ($Method -eq 'get') {
+                          try {
+                              # Add authorization, make request
+                              $WebRequest.ContentType = 'application/json'
+                              $WebRequest.Headers.Add('Authorization', $Authorization)
+                              $RequestStream = ($WebRequest.GetResponse()).GetResponseStream()
+                              $StreamReader = New-Object System.IO.StreamReader $RequestStream
+
+                              # Convert result to Json and log
+                              Convert-Result -Json $StreamReader.ReadToEnd() -Uri $Uri
+                          } finally {
+                              # Close open streams
+                              if ($null -ne $StreamReader) { $StreamReader.Dispose() }
+                              if ($null -ne $RequestStream) { $RequestStream.Dispose() }
+                          }
+                      } elseif ($Method -eq 'post') {
+                          try {
+                              # Make OAuth2 token request
+                              $WebRequest.ContentType = 'application/x-www-form-urlencoded'
+                              $RequestStream = $WebRequest.GetRequestStream()
+                              $StreamWriter = New-Object System.IO.StreamWriter $RequestStream
+                              $StreamWriter.Write($Body)
+                              $StreamWriter.Flush()
+                              $StreamWriter.Close()
+                              $Response = $WebRequest.GetResponse()
+                              $ResponseStream = $Response.GetResponseStream()
+                              $StreamReader = [System.IO.StreamReader]($ResponseStream)
+
+                              # Convert result to Json and log
+                              Convert-Result -Json $StreamReader.ReadToEnd() -Uri $Uri
+                          } finally {
+                              # Close open streams
+                              if ($null -ne $StreamWriter) { $StreamWriter.Dispose() }
+                              if ($null -ne $RequestStream) { $RequestStream.Dispose() }
+                          }
+                      }
+                  }
+              }
+              # Load assemblies for .NET interaction
+              Add-Type -AssemblyName System.Web
+              Add-Type -AssemblyName System.Web.Extensions
+          }
+          process {
+              if (-not(Get-Service | Where-Object { $_.Name -eq 'CSFalconService' })) {
+                  # Request OAuth2 token
+                  $Param = @{
+                      Uri = '/oauth2/token'
+                      Method = 'post'
+                      Body = "client_id=$ApiClient&client_secret=$ApiSecret"
+                  }
+                  if ($MemberCID) {
+                      $Param.Body += "&member_cid=$MemberCID"
+                  }
+                  $Token = Invoke-Falcon @Param
+
+                  if ($Token.token_type -and $Token.access_token) {
+                      $Authorization = "$($Token.token_type) $($Token.access_token)"
+
+                      if ($PolicyName) {
+                          # Retrieve details for $PolicyName
+                          $Param = @{
+                              Uri = '/policy/combined/sensor-update/v2?filter=' + [System.Web.HTTPUtility]::UrlEncode(
+                                  "platform_name:'Windows'+name:'$($PolicyName.ToLower())'")
+                              Method = 'get'
+                          }
+                          $Policy = Invoke-Falcon @Param
+
+                          # Capture $MinorVersion from $PolicyName
+                          $MinorVersion = ($BuildRegex.Matches($Policy.resources.settings.build)).value
+                      }
+                      # Retrieve list of installer files
+                      $InstallerList = if ($Version) {
+                          $Param = @{
+                              Uri = '/sensors/combined/installers/v1?filter=' +
+                                  [System.Web.HTTPUtility]::UrlEncode("platform:'windows'+version:'$Version'")
+                              Method = 'get'
+                          }
+                          Invoke-Falcon @Param
+                      } else {
+                          $Param = @{
+                              Uri = "/sensors/combined/installers/v1?filter=platform:'windows'"
+                              Method = 'get'
+                          }
+                          Invoke-Falcon @Param
+                      }
+                      # Retrieve CCID
+                      $Param = @{
+                          Uri = '/sensors/queries/installers/ccid/v1'
+                          Method = 'get'
+                      }
+                      $CCID = (Invoke-Falcon @Param).resources
+
+                      # Capture SHA256 and name of target installer file
+                      $CloudHash = if ($MinorVersion) {
+                          ($InstallerList.resources | Where-Object { $_.version -match $MinorVersion }).sha256
+                      } else {
+                          $InstallerList.resources[0].sha256
+                      }
+                      $InstallerName = if ($MinorVersion) {
+                          ($InstallerList.resources | Where-Object { $_.version -match $MinorVersion }).name
+                      } else {
+                          $InstallerList.resources[0].name
+                      }
+                      # Set path for installer file
+                      [string] $InstallerPath = "$PSScriptRoot\$InstallerName"
+
+                      # Download installer file
+                      $Param = @{
+                          Uri = "/sensors/entities/download-installer/v1?id=$CloudHash"
+                          Method = 'get'
+                          Outfile = $InstallerPath
+                      }
+                      Invoke-Falcon @Param
+
+                      if (Test-Path $InstallerPath) {
+                          # Compare local hash against cloud hash
+                          $LocalHash = Get-SHA256 -Path $InstallerPath
+
+                          if ($CloudHash -eq $LocalHash) {
+                              # Start installer
+                              $InstallerPID = (Start-Process -FilePath $InstallerPath -ArgumentList (
+                                  "/install /quiet /noreboot CID=$CCID $InstallParams") -PassThru).id
+
+                              if (Get-Process | Where-Object { $_.Id -eq $InstallerPID }) {
+                                  Add-Log -EntryType 'Information' -Message (
+                                      "$($MyInvocation.MyCommand.Name) started $InstallerPath")
+                              }
+                              if ($DeleteInstaller -eq $true) {
+                                  # Wait for process to finish, then delete installer file
+                                  Wait-Process $InstallerPID
+
+                                  Add-Log -EntryType 'Information' -Message "$InstallerPath ended"
+
+                                  Remove-Item -Path $InstallerPath -Force
+
+                                  if ((Test-Path $InstallerPath) -eq $false) {
+                                      Add-Log -EntryType 'Information' -Message (
+                                          "$($MyInvocation.MyCommand.Name) deleted $InstallerPath")
+                                  } else {
+                                      Add-Log -EntryType 'Warning' -Message (
+                                          "$($MyInvocation.MyCommand.Name) failed to delete $InstallerPath")
+                                  }
+                              }
+                              if ($DeleteScript -eq $true) {
+                                  # Set script path
+                                  [string] $ScriptPath = "$PSScriptRoot\$($MyInvocation.MyCommand.Name)"
+
+                                  # Delete script
+                                  Remove-Item -Path $ScriptPath -Force
+
+                                  if ((Test-Path $ScriptPath) -eq $false) {
+                                      Add-Log -EntryType 'Information' -Message (
+                                          "$($MyInvocation.MyCommand.Name) deleted $ScriptPath")
+                                  } else {
+                                      Add-Log -EntryType 'Warning' -Message (
+                                          "$($MyInvocation.MyCommand.Name) failed to delete $ScriptPath")
+                                  }
+                              }
+                          } else {
+                              # Output error for failed hash check
+                              Add-Log -EntryType 'Error' -Message ("$($MyInvocation.MyCommand.Name) failed hash check on " +
+                                  "$InstallerPath [cloud: $CloudHash, local: $LocalHash]")
+                          }
+                      }
+                  }
+              } else {
+                  if ($DeleteScript -eq $true) {
+                      # Delete script
+                      Remove-Item -Path $ScriptPath -Force
+
+                      if ((Test-Path $ScriptPath) -eq $false) {
+                          Add-Log -EntryType 'Information' -Message (
+                              "$($MyInvocation.MyCommand.Name) deleted $ScriptPath")
+                      } else {
+                          Add-Log -EntryType 'Warning' -Message (
+                              "$($MyInvocation.MyCommand.Name) failed to delete $ScriptPath")
+                      }
+                  }
+                  Add-Log -EntryType 'Error' -Message ("Aborted: CSFalconService already running")
+              }
+          }
+          </powershell>
+      InstanceType: !Ref WindowsInstanceType
+      AvailabilityZone: !Select
+        - '0'
+        - !Ref 'AvailabilityZones'
+      ImageId: !Ref 'LatestWindowsAMI'
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref 'AWS::StackName'
+              - WindowsInstance
+        - Key: CRWD_MANAGED
+          Value: 'YES'
+        - Key: Reason
+          Value: !Ref Reason
+        - Key: Owner
+          Value: !Ref Owner
+  WinEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+  AssociateWinEIP:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId: !GetAtt WinEIP.AllocationId
+      NetworkInterfaceId: !Ref 'WinNetInt'
+  WinNetInt:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      SubnetId: !Ref 'AWSNetFWPublicSubnet'
+      GroupSet:
+        - !Ref 'AWSNetFWSecurityGroup'
+  #
+  #  Security Hub Integration Components EC2 + SQS + Lambda to add detections to Security Hub
+  #
+  Fig:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: !Ref 'KeyPairName'
+      NetworkInterfaces:
+        - NetworkInterfaceId: !Ref 'FigNetInt'
+          DeviceIndex: '0'
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          # version 3.0
+          # This is the userdata script for newly created EC2 instances.
+          # This script should not be executed manually
+          cd /var/tmp
+          wget -O ${FigFileName} https://raw.githubusercontent.com/CrowdStrike/Cloud-AWS/master/Falcon-Integration-Gateway/install/${FigFileName}
+          chmod 755 ${FigFileName}
+          ./${FigFileName} --target /usr/share/fig
+      InstanceType: !Ref LinuxInstanceType
+      AvailabilityZone: !Select
+        - '0'
+        - !Ref 'AvailabilityZones'
+      IamInstanceProfile: !Ref FigBootstrapInstanceProfile
+      ImageId: !Ref 'LatestLinuxAMI'
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref 'AWS::StackName'
+              - Falcon-Integration-Instance
+        - Key: Network
+          Value: Public
+        - Key: Reason
+          Value: !Ref Reason
+        - Key: Owner
+          Value: !Ref Owner
+  FigBootstrapInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref 'FigIAMRole'
+  FigNetInt:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      SubnetId: !Ref 'AWSNetFWPublicSubnet'
+      GroupSet:
+        - !Ref 'AWSNetFWSecurityGroup'
+  FigEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+  AssociateFigEIP:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId: !GetAtt FigEIP.AllocationId
+      NetworkInterfaceId: !Ref 'FigNetInt'
+  FigIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - FIGRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+            Condition: { }
+      Path: /
+      Policies:
+        - PolicyName: Get_Values
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParametersByPath
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                Resource: "*"
+              - Action:
+                  - sqs:SendMessage
+                  - sqs:SendMessageBatch
+                Effect: Allow
+                Resource: !GetAtt FigQueue.Arn
+
+
+  FigQueue:
+    Type: AWS::SQS::Queue
+
+    Properties:
+      VisibilityTimeout: 120
+      QueueName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - crwd-fig
+      RedrivePolicy:
+        deadLetterTargetArn:
+          Fn::GetAtt:
+            - "MyDeadLetterQueue"
+            - "Arn"
+        maxReceiveCount: 5
+  MyDeadLetterQueue:
+    Type: AWS::SQS::Queue
+  CRWDFigIdentifyDetection:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: !Ref FWConfigBucket
+        S3Key: fig_lambda.zip
+      Layers:
+        - !Ref lambdaLayer
+      Handler: main.lambda_handler
+      MemorySize: 128
+      Role: !GetAtt figLambdaRole.Arn
+      Runtime: python3.7
+      Timeout: 60
+  figLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - FIG-LambdaRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+            Condition: { }
+      Path: /
+      Policies:
+        - PolicyName: Get_Values
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: VisualEditor0
+                Effect: Allow
+                Action:
+                  - securityhub:*
+                Resource: '*'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLambdaExecute
+        - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+        - arn:aws:iam::aws:policy/AmazonSQSFullAccess
+  LambdaFunctionEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 10
+      Enabled: true
+      EventSourceArn: !GetAtt FigQueue.Arn
+      FunctionName: !GetAtt CRWDFigIdentifyDetection.Arn
+  AddDomainToRGTarget:
+    Type: Custom::ActionTarget
+    Version: 1.0
+    Properties:
+      ServiceToken: !GetAtt CreateActionTargetLambdaFunction.Arn
+      Name: CRWD-Domain-To-FW
+      Description: Adds Domain name from finding to network firewall resource group
+      Id: DomaintoNetFwRG
+  CreateActionTargetLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - CreateActionTarget
+      Description: Custom resource to create an action target in Security Hub
+      Handler: create_action_target.lambda_handler
+      MemorySize: 256
+      Role: !GetAtt CreateActionTargetLambdaRole.Arn
+      Runtime: python3.7
+      Timeout: 60
+      Code:
+        S3Bucket: !Ref FWConfigBucket
+        S3Key: create_action_target.zip
+  CreateActionTargetLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Policies:
+        - PolicyName: CreateActionTarget-LambdaPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudwatch:PutMetricData
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - securityhub:CreateActionTarget
+                  - securityhub:DeleteActionTarget
+                Resource: '*'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action:
+              - sts:AssumeRole
+  AddDomainToRGTargetEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: AddDomainToRGTargetEventRule
+      Description: "Adds domain from Security Hub finding to Network Firewall domain rule group"
+      EventPattern:
+        source:
+          - aws.securityhub
+        detail-type:
+          - Security Hub Findings - Custom Action
+        resources:
+          - !GetAtt AddDomainToRGTarget.Arn
+      State: "ENABLED"
+      Targets:
+        - Arn:
+            Fn::GetAtt:
+              - "AddDomainToRGLambdaFunction"
+              - "Arn"
+          Id: "CRWDAddDomainEvent"
+  # Lambda function to add the AWS Network Firewall
+  AddDomainToRGLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Environment:
+        Variables:
+          DEBUG_LEVEL: 'INFO'
+          fw_domain_rg_name: !Ref DomainRGName
+      Code:
+        S3Bucket: !Ref FWConfigBucket
+        S3Key: add_finding_domain_to_rg.zip
+      Layers:
+        - !Ref lambdaLayer
+      Handler: add_finding_domain_to_rg.lambda_handler
+      MemorySize: 128
+      Role: !GetAtt AddDomaintoRGLambdaRole.Arn
+      Runtime: python3.7
+      Timeout: 60
+    #
+  AddDomaintoRGLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - AddDomaintoRGLambdaRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+            Condition: { }
+      Path: /
+      Policies:
+        - PolicyName: Get_Values
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: VisualEditor1
+                Effect: Allow
+                Action:
+                  - network-firewall:DescribeRuleGroup
+                  - network-firewall:CreateRuleGroup
+                  - network-firewall:UpdateRuleGroup
+                Resource: '*'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLambdaExecute
+  CreateSSMParamsTrigger:
+    Type: 'Custom::TriggerLambda'
+    DependsOn:
+      - createSsmParamsLambdaRole
+    Properties:
+      FIG_FALCON_CLIENT_ID: !Ref FalconClientId
+      FIG_FALCON_CLIENT_SECRET: !Ref FalconSecret
+      FIG_SEVERITY_THRESHOLD: "3"
+      FIG_SQS_QUEUE_NAME: !Ref FigQueue
+      FIG_APP_ID: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - 'CRWD-AppID1'
+      ServiceToken: !GetAtt
+        - createSsmParams
+        - Arn
+  createSsmParams:
+    Type: AWS::Lambda::Function
+    Properties:
+      Environment:
+        Variables:
+          aws_region: !Ref AWS::Region
+      Code:
+        S3Bucket: !Ref FWConfigBucket
+        S3Key: createSsmParams.zip
+      Layers:
+        - !Ref lambdaLayer
+      Handler: createSsmParams.lambda_handler
+      MemorySize: 128
+      Role: !GetAtt "createSsmParamsLambdaRole.Arn"
+      Runtime: python3.7
+      Timeout: 60
+  createSsmParamsLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLambdaExecute
+        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+      Policies:
+        - PolicyName: LambdaExecutionRolePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:PutParameter
+                  - ssm:DeleteParameter
+                  - ssm:RemoveTagsFromResource
+                  - ssm:GetParameterHistory
+                  - ssm:AddTagsToResource
+                  - ssm:GetParametersByPath
+                  - ssm:GetParameters
+                  - ssm:GetParameter
+                  - ssm:DeleteParameters
+                Resource:
+                  - arn:aws:ssm:*:*:document/*
+                  - arn:aws:ssm:*:*:parameter/*
+              - Sid: VisualEditor1
+                Effect: Allow
+                Action: ssm:DescribeParameters
+                Resource: "*"
