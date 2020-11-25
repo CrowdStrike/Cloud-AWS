@@ -1,0 +1,5 @@
+pass tcp 0.0.0.0/0 any -> 10.0.0.0/8 22 (msg:"pass ssh"; classtype:misc-activity; sid:1000002; rev:1; metadata:temp-ssh-pass;)
+alert icmp 0.0.0.0/0 any -> 10.0.0.0/8 any (msg:"alert icmp"; classtype:misc-activity; sid:2000001; rev:1; metadata:temp-icmp-alert;)
+alert http 0.0.0.0/0 any -> 10.0.0.0/8 80 (msg:"alert http"; classtype:misc-activity; sid:2000002; rev:1; metadata:temp-http-alert;)
+alert tcp 0.0.0.0/0 any -> 0.0.0.0/0 443 (msg:"alert https"; classtype:misc-activity; sid:2000003; rev:1; metadata:temp-https-alert;)
+alert tcp 0.0.0.0/0 any -> 0.0.0.0/0 389 (msg:"alert rdp"; classtype:misc-activity; sid:2000004; rev:1; metadata:temp-alert-alert;)
