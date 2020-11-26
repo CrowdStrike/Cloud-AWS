@@ -952,7 +952,7 @@ Resources:
         S3Key: fig_lambda.zip
       Layers:
         - !Ref lambdaLayer
-      Handler: main.lambda_handler
+      Handler: fig_lambda.lambda_handler
       MemorySize: 128
       Role: !GetAtt figLambdaRole.Arn
       Runtime: python3.7
@@ -978,6 +978,12 @@ Resources:
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParametersByPath
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                Resource: "*"
               - Sid: VisualEditor0
                 Effect: Allow
                 Action:
@@ -1041,6 +1047,8 @@ Resources:
                   - securityhub:CreateActionTarget
                   - securityhub:DeleteActionTarget
                 Resource: '*'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLambdaExecute
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -1107,6 +1115,12 @@ Resources:
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParametersByPath
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                Resource: "*"
               - Sid: VisualEditor1
                 Effect: Allow
                 Action:
