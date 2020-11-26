@@ -31,7 +31,7 @@ There are several benefits to this architecture:
 2. A connection is opened to each available event stream. As new events are received within CrowdStrike, these events are published to the event stream, which are then consumed by the Falcon Integration Gateway.
 3. Detection events are reviewed, with requests to the CrowdStrike Falcon API being performed to confirm these instances are deployed to AWS.
 4. Detection events that meet severity threshold settings and are initially confirmed to exist within AWS are published to a SQS queue.
-5. A lambda function is triggered that reviews the detection, and identifies the region the instance is located in. The instance is confirmed by matching the mac address to the address reported in the detection.
+5. A lambda function is triggered that reviews the detection, and identifies the region the instance is located in. The instance is confirmed by matching the MAC address to the address reported in the detection.
 6. Confirmed detections that are positively identified as attached to valid instances are then published as a finding to AWS Security Hub.
 ---
 
@@ -408,5 +408,6 @@ You may run FIG in stand-alone mode to review any errors that are sent to stdout
 ```bash
 $ sudo -u fig python3 main.py
 ```
+
 
 
