@@ -1076,6 +1076,17 @@ Resources:
               - "Arn"
           Id: "CRWDAddDomainEvent"
   # Lambda function to add the AWS Network Firewall
+  AddDomainToRGTargetPermissions:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Ref: "AddDomainToRGLambdaFunction"
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn:
+        Fn::GetAtt:
+          - "AddDomainToRGTargetEventRule"
+          - "Arn"
   AddDomainToRGLambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
