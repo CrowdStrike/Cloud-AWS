@@ -4,9 +4,9 @@ This example is broken down into multiple parts, easing integration into existin
 build scripts and allowing for quick customization.
 
 Each folder is encapsulated and can be executed as a stand-alone Terraform deployment,
-deploying just the elements described within that folder. The __*[full](full)*__ contains 
-a complete deployment, allowing the entire FIG solution to be deployed within 10 minutes
-using a single Terraform statement.
+deploying just the elements described within that folder. The __*[full](full)*__ folder 
+contains a complete deployment, allowing the entire FIG solution to be deployed within 
+10 minutes using a single Terraform statement.
 
 ## Components
 + `ec2` - FIG [EC2 instance deployment](ec2)
