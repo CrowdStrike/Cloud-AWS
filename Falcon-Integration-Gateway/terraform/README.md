@@ -14,7 +14,8 @@ using a single Terraform statement.
 + `lambda-sqs` - FIG [Lambda SQS trigger deployment](lambda-sqs)
 + `sqs` - FIG [SQS queues deployment](sqs)
 + `ssm` - FIG [SSM parameter store deployment](ssm)
-+ `full` - FIG [Complete deployment](full)
++ `full` - FIG [complete deployment](full)  
+    - This is _recommended solution_ for most use cases
 
 ## Pre-requisites
 + Working AWS API credentials providing you permissions to create:
