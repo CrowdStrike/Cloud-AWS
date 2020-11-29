@@ -18,6 +18,8 @@ proceed.
 ## Required variables
 The following variables __must be__ changed to the correct values reflecting your environment before deploying.
 + `region` - The AWS region we are deploying to.
++ `falcon_client_id` - **DO NOT** store this value within _ssm-variables.tf_. Instead pass it during execution on the command line as shown below.
++ `falcon_client_secret` - **DO NOT** store this value within _ssm-variables.tf_. Instead pass it during execution on the command line as shown below.
 
 ## Optional variables
 The following variables _can be_ changed to reflect desired values within your environment.
@@ -25,8 +27,6 @@ The following variables _can be_ changed to reflect desired values within your e
 + `fig_severity_threshold` - The integer value to use as a threshold for alerts considered worthy of notification.
 + `fig_sqs_queue_name` - The name of the SQS queue to send detections to.
 > If you have updated the name of the SQS queue to reflect a different value, you must update this variable to match or your deployment will not function properly.
-+ `falcon_client_id` - **DO NOT** store this value within _ssm-variables.tf_. Instead pass it during execution on the command line as shown below.
-+ `falcon_client_secret` - **DO NOT** store this value within _ssm-variables.tf_. Instead pass it during execution on the command line as shown below.
 
 ## Confirming the deployment
 Before deploying, confirm you've set the appropriate variable values by executing the following command.
