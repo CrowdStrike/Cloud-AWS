@@ -4,7 +4,7 @@ This folder contains the necessary Terraform files to deploy the SQS trigger to 
 ## Components created
 + Lambda SQS trigger
 
-> In order to properly deploy this trigger, the [Lambda function](terraform/lambda) and the [SQS queues](terraform/sqs) must already exist. This means
+> In order to properly deploy this trigger, the [Lambda function](../lambda) and the [SQS queues](../sqs) must already exist. This means
 the trigger deployment must be executed _after_ the Lambda and SQS deployments.
 
 ## First run
