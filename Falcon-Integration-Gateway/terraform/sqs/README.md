@@ -28,6 +28,7 @@ The following variables _can be_ changed to reflect desired values within your e
 + `sqs_dlq_max_size` - Maximum message size for messages handled by the dead-letter queue.
 + `sqs_dlq_message_retention` - Amount of time messages are retained within the dead-letter queue.
 + `sqs_dlq_wait_time` - Wait time before a message becomes visible within the dead-letter queue.
++ `sqs_queue_name` - The string to use for the name of the primary detections SQS queue.
 + `sqs_queue_delay` - The message delay for the primary detections queue.
 + `sqs_queue_max_size` - The maximum message size for alerts received within the primary detections queue.
 + `sqs_queue_message_retention` - The amount of time messages are retained within the primary detections queue before being passed to the dead-letter queue.
