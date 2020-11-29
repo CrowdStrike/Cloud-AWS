@@ -15,7 +15,7 @@ before you will be able to proceed.
 > Please note: The __*region*__ variable is not stored within _lambda-variables.tf_ and instead resides in _region.tf_. This value __must be__ updated to reflect the appropriate region before you
 proceed.
 
-> Also note: The variable __*lambda_function_name*__ is stored in a stand-alone file named _lambda-function-name.tf_. If you wish to change the name of your Lambda function, this value will need to be updated to reflect the change. This will impact SQS connectivity and should be updated in other aspects of the deployment as well. (See [lambda-sqs](lambda-sqs) for more detail.)
+> Also note: The variable __*lambda_function_name*__ is stored in a stand-alone file named _lambda-function-name.tf_. If you wish to change the name of your Lambda function, this value will need to be updated to reflect the change. This will impact SQS connectivity and should be updated in other aspects of the deployment as well. (See [lambda-sqs](../lambda-sqs) for more detail.)
 
 ## Required variables
 The following variables __must be__ changed to the correct values reflecting your environment before deploying.
