@@ -4,6 +4,9 @@ This folder contains the necessary Terraform files to deploy the SQS trigger to 
 ## Components created
 + Lambda SQS trigger
 
+> In order to properly deploy this trigger, the [Lambda function](terraform/lambda) and the [SQS queues](terraform/sqs) must already exist. This means
+the trigger deployment must be executed _after_ the Lambda and SQS deployments.
+
 ## First run
 After downloading the Terraform files (*.tf) you must execute _terraform init_ in order to download the necessary resources for Terraform to function. More information regarding Terraform and how it can be leveraged to expedite infrastructure deployments can be found [here](https://learn.hashicorp.com/tutorials/terraform/aws-build?in=terraform/aws-get-started).
 
