@@ -15,6 +15,7 @@ $ python3 fd_accounts.py -f [falcon_client_id] -s [falcon_client_secret] -c [com
 + `falcon_client_id` - Falcon Client API key ID
 + `falcon_client_secret` - Falcon Client API key secret
 + `command` - Command to perform
+    - Valid commands are register, update, check and delete
 
 ### Optionally required arguments
 + `external_id` - The external ID used for IAM Role assumption. When using the update or register command, this value is required.
