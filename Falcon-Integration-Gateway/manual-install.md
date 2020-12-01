@@ -95,17 +95,15 @@ $ sudo -u fig pip3 install --user requests
 $ sudo -u fig pip3 install --user boto3
 ```
 
-#### Copying files and necessary permissions
+#### Directory permissions
 By default, FIG installs to the _/usr/share/fig_ folder. This can be changed during installation, but the service definition you will create later will need to be updated to reflect the new location. 
-
-If you are installing from source, copy the files located in the [source folder](src) to your installation folder on your new instance.
 
 In order to execute properly, FIG will need to own and be able to write to this installation folder. An example of setting the necessary permissions can be seen below.
 
 ```bash
 $ sudo chown -R fig:fig /usr/share/fig
 
-$ sudo chmod 644 /usr/share/fig/*.py
+$ sudo chmod 644 /usr/share/fig/*
 ```
 
 ### Running the FIG service automated installer
@@ -132,7 +130,9 @@ If you want to execute the installer _without_ executing the post-installation s
 The service automated installer uses systemd to create and manage the FIG service. The following steps can be performed to install the service manually.
 
 #### Create the service definition
-First create the service definition file. The service file used in the installer is shown below. If you install FIG to a location other than _/usr/share/fig_, then you will need to update the directory listed in the ExecStart line to point to the new location.
+First create the service definition file. The service file used in the installer is shown below. If you have installed the FIG application to a location other than _/usr/share/fig_, then you will need to update the directory listed in the WorkingDirectory and ExecStart lines to point to the new location.
+
+If you are using a user account named something other than _fig_ you will need to update the User line to reflect this change.
 
 The file should be named _fig.service_ and saved in /lib/systemd/system.
 ```bash
