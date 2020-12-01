@@ -832,6 +832,8 @@ Resources:
   #
   Fig:
     Type: AWS::EC2::Instance
+    DependsOn:
+      - CreateSSMParamsTrigger
     Properties:
       KeyName: !Ref 'KeyPairName'
       NetworkInterfaces:
@@ -865,6 +867,7 @@ Resources:
           Value: !Ref Reason
         - Key: Owner
           Value: !Ref Owner
+
   FigBootstrapInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
@@ -898,7 +901,7 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              Service: lambda.amazonaws.com
+              Service: ec2.amazonaws.com
             Action: sts:AssumeRole
             Condition: { }
       Path: /
@@ -914,15 +917,19 @@ Resources:
                   - ssm:GetParameters
                 Resource: "*"
               - Action:
+                  - sqs:GetQueueUrl
+                  - sqs:ListDeadLetterSourceQueues
+                  - sqs:SendMessageBatch
+                  - sqs:ReceiveMessage
+                  - sqs:SendMessage
+                  - sqs:GetQueueAttributes
+                  - sqs:ListQueueTags
                   - sqs:SendMessage
                   - sqs:SendMessageBatch
                 Effect: Allow
                 Resource: !GetAtt FigQueue.Arn
-
-
   FigQueue:
     Type: AWS::SQS::Queue
-
     Properties:
       VisibilityTimeout: 120
       QueueName: !Join
@@ -945,7 +952,7 @@ Resources:
         S3Key: fig_lambda.zip
       Layers:
         - !Ref lambdaLayer
-      Handler: main.lambda_handler
+      Handler: fig_lambda.lambda_handler
       MemorySize: 128
       Role: !GetAtt figLambdaRole.Arn
       Runtime: python3.7
@@ -971,6 +978,12 @@ Resources:
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParametersByPath
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                Resource: "*"
               - Sid: VisualEditor0
                 Effect: Allow
                 Action:
@@ -1034,6 +1047,8 @@ Resources:
                   - securityhub:CreateActionTarget
                   - securityhub:DeleteActionTarget
                 Resource: '*'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLambdaExecute
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -1061,6 +1076,17 @@ Resources:
               - "Arn"
           Id: "CRWDAddDomainEvent"
   # Lambda function to add the AWS Network Firewall
+  AddDomainToRGTargetPermissions:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Ref: "AddDomainToRGLambdaFunction"
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn:
+        Fn::GetAtt:
+          - "AddDomainToRGTargetEventRule"
+          - "Arn"
   AddDomainToRGLambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
@@ -1078,7 +1104,7 @@ Resources:
       Role: !GetAtt AddDomaintoRGLambdaRole.Arn
       Runtime: python3.7
       Timeout: 60
-    #
+  # Add lambda functions for managing firewall rule groups
   AddDomaintoRGLambdaRole:
     Type: AWS::IAM::Role
     Properties:
@@ -1100,6 +1126,12 @@ Resources:
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParametersByPath
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                Resource: "*"
               - Sid: VisualEditor1
                 Effect: Allow
                 Action:
@@ -1109,6 +1141,7 @@ Resources:
                 Resource: '*'
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSLambdaExecute
+  # Create the required parameters for security hub integration.
   CreateSSMParamsTrigger:
     Type: 'Custom::TriggerLambda'
     DependsOn:
@@ -1117,7 +1150,10 @@ Resources:
       FIG_FALCON_CLIENT_ID: !Ref FalconClientId
       FIG_FALCON_CLIENT_SECRET: !Ref FalconSecret
       FIG_SEVERITY_THRESHOLD: "3"
-      FIG_SQS_QUEUE_NAME: !Ref FigQueue
+      FIG_SQS_QUEUE_NAME: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - crwd-fig
       FIG_APP_ID: !Join
         - '-'
         - - !Ref 'AWS::StackName'
