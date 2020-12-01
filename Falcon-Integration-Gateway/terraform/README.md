@@ -30,7 +30,7 @@ contains a complete deployment, allowing the entire FIG solution to be deployed 
 After downloading the Terraform files (*.tf) you must execute _terraform init_ in order to download the necessary resources for Terraform to function. More information regarding Terraform and how it can be leveraged to expedite infrastructure deployments can be found [here](https://learn.hashicorp.com/tutorials/terraform/aws-build?in=terraform/aws-get-started).
 
 ## Passing Falcon API keys
-FIG communicates directly with the CrowdStrike Falcon API using the API Client ID and Secret you generate. This solution creates these secrets as Systems Manager Parameter Store parameters. Pre-deployment, these values can be specified in the file _ssm-variables.tf_ but this is **not** recommended as this file is not encrypted. 
+FIG communicates directly with the CrowdStrike Falcon API using the API Client ID and Secret you generate. This solution creates these secrets as Systems Manager Parameter Store parameters. Pre-deployment, these values can be specified in the file _ssm-variables.tf_ but this is **not** recommended without first encrypting the values. 
 
 Instead, pass these values via the command line as follows.
 
