@@ -174,7 +174,7 @@ def lambda_handler(event, context):
         # See https://aws.amazon.com/fr/blogs/aws/amazon-s3-path-deprecation-plan-the-rest-of-the-story/
         # path-style URLs to be depricated
         #
-        CrowdstrikeTemplateUrl = f'https://crowdstrike-sa-resources-ct-{AwsRegion}.s3.amazonaws.com/ct_crowdstrike_stackset.yaml',
+        CrowdstrikeTemplateUrl = f'https://crowdstrike-sa-resources-ct-{AwsRegion}.s3.amazonaws.com/ct_crowdstrike_stackset.yaml'
         AccountId = get_master_id()
         cList = ['CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND']
         ExecRole = 'AWSControlTowerExecution'
