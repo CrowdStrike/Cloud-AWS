@@ -44,12 +44,12 @@ Parameters:
     Description: The name of the cross account IAM role to be created.
     MinLength: '1'
     Type: String
-    Default: testapi1
+
 
   LogArchiveBucketRegion:
     Type: String
     Description: Log archive bucket region
-    Default: eu-west-1
+
 
   CSAccountNumber:
     AllowedPattern: '[0-9]+'
@@ -68,7 +68,7 @@ Parameters:
   LogArchiveAccount:
     Type: String
     Description: AccountId of Log Archive Bucket
-    Default: "004881111746"
+
 
 Mappings:
   S3perRegion:
