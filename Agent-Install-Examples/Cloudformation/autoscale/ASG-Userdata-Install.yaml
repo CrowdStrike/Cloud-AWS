@@ -47,7 +47,7 @@ Parameters:
   FalconInstallerBucket:
     Type: String
     Description: Name of the S3 bucket containing the falcon sensor installer.
-    Default: falcon-bootstrap-no-endpoint
+
   FalconFileName:
     Type: String
     Description: Name of the S3 bucket containing the falcon sensor installer.
@@ -55,27 +55,27 @@ Parameters:
   CCID:
     Type: String
     Description: Your CID
-    Default: "797BCD0BF5AE4F39A2B770FF52517125-08"
+
   Owner:
     Type: String
     Description: Owner/Creator of resource
     MaxLength: 20
-    Default: JHarris
+
   Business:
     Type: String
     Description: Department
     MaxLength: 20
-    Default: Sales - 310000
+
   Accounting:
     Type: String
     Description: Billing Account
     MaxLength: 20
-    Default: dev
+
   Department:
     Type: String
     Description: Department
     MaxLength: 20
-    Default: Sales
+
   AvailabilityZones:
     Description: Availability Zone to use for the subnets in the VPC. You should select
       two so that we can deploy the ALB, but we just use 1 (the first).
@@ -179,7 +179,7 @@ Resources:
         - Key: Network
           Value: Public
         - Key: CreatedBy
-          Value: GuardDuty Test Script
+          Value: ASG
       MapPublicIpOnLaunch: true
   WorkloadPublicSubnet2:
     Type: AWS::EC2::Subnet
@@ -196,7 +196,7 @@ Resources:
         - Key: Network
           Value: Public
         - Key: CreatedBy
-          Value: GuardDuty Test Script
+          Value: ASG
       MapPublicIpOnLaunch: true
   WorkloadPrivateSubnetRouteTable:
     Type: AWS::EC2::RouteTable
