@@ -132,7 +132,7 @@ Resources:
             - - !Ref 'AWS::StackName'
               - Workload-VPC
         - Key: CreatedBy
-          Value: GuardDuty Test Script
+          Value: ASG Test Script
   WorkloadNATGateway:
     Type: AWS::EC2::NatGateway
     Properties:
@@ -147,7 +147,7 @@ Resources:
     Properties:
       Tags:
         - Key: CreatedBy
-          Value: GuardDuty Test Script
+          Value: ASG Test Script
   WorkloadVPCGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
@@ -542,7 +542,7 @@ Resources:
       HealthCheckPath: /
       Matcher:
         HttpCode: '200'
-      Port: 8080
+      Port: 80
       Protocol: HTTP
       VpcId:
         Ref: WorkloadVPC
@@ -567,7 +567,7 @@ Resources:
           CidrIp: '0.0.0.0/0'
       SecurityGroupEgress:
         - IpProtocol: tcp
-          FromPort: 80
+          FromPort: 8080
           ToPort: 8080
           CidrIp: '0.0.0.0/0'
 
