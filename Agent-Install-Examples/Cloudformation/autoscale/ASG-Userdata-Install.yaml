@@ -1,8 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: This template creates the two VP  for an isolated testing
-  environment. It will deploy tow EC2 hosts running docker which will run an 'attacker and 'victim'.
-  The environment will demontrate how cloud security requires multiple approaches including cloud native and third party
-  Services.
+Description: This template creates instances in an ASG.  Lifecycle hooks are included to run a lambda to hide the host in the falcon console during a scale in event.
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
