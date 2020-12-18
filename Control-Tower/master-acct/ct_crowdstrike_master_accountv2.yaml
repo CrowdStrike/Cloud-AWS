@@ -2,10 +2,10 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Control Tower Lifecycle Events
 Parameters:
   RoleCreationDelayTimer:
-    Description: Delay timer wait for role creation before registering acct
+    Description: Delay timer wait for role creation before registering acct (Time in seconds)
     Type: Number
-    MaxValue: 14
-    Default: 5
+    MaxValue: 800
+    Default: 60
   FalconClientId:
     Description: Your Falcon OAuth2 API Key.
     NoEcho: 'true'
