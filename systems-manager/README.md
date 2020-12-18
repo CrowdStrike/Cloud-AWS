@@ -19,12 +19,18 @@ The **staging** Folder contains the lambda zip **createSsmParams.zip** and **lay
 
 ## Documentation
 
+#### *Systems Manager Overview*
+Systems Manager Overview
+
+[https://github.com/CrowdStrike/Cloud-AWS/blob/master/systems-manager/documentation/introduction/AWS-Systems-Manager-Intro.md](https://github.com/CrowdStrike/Cloud-AWS/blob/master/systems-manager/documentation/introduction/AWS-Systems-Manager-Intro.md)
+
+
 #### *Overview*
-Overview of the integration
+Systems Manager Overview
 
-[https://github.com/CrowdStrike/Cloud-AWS/blob/master/systems-manager/documentation/overview/AWS-Systems-Manager-Intro.md](https://github.com/CrowdStrike/Cloud-AWS/blob/master/systems-manager/documentation/overview/AWS-Systems-Manager-Intro.md)
+[https://github.com/CrowdStrike/Cloud-AWS/blob/master/systems-manager/documentation/overview/Overview.md](https://github.com/CrowdStrike/Cloud-AWS/blob/master/systems-manager/documentation/overview/Overview.md)
 
-#### *Setup*
+#### *Setup Instructions*
 How to setup your account using the CloudFormation template
 
 [https://github.com/CrowdStrike/Cloud-AWS/blob/master/systems-manager/documentation/setup/Setup-your-account.md](https://github.com/CrowdStrike/Cloud-AWS/blob/master/systems-manager/documentation/setup/Setup-your-account.md)
