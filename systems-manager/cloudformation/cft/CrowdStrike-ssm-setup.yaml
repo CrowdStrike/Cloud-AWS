@@ -10,6 +10,11 @@ Metadata:
           - APIGatewayHostKey
           - APIGatewayClientIDKey
           - APIGatewayClientSecretKey
+      - Label:
+          default: Package and Automation Documents
+        Parameters:
+          - InstallPackageName
+          - AutomationDocumentName
     ParameterLabels:
       RoleName:
         default: IAM Role Name
@@ -21,6 +26,14 @@ Outputs:
     Description: The ARN of the role that can be assumed by the other account.
     Value: !GetAtt 'createSsmParamsLambdaRole.Arn'
 Parameters:
+  InstallPackageName:
+    Description: The name of the install package that you wish to create
+    Type: String
+    Default: Local-FalconSensor
+  AutomationDocumentName:
+    Description: The name of the automation document that you wish to create
+    Type: String
+    Default: CS-Falcon-Install
   S3Bucket:
     Description: S3 bucket for lambda files
     Type: String
@@ -32,10 +45,12 @@ Parameters:
     Description: Falcon OAuth2 Client ID.
     Type: String
     NoEcho: 'true'
+    Default: 22751c5bf5464ba78d3478d97e52c127
   APIGatewayClientSecretKey:
     Description: Falcon Oath2 API secret.
     Type: String
     NoEcho: 'true'
+    Default: z9S6d8Qi51NORE7yHTnfu42jls0kJFxcGBUeLIP3
 
 Resources:
 
@@ -110,7 +125,11 @@ Resources:
                   - ssm:GetParametersByPath
                   - ssm:GetParameters
                   - ssm:GetParameter
+                  - ssm:DescribeDocument
                   - ssm:DeleteParameters
+                  - ssm:DeleteDocument
+                  - ssm:CreateDocument
+                  - ssm:UpdateDocument
                 Resource:
                   - arn:aws:ssm:*:*:document/*
                   - arn:aws:ssm:*:*:parameter/*
@@ -136,3 +155,32 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole
 
       RoleName: CrowdStrike-SSMExecutionRole
+
+  TriggerLambda1:
+    Type: 'Custom::TriggerLambda'
+    DependsOn:
+      - LambdaDocsSetup
+    Properties:
+      ServiceToken: !GetAtt
+        - LambdaDocsSetup
+        - Arn
+
+  LambdaDocsSetup:
+    Type: AWS::Lambda::Function
+    Properties:
+      Environment:
+        Variables:
+          aws_region: !Ref AWS::Region
+          document_name: !Ref AutomationDocumentName
+          s3bucket: !Ref S3Bucket
+          package_name: !Ref InstallPackageName
+      Code:
+        S3Bucket: !Ref S3Bucket
+        S3Key: lambda_ssm_setup.zip
+      Layers:
+        - !Ref lambdaLayer
+      Handler: lambda_ssm_setup.lambda_handler
+      MemorySize: 128
+      Role: !GetAtt "createSsmParamsLambdaRole.Arn"
+      Runtime: python3.7
+      Timeout: 120

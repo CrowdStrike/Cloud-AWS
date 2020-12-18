@@ -38,7 +38,7 @@ lambda/staging folder
 2\) Create an S3 Bucket in the region where you will be running the
 CloudFormation template
 
-Upload the **createSsmParams.zip** and **layer.zip** files to the S3 bucket
+Upload all the files in the s3 folder to the S3 bucket.  Ensure that the folder structure is maintained. 
 
 ![](media/image3.png)
 
@@ -59,10 +59,18 @@ The API key will require
 
 -   "Installation Tokens" -- "Read" + "Write"
 
--   
+-   "Sensor Download" -- "Read"
 
 ![](media/image4.png)
 
-5\) Verify that the template has created the resources
+5) Verify that the template has created the resources
 
 ![](media/image5.png)
+
+6) Check that the automation document has been created.
+
+![](media/image7.png)
+
+7) Check that the distributor document has been created.
+
+![](media/image8.png)
