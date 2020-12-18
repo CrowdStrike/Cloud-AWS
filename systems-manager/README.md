@@ -19,8 +19,8 @@ The **staging** Folder contains the lambda zip **createSsmParams.zip** and **lay
 
 ## Documentation
 
-#### *Systems Manager Overview*
-Systems Manager Overview
+#### *Systems Manager Introduction*
+Systems Manager Introduction
 
 [https://github.com/CrowdStrike/Cloud-AWS/blob/master/systems-manager/documentation/introduction/AWS-Systems-Manager-Intro.md](https://github.com/CrowdStrike/Cloud-AWS/blob/master/systems-manager/documentation/introduction/AWS-Systems-Manager-Intro.md)
 
