@@ -172,7 +172,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
-        S3Key: create_stackset_lambda.zip
+        S3Key: create_stackset_lambdav2.zip
       Layers:
         - !Ref lambdaLayer
       Environment:
@@ -185,7 +185,7 @@ Resources:
           CSAccountNumber: !Ref CSAccountNumber
           CSAssumingRoleName: !Ref CSAssumingRoleName
           CrowdstrikeCredentialsSecret: !Ref CrowdStrikeCredentials
-      Handler: create_stackset_lambda.lambda_handler
+      Handler: create_stackset_lambdav2.lambda_handler
       Runtime: python3.7
       MemorySize: 128
       Role: !GetAtt "launchLambdaRole.Arn"
