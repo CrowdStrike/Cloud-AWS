@@ -198,6 +198,5 @@ Resources:
             Condition: { }
       Path: /
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AWSLambdaExecute
-        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+        - arn:aws:iam::aws:policy/AWSLambdaBasicExecutionRole
 
