@@ -155,7 +155,14 @@ def lambda_handler(event, context):
             API_METHOD = 'POST'
             api_message = format_notification_message(external_id)
             # Register account
-            time.sleep(delay_timer)
+            try:
+                delay = float(delay_timer)
+            except Exception as e:
+                logger.info('cant convert delay_timer type {} error {}'.format(type(delay_timer), e))
+                delay = 60
+                pass
+            logger.info('Got ARN of Role Pausing for {} seconds for role setup'.format(delay))
+            time.sleep(delay)
             register_result = register_falcon_discover_account(api_message, api_keys, API_METHOD)
             logger.info('Account registration result: {}'.format(register_result))
             if register_result:
