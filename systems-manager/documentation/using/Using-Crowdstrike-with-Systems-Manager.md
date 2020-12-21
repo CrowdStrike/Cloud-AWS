@@ -30,33 +30,33 @@ We recommend that you automate the process of updating SSM Agent on your instanc
 ## Installing the CrowdStrike Falcon agent 
 ## Installing With the GUI
 
-1. From the AWS console can be select the automation document under AWS Systems Manager \> Distributor \> Third
-    Party > FalconSensor-(Linux\|Windows) 
+1. From the AWS console can be select the automation document under AWS Systems Manager \> Automation \> Owned By Me > CS-Falcon-Install 
 
-   Select "Install one time"
+   ![](./media/automation-doc-page1.png) 
 
 2. Complete the Input parameters form
-   ![](.//media/image2.png)
-   
+
+    Select the *Instanceids* from the selector
+    ![](./media/Console-page1.png)
+
 3. Select the **Action** that you wish to perform
 
-    Select either "**Install**" or "**Uninstall**" for the action to perform on the instance
-
-4. Select the correct package name and optional package version.
-
-   Package Name - The package name should **FalconSensor-Windows** or **FalconSensor-Linux**
-
-   PackageVersion - Leave blank unless you wish to specify a specific version
+4.  Select the *Install or Uninstall* from the Action dropdown
+    ![](./media/Console-page2.png)
     
-5. Enter the parameters that you wish to send to the CrowdStrike agent
-    
+5.  Select the correct package name and optional package version.
+
+    Package Name - The package is the name of the package you provided in the cloudformation template
+    PackageVersion - Leave blank unless you wish to specify a specific version
+6.  Enter the parameters that you wish to send to the CrowdStrike agent
+            
     Note: No additional parameters are required in most situations
     
     Addtional information for installing the Windows sensor [https://falcon.crowdstrike.com/support/documentation/23/falcon-sensor-for-windows](https://falcon.crowdstrike.com/support/documentation/23/falcon-sensor-for-windows)
-
+    
     Addtional information for installing the Linux sensor [https://falcon.crowdstrike.com/support/documentation/20/falcon-sensor-for-linux](https://falcon.crowdstrike.com/support/documentation/20/falcon-sensor-for-linux)
     
-6. AutomationAssumeRole - Select a role that has the pre configured *AWS-SSM-ExecutionRole* policy
+6.  Select a role that has the pre configured *AWS-SSM-ExecutionRole* policy
     bound to it. If you have used the supplied cloudformation template to setup the account select the role named
     **Crowdstrike-SSMExecutionRole**
 
@@ -93,8 +93,10 @@ The CrowdStrike agent is installed with a automation document as described in th
 To start the installation process via the cli use the **aws ssm start-automation-execution** command.
  [https://docs.aws.amazon.com/cli/latest/reference/ssm/start-automation-execution.html](https://docs.aws.amazon.com/cli/latest/reference/ssm/start-automation-execution.html)
  
+Substitue values for ```<<automation document name>>``` and ```<<distributor package name>>``` from the names provided in the cloudformation template.
+ 
  ```console
-aws ssm start-automation-execution --document-name "Crowdstrike-FalconSensorDeploy" -document-version "\$DEFAULT" --parameters '{"InstallerParams":["--tags=\"CrowdStrike SSMAutomationTest\""],"Action":["Install"],"InstallationType":["Uninstall and reinstall"],"PackageName":["FalconSensor-Windows"],"PackageVersion":["5.36.xxxx"],"APIGatewayHostKey":["CS_API_GATEWAY_HOST"],"APIGatewayClientIDKey":["CS_API_GATEWAY_CLIENT_ID"],"APIGatewayClientSecretKey":["CS_API_GATEWAY_CLIENT_SECRET"],"InstanceIds":["i-0axxxyyyzzzc12345"],"AutomationAssumeRole":["xxxxxxxxxxxxxxxxxxx"]}' --region us-east-1
+aws ssm start-automation-execution --document-name "<<automation document name>>" --document-version "\$DEFAULT" --parameters '{"InstallerParams":[""],"Action":["Install"],"InstallationType":["Uninstall and reinstall"],"PackageName":["<<distributor package name>>"],"PackageVersion":[""],"APIGatewayHostKey":["CS_API_GATEWAY_HOST"],"APIGatewayClientIDKey":["CS_API_GATEWAY_CLIENT_ID\n"],"APIGatewayClientSecretKey":["CS_API_GATEWAY_CLIENT_SECRET"],"Targets":[]}' --region eu-west-1
 ```
 
 ### Installing With Python

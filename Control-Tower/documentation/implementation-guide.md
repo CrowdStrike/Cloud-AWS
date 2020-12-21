@@ -61,10 +61,7 @@ CrowdStrike will analyze the logs in the log file, if an event of interest is fo
 Customers will require the following:
 * Subscription to Falcon Discover for Cloud & Containers **or** the Falcon Cloud Workload Protection Bundle.
 * Subscription to Falcon Insight
-
-The following parameters will be stored in AWS Secrets Manager in the master account:
-* Falcon Cloud API ClientID
-* Falcon Cloud API Client Secret
+* AWS Secrets Manager enabled in the region that you are deploying Control Tower.  We use secrets manager to store the CrowdStrike API keys with Read+Write permissions for the “AWS Accounts” role.
 
 CrowdStrike will pass an ``externalid`` when trying to assume a role in the log archive account to read the log files. We recommend that you become familiar with the following article:
 
@@ -122,7 +119,8 @@ Setup consists of the following high-level tasks:
 1) Generate CrowdStrike Falcon API Keys.
 
     First login to the CrowdStrike console and go to ``Support --> API Clients and Keys``. Obtain CrowdStrike OAuth2 keys from the Falcon Console. Copy the ``CLIENT ID`` and ``SECRET`` as these will be used in the template.
-
+    ![Select Contract Options)](images/AWS-Accounts-keys.png)
+    
     ![Select Contract Options)](images/api-client-created.png)
 
     
