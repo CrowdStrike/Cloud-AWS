@@ -198,5 +198,5 @@ Resources:
             Condition: { }
       Path: /
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 

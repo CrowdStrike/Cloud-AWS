@@ -26,9 +26,9 @@ delay_timer = os.environ['delay_timer']
 Falcon_Discover_Url = 'https://ctstagingireland.s3-' + aws_region + '.amazonaws.com/crowdstrike_role_creation_ss.yaml'
 
 
-def delete_falcon_discover_account(account) -> bool:
-    url = f'https://api.crowdstrike.com/cloud-connect-aws/entities/accounts/v1?ids={account}'
-    auth_token = get_auth_token()
+def delete_falcon_discover_account(payload, api_keys, api_method) -> bool:
+    url = f'https://api.crowdstrike.com/cloud-connect-aws/entities/accounts/v1?ids={LocalAccount}'
+    auth_token = get_auth_token(api_keys)
     if auth_token:
         auth_header = get_auth_header(auth_token)
     else:
@@ -216,8 +216,12 @@ def lambda_handler(event, context):
             cfnresponse_send(event, context, 'SUCCESS', "CustomResourcePhysicalID")
 
         elif event['RequestType'] in ['Delete']:
+            API_METHOD = 'DELETE'
             logger.info('Event = ' + event['RequestType'])
-            result = delete_falcon_discover_account(LocalAccount)
+            api_keys = event['ResourceProperties']
+            external_id = event['ResourceProperties']['ExternalID']
+            api_message = format_notification_message(external_id)
+            result = delete_falcon_discover_account(api_message, api_keys, API_METHOD)
             if result:
                 logger.info('Successfully deleted account in Falcon Discover portal')
             else:
