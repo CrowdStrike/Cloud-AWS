@@ -12,7 +12,7 @@ import json
 import sys
 import requests
 #Falcon SDK - All in one uber-class
-import falconpy.api_complete as FalconSDK
+from falconpy import api_complete as FalconSDK
 
 ############### FORMAT API PAYLOAD
 def format_api_payload(rate_limit_reqs=0, rate_limit_time=0):

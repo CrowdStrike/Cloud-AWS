@@ -12,8 +12,8 @@ import json
 import sys
 import requests
 #Falcon SDK - Cloud_Connect_AWS and OAuth2 API service classes
-import falconpy.services.cloud_connect_aws as FalconAWS
-import falconpy.services.oauth2 as FalconAuth
+from falconpy import cloud_connect_aws as FalconAWS
+from falconpy import oauth2 as FalconAuth
 
 ############### FORMAT API PAYLOAD
 def format_api_payload(rate_limit_reqs=0, rate_limit_time=0):
