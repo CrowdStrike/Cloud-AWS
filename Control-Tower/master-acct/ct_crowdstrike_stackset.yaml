@@ -25,6 +25,7 @@ Outputs:
     Description: The ARN of the role that can be assumed by the other account.
     Value: !GetAtt 'iamRole.Arn'
 Parameters:
+
   FalconClientId:
     Description: Falcon OAuth2 Client ID.
     Type: String
@@ -155,6 +156,7 @@ Resources:
           CSAssumingRoleName: !Ref CSAssumingRoleName
           LocalAccount: !Ref AWS::AccountId
           aws_region: !Ref AWS::Region
+
       Code:
         S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
         S3Key: register_new_account.zip
@@ -164,7 +166,7 @@ Resources:
       MemorySize: 128
       Role: !GetAtt "CrowdStrikeRegisterAcctLambdaRole.Arn"
       Runtime: python3.7
-      Timeout: 60
+      Timeout: 900
 
   TriggerLambda:
     Type: 'Custom::TriggerLambda'

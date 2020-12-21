@@ -2,12 +2,19 @@
 
 ## Setting up and Using Systems Manager
 
+The diagram below shows the process for setting up systems manager with CrowdStrike in your account. 
+
+
+
 ![Setup Overview](images/systems-manager-private-package.png)
 
 1) Customer downloads the files in this github repository and reviews the install and uninstall scripts provided.
 
+    Example install and uninstall scripts are included in the folder in the required directory structure.  Refer to the AWS documentation for more information about creating packages. 
+    
+    https://docs.aws.amazon.com/systems-manager/latest/userguide/distributor-working-with-packages-create.html#distributor-working-with-packages-create-adv
+
 2) Customer uploads package contents to an S3 bucket. 
-The S3 bucket should contain a zip file for each supported OS and a manifest.json file.
 
 3) Customer applies a CloudFormation template that sets up the required Parameters in the AWS parameter store. These parameters are required by the installation scripts. 
 The cloudformation template will also create the distributor package in the customer account. 
@@ -40,10 +47,10 @@ During the agent install process the following tasks are performed.
 The `AWS-ConfigureAWSPackage` is a standard AWS package that invokes the process of delivering the software package to the instance and invoking the install/uninstall scripts. 
 
 
+Running the automation document
 
-
-## Creating the Automation Document
+## Creating an Automation Document from a local machine.
 
 ```shell
-python3 aws_ssm_automation_document_management.py --document_name=CS-FalconSensorDeploy-Test --source_file=../../aws-automation-doc/Crowdstrike-FalconSensorDeploy.yml --action=create --region=eu-west-1
+python3 aws_ssm_automation_document_management.py --document_name=<<Automation document name>> --source_file=../../aws-automation-doc/Crowdstrike-FalconSensorDeploy.yml --action=create --region=eu-west-1
 ```
