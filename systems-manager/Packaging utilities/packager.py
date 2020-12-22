@@ -154,40 +154,41 @@ def bucket_exists(bucket_name, region):
     return False
 
 
-# def createDocument(region, filepath, package_name):
-#     """
-#
-#     :param region:
-#     :param filepath: Path to the maniftest file in this case "manifest.json"
-#     :param package_name: The name of the package in SSM
-#     :return: True or False
-#     """
-#
-#     try:
-#         start_time = time.time()
-#         ssm_client = boto3.client('ssm', region_name=region)
-#         with open(filepath) as openFile:
-#             documentContent = openFile.read()
-#             createDocRequest = ssm_client.create_package(
-#                 Content = documentContent,
-#                 Attachments=[
-#                     {
-#                         'Key': 'SourceUrl',
-#                         'Values': [
-#                             # 'https://'+s3bucket+'.s3-'+region+'.amazonaws.com/falcon',
-#                             f'https://{s3bucket}.s3.amazonaws.com/falcon',
-#                         ]
-#                     },
-#                 ],
-#                 Name=package_name,
-#                 DocumentType='Package',
-#                 DocumentFormat='JSON'
-#             )
-#             print('Created ssm package {}:'.format(package_name))
-#             return True
-#     except Exception as e:
-#         print('Error creating document {}'.format(e))
-#         return False
+def createDocument(region, filepath, package_name):
+    """
+
+    :param region:
+    :param filepath: Path to the maniftest file in this case "manifest.json"
+    :param package_name: The name of the package in SSM
+    :return: True or False
+    """
+
+    try:
+        start_time = time.time()
+        ssm_client = boto3.client('ssm', region_name=region)
+        with open(filepath) as openFile:
+            documentContent = openFile.read()
+            createDocRequest = ssm_client.create_document(
+                Content = documentContent,
+                Attachments=[
+                    {
+                        'Key': 'SourceUrl',
+                        'Values': [
+                            # 'https://'+s3bucket+'.s3-'+region+'.amazonaws.com/falcon',
+                            f'https://{s3bucket}.s3.amazonaws.com/falcon'
+                        ]
+                    },
+                ],
+                Name=package_name,
+                DocumentType='Package',
+              #  DocumentVersion="$LATEST",
+                DocumentFormat='JSON'
+            )
+            print('Created ssm package {}:'.format(package_name))
+            return True
+    except Exception as e:
+        print('Error creating document {}'.format(e))
+        return False
 
 def upload_file(file_name, bucket, object_name=None):
     """Upload a file to an S3 bucket
@@ -261,8 +262,8 @@ def main():
     for file in files:
         s3name = 'falcon/' + file
         upload_file(file, s3bucket, s3name)
-    # if createDocument(region, "../s3-bucket/manifest.json", package_name):
-    #     print("Successfully created package")
+    if createDocument(region, "../s3-bucket/falcon/manifest.json", package_name):
+        print("Successfully created package")
 
 
 if __name__ == '__main__':
@@ -275,7 +276,7 @@ if __name__ == '__main__':
 
     region = args.aws_region
     package_name = args.package_name
-    s3bucket = f'{args.s3bucket}-{region}'
+    s3bucket = f'{args.s3bucket}'
     FILENAME = 'agent_list.json'
 
     main()
