@@ -45,12 +45,12 @@ Parameters:
     Description: Falcon OAuth2 Client ID.
     Type: String
     NoEcho: 'true'
-    Default: 22751c5bf5464ba78d3478d97e52c127
+
   APIGatewayClientSecretKey:
     Description: Falcon Oath2 API secret.
     Type: String
     NoEcho: 'true'
-    Default: z9S6d8Qi51NORE7yHTnfu42jls0kJFxcGBUeLIP3
+
 
 Resources:
 
