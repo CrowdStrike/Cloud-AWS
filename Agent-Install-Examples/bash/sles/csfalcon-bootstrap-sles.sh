@@ -37,7 +37,7 @@ done
 if [[ $PROCEED -eq 4 ]]
 then
    cd /var/tmp
-   curl -o stage2 https://raw.githubusercontent.com/jshcodes/stuff/main/Agent-Install-Examples/bash/cssensor_download.sh
+   curl -o stage2 https://raw.githubusercontent.com/CrowdStrike/Cloud-AWS/master/Agent-Install-Examples/bash/cssensor_download.sh
    chmod 755 stage2
    # export CS_FALCON_CLIENT_ID=$CLIENT_ID
    # export CS_FALCON_CLIENT_SECRET=$CLIENT_SECRET
