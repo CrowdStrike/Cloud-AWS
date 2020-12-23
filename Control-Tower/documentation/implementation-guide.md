@@ -146,7 +146,7 @@ Setup consists of the following high-level tasks:
 
 4) Load the CloudFormation template in the master account.
 
-    Go to the master account and apply the CloudFormation template "*ct_crowdstrike_master_account.yaml*" from the ``master-acct`` folder.
+    Go to the master account and apply the CloudFormation template "*ct_crowdstrike_master_accountv2.yaml*" from the ``master-acct`` folder.
 
     Description of Parameters:
 
@@ -165,6 +165,8 @@ Setup consists of the following high-level tasks:
     * **LogArchiveBucketRegion**: Region where CloudTrail log archive bucket that was created by Control Tower.
 
     * **RoleName**: This name may be modified as required.
+    
+    * **RoleCreationDelayTimer**: Time delay before registering the account.  Provides time fot hte newly createed role to be replicated to all regions before we register the account in the CrowdStrike API
     
     The CloudFormation template will create the following resources in the account:
     

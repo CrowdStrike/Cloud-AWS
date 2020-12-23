@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: This template sets up a cross account IAM role in order to 
+Description: This template sets up a cross account IAM role in order to
   enable CrowdStrike Falcon Discover for AWS functionality.
 Metadata:
   AWS::CloudFormation::Interface:
@@ -25,6 +25,7 @@ Outputs:
     Description: The ARN of the role that can be assumed by the other account.
     Value: !GetAtt 'iamRole.Arn'
 Parameters:
+
   FalconClientId:
     Description: Falcon OAuth2 Client ID.
     Type: String
@@ -44,12 +45,12 @@ Parameters:
     Description: The name of the cross account IAM role to be created.
     MinLength: '1'
     Type: String
-    Default: testapi1
+
 
   LogArchiveBucketRegion:
     Type: String
     Description: Log archive bucket region
-    Default: eu-west-1
+
 
   CSAccountNumber:
     AllowedPattern: '[0-9]+'
@@ -65,16 +66,10 @@ Parameters:
     Type: String
     Default: "CS-Prod-HG-CsCloudconnectaws"
 
-  LogArchiveBucketName:
-    Type: String
-    Description: Log Archive Bucket Name
-    Default: aws-controltower-logs-004881111746-eu-west-1
-
-
   LogArchiveAccount:
     Type: String
     Description: AccountId of Log Archive Bucket
-    Default: "004881111746"
+
 
 Mappings:
   S3perRegion:
@@ -135,7 +130,7 @@ Resources:
         Version: '2012-10-17'
       Roles:
         - !Ref 'iamRole'
-    DependsOn: iamRole
+
 
   lambdaLayer:
     Type: AWS::Lambda::LayerVersion
@@ -150,8 +145,6 @@ Resources:
 
 
   manageInstanceFalconAPI:
-    DependsOn:
-      - CrowdstrikeRegisterAcctLambdaRole
     Type: AWS::Lambda::Function
     Properties:
       Environment:
@@ -162,6 +155,8 @@ Resources:
           CSAccountNumber: !Ref CSAccountNumber
           CSAssumingRoleName: !Ref CSAssumingRoleName
           LocalAccount: !Ref AWS::AccountId
+          aws_region: !Ref AWS::Region
+
       Code:
         S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
         S3Key: register_new_account.zip
@@ -169,15 +164,14 @@ Resources:
         - !Ref lambdaLayer
       Handler: register_new_account.lambda_handler
       MemorySize: 128
-      Role: !GetAtt "CrowdstrikeRegisterAcctLambdaRole.Arn"
+      Role: !GetAtt "CrowdStrikeRegisterAcctLambdaRole.Arn"
       Runtime: python3.7
-      Timeout: 60
+      Timeout: 900
 
   TriggerLambda:
     Type: 'Custom::TriggerLambda'
     DependsOn:
-      - CrowdstrikeRegisterAcctLambdaRole
-      - manageInstanceFalconAPI
+      - CrowdStrikeRegisterAcctLambdaRole
     Properties:
       FalconSecret: !Ref FalconSecret
       FalconClientId: !Ref FalconClientId
@@ -186,10 +180,10 @@ Resources:
         - manageInstanceFalconAPI
         - Arn
 
-  CrowdstrikeRegisterAcctLambdaRole:
+  CrowdStrikeRegisterAcctLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: CrowdstrikeRegisterAcctLambdaRole
+      RoleName: CrowdStrikeRegisterAcctLambdaRole
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
