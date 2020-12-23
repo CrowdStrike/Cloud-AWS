@@ -1,0 +1,1 @@
+# BASH bootstrap examples
