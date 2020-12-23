@@ -1,4 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
+# Version 2
+# Added delay timer to allow time between role creation and account registration
+# AWS API calls are eventually consistent. When an API call is made to a service endpoint,
+# there is an expected delay in the resource being available after creation/modification of the resource.
+# In the case with IAM roles/policies, there is a delay in the inter-region replication of the newly
+# created/modified IAM resources.
 Description: Control Tower Lifecycle Events
 Parameters:
   RoleCreationDelayTimer:
@@ -15,7 +21,6 @@ Parameters:
     Description: Your Falcon OAuth2 API Secret.
     NoEcho: 'true'
     Type: String
-
 
   ExternalId:
     Description: ExternalID Used for authenticating assume role requests.
@@ -164,9 +169,6 @@ Resources:
       SourceAccount: !Ref "AWS::AccountId"
 
   LambdaToLaunchStackSet:
-    DependsOn:
-      - "launchLambdaRole"
-      - CrowdStrikeCredentials
     Type: 'AWS::Lambda::Function'
     DeletionPolicy: Delete
     Properties:
@@ -192,10 +194,6 @@ Resources:
       Timeout: 180
   TriggerLambda1:
     Type: 'Custom::TriggerLambda'
-    DependsOn:
-      - LambdaToLaunchStackSet
-      - "launchLambdaRole"
-      - permissionForEventsToInvokeLambda
     Properties:
       FalconSecret: !Ref FalconSecret
       FalconClientId: !Ref FalconClientId
@@ -214,8 +212,6 @@ Resources:
       LayerName: requests-package
 
   CrowdStrikeCaptureControlTowerLifeCycleEvents:
-    DependsOn:
-      - TriggerCustomizationsOnLifeCycleEvent
     Type: AWS::Events::Rule
     Properties:
       Description: Capture Control Tower LifeCycle Events and Trigger an Action
@@ -262,8 +258,6 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
   TriggerCustomizationsOnLifeCycleEvent:
-    DependsOn:
-      - LambdaRoleToCaptureEvents
     Type: AWS::Lambda::Function
     Properties:
       Code:
