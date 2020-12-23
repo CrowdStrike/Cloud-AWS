@@ -43,7 +43,7 @@ then
    # export CS_FALCON_CLIENT_SECRET=$CLIENT_SECRET
    ./stage2 $OS_NAME $OS_VERSION . $CLIENT_ID $CLIENT_SECRET
    #yum -y install libnl
-   rpm -ivh sensor.rpm
+   rpm -ivh --nodeps sensor.rpm
    /opt/CrowdStrike/falconctl -s -f --cid=$CLIENT_CID
    /sbin/service falcon-sensor restart
    rm stage2
