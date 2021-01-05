@@ -1,1 +1,20 @@
-{"schemaVersion": "2.0", "version": "3.0", "packages": {"amazon": {"_any": {"x86_64": {"file": "CS_AMAZON.zip"}}}}, "files": {"CS_AMAZON.zip": {"checksums": {"sha256": "c17b081a58e573d2e1e860ca8d0ae57b0604ca3259538832b79c3380ff278b9f"}}}}
+{
+  "schemaVersion": "2.0",
+  "version": "3.0",
+  "packages": {
+    "amazon": {
+      "_any": {
+        "x86_64": {
+          "file": "CS_AMAZON.zip"
+        }
+      }
+    }
+  },
+  "files": {
+    "CS_AMAZON.zip": {
+      "checksums": {
+        "sha256": "19817ba00f2663967b5cce946eb9a0ab67f9f318d1cba45e0c0e9368805d4d23"
+      }
+    }
+  }
+}

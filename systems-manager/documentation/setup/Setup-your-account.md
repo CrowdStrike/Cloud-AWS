@@ -32,7 +32,7 @@ Deploy the cloudformation template
     *Download the files from the S3 folder and the Packaging Utilities folder
     
     Review the installation scripts in the Falcon folder under S3.   If you are happy with the scripts then proceed to Step 2.  If you wish to modify the scripts   
-    then follow the guide "creating new install scripts and manifest file".
+    then follow the guide ["creating new install scripts and manifest file"](https://github.com/CrowdStrike/Cloud-AWS/tree/master/systems-manager/Packaging%20utilities).
 
 2. Create an S3 Bucket in the region where you will be running the CloudFormation template
 
