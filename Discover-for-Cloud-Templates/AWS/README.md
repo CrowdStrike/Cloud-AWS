@@ -81,7 +81,7 @@ If an event of interest is found we proceed to step 4
 
 **Step 4: Crowdstrike assumes a role from the customer account that permits access.**
 
-If an event of interest is found in the log file, Crowdstrike will attempt to assume a role in the accountand discover more about the AWS object that has been created.
+If an event of interest is found in the log file, Crowdstrike will attempt to assume a role in the account and discover more about the AWS object that has been created.
 
 A role must exist in the account that has the following permissions
 

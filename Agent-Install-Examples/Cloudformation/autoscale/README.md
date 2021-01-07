@@ -2,7 +2,7 @@
 
 An example of an autoscale group consisting and Amazon Linux 2 instances.
 
-We use user-data scripts to install the sensor during intialisation and autoscale Lifecycle hooks to remove the instance from the Falcon Console when it is terminated. 
+We use user-data scripts to install the sensor during initialisation and autoscale Lifecycle hooks to remove the instance from the Falcon Console when it is terminated. 
 
 # Instructions 
 
@@ -64,7 +64,7 @@ The CrowdStrike customer ID is passed from the input parameters, this could be s
 ```
  eval /opt/CrowdStrike/falconctl -s --cid="${CCID}"
 ```
-The location and name of the install file is passed from the input parameteres.
+The location and name of the install file is passed from the input parameters.
 ```
  aws s3 cp s3://${FalconInstallerBucket}/${FalconFileName} ./
 ```
