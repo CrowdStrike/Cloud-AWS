@@ -27,7 +27,7 @@ Cloud Formation Templates and lambda functions to integrate Falcon Discover with
 
 ## Discover for Cloud
 
-This folder contains a number of templates for setting up AWS accounts with Discover.  The scripts all assument that you are using CloudTrail to write to an S3 bucket in a shared log Archive account. 
+This folder contains a number of templates for setting up AWS accounts with Discover.  The scripts all assume that you are using CloudTrail to write to an S3 bucket in a shared log Archive account. 
 
 ### Terraform
 

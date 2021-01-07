@@ -52,9 +52,9 @@ We recommend that you automate the process of updating SSM Agent on your instanc
             
     Note: No additional parameters are required in most situations
     
-    Addtional information for installing the Windows sensor [https://falcon.crowdstrike.com/support/documentation/23/falcon-sensor-for-windows](https://falcon.crowdstrike.com/support/documentation/23/falcon-sensor-for-windows)
+    Additional information for installing the Windows sensor [https://falcon.crowdstrike.com/support/documentation/23/falcon-sensor-for-windows](https://falcon.crowdstrike.com/support/documentation/23/falcon-sensor-for-windows)
     
-    Addtional information for installing the Linux sensor [https://falcon.crowdstrike.com/support/documentation/20/falcon-sensor-for-linux](https://falcon.crowdstrike.com/support/documentation/20/falcon-sensor-for-linux)
+    Additional information for installing the Linux sensor [https://falcon.crowdstrike.com/support/documentation/20/falcon-sensor-for-linux](https://falcon.crowdstrike.com/support/documentation/20/falcon-sensor-for-linux)
     
 6.  Select a role that has the pre configured *AWS-SSM-ExecutionRole* policy
     bound to it. If you have used the supplied cloudformation template to setup the account select the role named

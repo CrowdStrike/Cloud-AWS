@@ -5,7 +5,7 @@ The python script "packager.py" will create files required to create a custom au
 
 1) Create a directory for each os that you wish to generate a custom package. 
 
-2) Each directory should contain the folowing
+2) Each directory should contain the following
     1) Install script
     2) Uninstall script
 

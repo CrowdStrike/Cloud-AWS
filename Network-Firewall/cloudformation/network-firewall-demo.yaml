@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: This template creates a VPC for testing CrowdStrikes integration with the VPC Firewall.
+Description: This template creates a VPC for testing CrowdStrike integration with the VPC Firewall.
   It will deploy a windows host.  You can generate a detection on the protected windows host.  View the detection in the
   CrowdStrike console and in AWS Security Hub.  Using a custom action in Security Hub you can add the domain to the domain
   block list of the VPC Firewall.
