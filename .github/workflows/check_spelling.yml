@@ -15,4 +15,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Check Spelling
-      uses: UnicornGlobal/spellcheck-github-actions@master
+      uses: SFLScientific/spellcheck-github-actions@master
