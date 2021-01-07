@@ -1,7 +1,47 @@
 [
   {
     "os": "amazon",
-    "dir": "CS_AMAZON",
-    "file": "CS_AMAZON.zip"
+    "dir": "linux",
+    "file": "linux.zip"
+  },
+  {
+    "os": "centos",
+    "dir": "linux",
+    "file": "linux.zip"
+  },
+  {
+    "os": "debian",
+    "dir": "linux",
+    "file": "linux.zip"
+  },
+  {
+    "os": "redhat",
+    "dir": "linux",
+    "file": "linux.zip"
+  },
+  {
+    "os": "suse",
+    "dir": "linux",
+    "file": "linux.zip"
+  },
+  {
+    "os": "opensuse",
+    "dir": "linux",
+    "file": "linux.zip"
+  },
+  {
+    "os": "opensuseleap",
+    "dir": "linux",
+    "file": "linux.zip"
+  },
+  {
+    "os": "oracle",
+    "dir": "linux",
+    "file": "linux.zip"
+  },
+  {
+    "os": "ubuntu",
+    "dir": "linux",
+    "file": "linux.zip"
   }
 ]
