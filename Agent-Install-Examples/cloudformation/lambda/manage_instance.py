@@ -176,7 +176,7 @@ def lambda_handler(event, context):
     The entry point when this lambda function gets
     invoked.
 
-    .. note:: The primary objective of this lambda funciton
+    .. note:: The primary objective of this lambda function
               is to handle life-cycle hooks and to create / delete
               elastic network interfaces to assign / disassociate to / from
               instances.

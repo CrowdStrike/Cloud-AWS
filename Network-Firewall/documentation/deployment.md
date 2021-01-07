@@ -166,7 +166,7 @@ After 15-20 mins the stack deployment should be complete
  
 ![](images/cft-status.png)
 
-1. Verify that you have a Firewall in your newly created VPC.  Verify the firewall rule groups associatied with the firewall policy.
+1. Verify that you have a Firewall in your newly created VPC.  Verify the firewall rule groups associated with the firewall policy.
 ![](images/fw-status.png)
 
 2. Verify that you have a route entry in the route table associated with the private subnet that has a next hop of the firewall vpce.

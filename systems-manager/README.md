@@ -15,7 +15,7 @@ It is expected that once installed, sensor versions will be managed via the falc
 #### *cft*
 Folder containing a CloudFormation template **CrowdStrike-ssm-setup.yaml**.
 #### *s3-bucket*
-The **s3-bucket** Folder contains all the files that must be uploaded to an S3Bucket in the account and region where CrowdStrikes systems manager integration is being enabled.
+The **s3-bucket** Folder contains all the files that must be uploaded to an S3Bucket in the account and region where CrowdStrike's systems manager integration is being enabled.
 #### *Packaging utilities*
 Example files for creating custom install packages with a script to create the package and upload to an S3 bucket.
 ## Documentation
