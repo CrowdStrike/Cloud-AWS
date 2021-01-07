@@ -43,9 +43,9 @@ The python script "packager.py" will create files required to create a custom au
    
    Usage
     ```code
-    % python3 generate_ssm_package_files.py -h 
+    % python3 packager.py -h
 
-    usage: generate_ssm_package_files.py [-h] -r AWS_REGION -b S3BUCKET
+    usage: packager.py [-h] -r AWS_REGION -b S3BUCKET -p PACKAGE_NAME
    ```
     Script execution
     

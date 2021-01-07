@@ -256,10 +256,10 @@ class DistributorPackager:
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Get Params to create CRWD SSM Package')
-    parser.add_argument('-r', '--aws_region', help='AWS Region', required=True)
-    parser.add_argument('-p', '--package_name', help='Package Name', required=True)
-    parser.add_argument('-b', '--s3bucket', help='Package Name', required=True)
+    parser = argparse.ArgumentParser(description='Create and upload Distributor packages to the AWS SSM')
+    parser.add_argument('-r', '--aws_region', help='AWS Region')
+    parser.add_argument('-p', '--package_name', help='Package Name')
+    parser.add_argument('-b', '--s3bucket', help='Package Name')
 
     args = parser.parse_args()
 
@@ -269,5 +269,9 @@ if __name__ == '__main__':
 
     files = DistributorPackager().build('agent_list.json')
 
-    S3BucketUpdater(region).update(s3bucket, files)
-    SSMPackageUpdater(region).update(package_name, "../s3-bucket/manifest.json")
+    if region is None or package_name is None or s3bucket is None:
+        print("Skipping AWS upload: please provide --aws_region, --package_name, and --s3bucket command-line options for upload")
+        print("Package has been built successfully.")
+    else:
+        S3BucketUpdater(region).update(s3bucket, files)
+        SSMPackageUpdater(region).update(package_name, "../s3-bucket/manifest.json")
