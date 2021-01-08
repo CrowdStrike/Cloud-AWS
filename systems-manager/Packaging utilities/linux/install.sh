@@ -131,7 +131,7 @@ os_install_package() {
         elif type yum > /dev/null 2>&1; then
             yum install -q -y "$pkg" || rpm -ivh --nodeps "$pkg"
         elif type zypper > /dev/null 2>&1; then
-            zypper install -y "$pkg" || rpm -ivh --nodeps "$pkg"
+            zypper --quiet install -y "$pkg" || rpm -ivh --nodeps "$pkg"
         else
             rpm -ivh --nodeps "$pkg"
         fi
@@ -145,7 +145,7 @@ os_install_package() {
             rpm_install_package "$pkg"
             ;;
         Debian)
-            apt-get install -y "$pkg" > /dev/nul
+            DEBIAN_FRONTEND=noninteractive apt-get -qq install -y "$pkg" > /dev/nul
             ;;
         Oracle)
             rpm_install_package "$pkg"
@@ -157,7 +157,7 @@ os_install_package() {
             rpm_install_package "$pkg"
             ;;
         Ubuntu)
-            apt-get install -y "$pkg"
+            DEBIAN_FRONTEND=noninteractive apt-get -qq install -y "$pkg" > /dev/null
             ;;
         *)
             die "Unrecognized OS: ${os_name}";;
