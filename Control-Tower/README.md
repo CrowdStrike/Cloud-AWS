@@ -1,6 +1,6 @@
 # CrowdStrike with AWS Control Tower 
 
-Setup CrowdStrikes Discover for AWS service using Control Tower.
+Setup CrowdStrike Discover for AWS service using Control Tower.
 
 ## Documentation 
 
