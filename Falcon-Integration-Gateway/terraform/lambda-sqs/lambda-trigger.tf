@@ -1,5 +1,5 @@
 #THIS VERSION ONLY WORKS FOR STAND-ALONE SQS / LAMBDA / SQS-LAMBDA DEPLOYMENTS
-#If you want to deploy all funcitonality at the same time, please use the 
+#If you want to deploy all functionality at the same time, please use the 
 #files contained within the "full" folder as this version will fail due to the
 #SQS and Lambda functions not yet existing.
 data "aws_sqs_queue" "fig_sqs_queue" {
