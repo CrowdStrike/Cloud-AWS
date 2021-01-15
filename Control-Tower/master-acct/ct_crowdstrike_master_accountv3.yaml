@@ -1,10 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
-# Version 2
-# Added delay timer to allow time between role creation and account registration
-# AWS API calls are eventually consistent. When an API call is made to a service endpoint,
-# there is an expected delay in the resource being available after creation/modification of the resource.
-# In the case with IAM roles/policies, there is a delay in the inter-region replication of the newly
-# created/modified IAM resources.
+#
+# Version 3
+# Modified IAM Role names so that they are prepended with StackName-
+# Modified IAM Role used to invoke lambda - No longer uses AWS managed policies as some customers do not have
+# the required AWS managed roles in new accounts.
+#
 Description: Control Tower Lifecycle Events
 Parameters:
   RoleCreationDelayTimer:

@@ -146,7 +146,7 @@ Setup consists of the following high-level tasks:
 
 4) Load the CloudFormation template in the master account.
 
-    Go to the master account and apply the CloudFormation template "*ct_crowdstrike_master_account.yaml*" from the ``master-acct`` folder.
+    Go to the master account and apply the CloudFormation template "*ct_crowdstrike_master_accountv3.yaml*" from the ``master-acct`` folder.
 
     Description of Parameters:
 
