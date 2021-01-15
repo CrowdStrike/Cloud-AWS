@@ -25,7 +25,11 @@ Outputs:
     Description: The ARN of the role that can be assumed by the other account.
     Value: !GetAtt 'iamRole.Arn'
 Parameters:
-
+  RoleCreationDelayTimer:
+    Description: Delay timer wait for role creation before registering acct (Time in seconds)
+    Type: Number
+    MaxValue: 800
+    Default: 60
   FalconClientId:
     Description: Falcon OAuth2 Client ID.
     Type: String
@@ -156,17 +160,17 @@ Resources:
           CSAssumingRoleName: !Ref CSAssumingRoleName
           LocalAccount: !Ref AWS::AccountId
           aws_region: !Ref AWS::Region
-
+          delay_timer: !Ref RoleCreationDelayTimer
       Code:
         S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
-        S3Key: register_new_account.zip
+        S3Key: register_new_accountv2.zip
       Layers:
         - !Ref lambdaLayer
-      Handler: register_new_account.lambda_handler
+      Handler: register_new_accountv2.lambda_handler
       MemorySize: 128
       Role: !GetAtt "CrowdStrikeRegisterAcctLambdaRole.Arn"
       Runtime: python3.7
-      Timeout: 900
+      Timeout: 890
 
   TriggerLambda:
     Type: 'Custom::TriggerLambda'
@@ -179,11 +183,9 @@ Resources:
       ServiceToken: !GetAtt
         - manageInstanceFalconAPI
         - Arn
-
   CrowdStrikeRegisterAcctLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: CrowdStrikeRegisterAcctLambdaRole
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -191,9 +193,19 @@ Resources:
             Principal:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
-            Condition: {}
       Path: /
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AWSLambdaExecute
-        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+      Policies:
+        - PolicyName: LambdaExecutionRolePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - '*'
+
+
 
