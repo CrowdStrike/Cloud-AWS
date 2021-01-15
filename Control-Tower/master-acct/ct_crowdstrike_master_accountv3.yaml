@@ -1,6 +1,17 @@
 AWSTemplateFormatVersion: '2010-09-09'
+#
+# Version 3
+# Modified IAM Role names so that they are prepended with StackName-
+# Modified IAM Role used to invoke lambda - No longer uses AWS managed policies as some customers do not have
+# the required AWS managed roles in new accounts.
+#
 Description: Control Tower Lifecycle Events
 Parameters:
+  RoleCreationDelayTimer:
+    Description: Delay timer wait for role creation before registering acct (Time in seconds)
+    Type: Number
+    MaxValue: 800
+    Default: 60
   FalconClientId:
     Description: Your Falcon OAuth2 API Key.
     NoEcho: 'true'
@@ -10,7 +21,6 @@ Parameters:
     Description: Your Falcon OAuth2 API Secret.
     NoEcho: 'true'
     Type: String
-
 
   ExternalId:
     Description: ExternalID Used for authenticating assume role requests.
@@ -68,8 +78,8 @@ Metadata:
       - Label:
           default: CrowdStrike Falcon API keys.
         Parameters:
-           - FalconClientId
-           - FalconSecret
+          - FalconClientId
+          - FalconSecret
       - Label:
           default: Log Archive Account Details
         Parameters:
@@ -80,20 +90,26 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       Description: CrowdStrike Credentials
-      Name: CrowdStrikeAPISecret
+      Name: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - CrowdStrikeAPISecret
       SecretString:
         Fn::Join:
-        - ''
-        - - '{"FalconClientId":"'
-          - Ref: FalconClientId
-          - '","FalconSecret": "'
-          - Ref: FalconSecret
-          - '"}'
+          - ''
+          - - '{"FalconClientId":"'
+            - Ref: FalconClientId
+            - '","FalconSecret": "'
+            - Ref: FalconSecret
+            - '"}'
 
   launchLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: launchLambdaRole
+      RoleName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - launchLambdaRole
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -101,7 +117,7 @@ Resources:
             Principal:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
-            Condition: {}
+            Condition: { }
       Path: /
       Policies:
         - PolicyName: Get_Values
@@ -135,7 +151,7 @@ Resources:
                 - cloudformation:ListStackInstances
                 - cloudformation:DeleteStackInstances
                 - cloudformation:DeleteStackSet
-              Resource: !Join [':', ['arn:aws:cloudformation', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'stackset/*:*']]
+              Resource: !Join [ ':', [ 'arn:aws:cloudformation', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'stackset/*:*' ] ]
         - PolicyName: Pass_Role
           PolicyDocument:
             Version: '2012-10-17'
@@ -144,7 +160,7 @@ Resources:
               Effect: Allow
               Action:
                 - iam:PassRole
-              Resource: !Join [':', ['arn:aws:iam:', !Ref "AWS::AccountId", 'role/service-role/AWSControlTowerStackSetRole']]
+              Resource: !Join [ ':', [ 'arn:aws:iam:', !Ref "AWS::AccountId", 'role/service-role/AWSControlTowerStackSetRole' ] ]
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
         - arn:aws:iam::aws:policy/AWSOrganizationsReadOnlyAccess
@@ -159,37 +175,31 @@ Resources:
       SourceAccount: !Ref "AWS::AccountId"
 
   LambdaToLaunchStackSet:
-    DependsOn:
-      - "launchLambdaRole"
-      - CrowdStrikeCredentials
     Type: 'AWS::Lambda::Function'
     DeletionPolicy: Delete
     Properties:
       Code:
         S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
-        S3Key: create_stackset_lambda.zip
+        S3Key: create_stackset_lambdav3.zip
       Layers:
         - !Ref lambdaLayer
       Environment:
         Variables:
+          RoleCreationDelayTimer: !Ref RoleCreationDelayTimer
           AwsRegion: !Ref AWS::Region
           LogArchiveAccount: !Ref LogArchiveAccount
           LogArchiveBucketRegion: !Ref LogArchiveBucketRegion
-          RoleName : !Ref RoleName
+          RoleName: !Ref RoleName
           CSAccountNumber: !Ref CSAccountNumber
           CSAssumingRoleName: !Ref CSAssumingRoleName
           CrowdstrikeCredentialsSecret: !Ref CrowdStrikeCredentials
-      Handler: create_stackset_lambda.lambda_handler
+      Handler: create_stackset_lambdav3.lambda_handler
       Runtime: python3.7
       MemorySize: 128
       Role: !GetAtt "launchLambdaRole.Arn"
       Timeout: 180
   TriggerLambda1:
     Type: 'Custom::TriggerLambda'
-    DependsOn:
-      - LambdaToLaunchStackSet
-      - "launchLambdaRole"
-      - permissionForEventsToInvokeLambda
     Properties:
       FalconSecret: !Ref FalconSecret
       FalconClientId: !Ref FalconClientId
@@ -208,32 +218,33 @@ Resources:
       LayerName: requests-package
 
   CrowdStrikeCaptureControlTowerLifeCycleEvents:
-    DependsOn:
-    - TriggerCustomizationsOnLifeCycleEvent
     Type: AWS::Events::Rule
     Properties:
       Description: Capture Control Tower LifeCycle Events and Trigger an Action
       EventPattern:
         detail:
           eventName:
-          - CreateManagedAccount
-          - UpdateManagedAccount
+            - CreateManagedAccount
+            - UpdateManagedAccount
           eventSource:
-          - controltower.amazonaws.com
+            - controltower.amazonaws.com
         detail-type:
-        - AWS Service Event via CloudTrail
+          - AWS Service Event via CloudTrail
         source:
-        - aws.controltower
+          - aws.controltower
       Name: CrowdStrikeCaptureControlTowerLifeCycleEvents
       State: ENABLED
       Targets:
-      - Arn: !GetAtt "TriggerCustomizationsOnLifeCycleEvent.Arn"
-        Id: IDCrowdStrikeCaptureControlTowerLifeCycleEvents
+        - Arn: !GetAtt "TriggerCustomizationsOnLifeCycleEvent.Arn"
+          Id: IDCrowdStrikeCaptureControlTowerLifeCycleEvents
 
   LambdaRoleToCaptureEvents:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: LambdaRoleToCaptureEvents
+      RoleName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - LambdaRoleToCaptureEvents
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -241,7 +252,7 @@ Resources:
             Principal:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
-            Condition: {}
+            Condition: { }
       Path: /
       Policies:
         - PolicyName: inline-policy
@@ -251,13 +262,11 @@ Resources:
               - Effect: Allow
                 Action:
                   - 'cloudformation:CreateStackInstances'
-                Resource: !Join [':',['arn:aws:cloudformation', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'stackset/*:*']]
+                Resource: !Join [ ':',[ 'arn:aws:cloudformation', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'stackset/*:*' ] ]
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
   TriggerCustomizationsOnLifeCycleEvent:
-    DependsOn:
-    - LambdaRoleToCaptureEvents
     Type: AWS::Lambda::Function
     Properties:
       Code:
