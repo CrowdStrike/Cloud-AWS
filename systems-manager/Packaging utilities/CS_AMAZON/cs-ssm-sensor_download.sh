@@ -94,7 +94,7 @@ Win?*)
 esac
 
 ## Get Installer Versions
-jsonResult=$(curl -s -L -G "https://$CS_API_BASE/sensors/combined/installers/v1" --data-urlencode "filter=os:\"$OS_NAME\"" -H "Authorization: Bearer $CS_FALCON_OAUTH_TOKEN")
+jsonResult=$(curl -s -L -G "https://$CS_API_BASE/sensors/combined/installers/v1" --data-urlencode "filter=os:\"$OS_NAME\"" -H "Authorization: Bearer $SSM_CS_AUTH_TOKEN")
 
 if [[ $jsonResult == *"denied"* ]]; then
   echoRed "Invalid Access Token"
@@ -135,6 +135,6 @@ fi
 
 filename="$OUTPUT_DESTINATION/sensor.$file_type"
 
-curl -s -L "https://$CS_API_BASE/sensors/entities/download-installer/v1?id=$sha" -H "Authorization: Bearer $CS_FALCON_OAUTH_TOKEN" -o "$filename"
+curl -s -L "https://$CS_API_BASE/sensors/entities/download-installer/v1?id=$sha" -H "Authorization: Bearer $SSM_CS_AUTH_TOKEN" -o "$filename"
 
 echo "Output the sensor binary to: $filename"

@@ -13,7 +13,7 @@ CrowdStrike Discover for Cloud and Containers offers streamlined integration not
 By uniquely combining information from Discover for Cloud and Containers and AWS metadata, security teams are able to baseline existing Amazon EC2 deployments instantly across all regions and subsequently monitor AWS CloudTrail logs for any modifications to the environment. This holistic asset management across entire data centers and AWS cloud resources allows you to identify unmanaged assets -- pinpointing security gaps and closing them.
 
 * **Prioritizes detections for faster and more effective response.**
-Discover for Cloud and Containers delivers rish AWS metadata on EC2 instances, so that unprotected assets and impacted systems are quickly prioritized. It provides the critical answers analysts need such as: Is this system internet accessible? Does it have AWS Identity and Access Management (IAM) roles applied with elevated privileges? Is it on the same Amazon VPC as critical assets? Armed with this context-rich information, organizations can apply proactive measures to dramatically improve their security posture.
+Discover for Cloud and Containers delivers rich AWS metadata on EC2 instances, so that unprotected assets and impacted systems are quickly prioritized. It provides the critical answers analysts need such as: Is this system internet accessible? Does it have AWS Identity and Access Management (IAM) roles applied with elevated privileges? Is it on the same Amazon VPC as critical assets? Armed with this context-rich information, organizations can apply proactive measures to dramatically improve their security posture.
 
 * **Ensures consistent security across hybrid environments**.
 As organizations move to the cloud, they are implementing hybrid data center with workloads running on-premises and in the cloud, which can impede a consistent level of security. Discover for Cloud and Containers provides visibility across all assets whether they are on-premises or EC2 instances in AWS. In addition, the visibility extends to both managed and unmanaged assets -- allowing organizations to quickly ensure that all assets are being protected.
@@ -146,7 +146,7 @@ Setup consists of the following high-level tasks:
 
 4) Load the CloudFormation template in the master account.
 
-    Go to the master account and apply the CloudFormation template "*ct_crowdstrike_master_accountv3.yaml*" from the ``master-acct`` folder.
+    Go to the master account and apply the CloudFormation template "*ct_crowdstrike_master_accountv2.yaml*" from the ``master-acct`` folder.
 
     Description of Parameters:
 
@@ -165,6 +165,8 @@ Setup consists of the following high-level tasks:
     * **LogArchiveBucketRegion**: Region where CloudTrail log archive bucket that was created by Control Tower.
 
     * **RoleName**: This name may be modified as required.
+    
+    * **RoleCreationDelayTimer**: Time delay before registering the account.  Provides time fot hte newly createed role to be replicated to all regions before we register the account in the CrowdStrike API
     
     The CloudFormation template will create the following resources in the account:
     

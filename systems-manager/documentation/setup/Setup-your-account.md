@@ -29,13 +29,12 @@ Deploy the cloudformation template
     Download the template *CrowdStrike-ssm-setup.yaml* from the
     cloudformation folder
 
-    *Download the lambda files "createSsmParams.zip" and "layer.zip from the
-    lambda/staging folder
+    *Download the files from the S3 folder and the Packaging Utilities folder
+    
+    Review the installation scripts in the Falcon folder under S3.   If you are happy with the scripts then proceed to Step 2.  If you wish to modify the scripts   
+    then follow the guide ["creating new install scripts and manifest file"](https://github.com/CrowdStrike/Cloud-AWS/tree/master/systems-manager/Packaging%20utilities).
 
-    [https://github.com/CrowdStrike/Cloud-AWS/tree/master/systems-manager/cloudformation/lambda/staging](https://github.com/CrowdStrike/Cloud-AWS/tree/master/systems-manager/cloudformation/lambda/staging)
-
-2. Create an S3 Bucket in the region where you will be running the
-CloudFormation template
+2. Create an S3 Bucket in the region where you will be running the CloudFormation template
 
     Upload all the files in the s3 folder to the S3 bucket.  Ensure that the folder structure is maintained. 
 

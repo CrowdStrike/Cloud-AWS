@@ -12,8 +12,8 @@ import json
 import sys
 import requests
 #Falcon SDK - Cloud_Connect_AWS and OAuth2 API service classes
-import falconpy.services.cloud_connect_aws as FalconAWS
-import falconpy.services.oauth2 as FalconAuth
+from falconpy import cloud_connect_aws as FalconAWS
+from falconpy import oauth2 as FalconAuth
 
 ############### FORMAT API PAYLOAD
 def format_api_payload(rate_limit_reqs=0, rate_limit_time=0):
@@ -42,45 +42,50 @@ def check_account():
         with open('falcon-discover-accounts.json', 'w+') as f:
             json.dump(account_list, f)
     #Create a list of our account IDs out of account_list
-    id_list = ",".join([a["id"] for a in account_list])
+    id_items=[]
+    for z in account_list:
+        id_items.append(z["id"])
+    #id_list = ",".join([a["id"] for a in account_list])
     #Returns the specified value for a specific account id within account_list
     account_value = lambda i,v: [a[v] for a in account_list if a["id"] == i][0]
-    #Check our AWS account access against the list of accounts returned in our query
-    access_response = falcon_discover.VerifyAWSAccountAccess(body={}, parameters={}, ids=id_list)
-    if access_response['status_code'] == 200:
-        #Loop through each ID we verified
-        for result in access_response["body"]["resources"]:
-            if result["successful"]:
-                #This account is correctly configured
-                print(f'Account {result["id"]} is ok!')
-            else:
-                #This account is incorrectly configured.  We'll use our account_value function to
-                #retrieve configuration values from the account list we've already ingested.
-                account_values_to_check = {
-                    'id': result["id"],
-                    'iam_role_arn': account_value(result["id"],"iam_role_arn"),
-                    'external_id': account_value(result["id"],"external_id"),
-                    'cloudtrail_bucket_owner_id': account_value(result["id"],"cloudtrail_bucket_owner_id"),
-                    'cloudtrail_bucket_region': account_value(result["id"],"cloudtrail_bucket_region"),
-                }
-                #Use the account_value function to retrieve the access_health branch, which contains our api failure reason
-                try:
-                    print(f'Account {result["id"]} has a problem: {account_value(result["id"],"access_health")["api"]["reason"]}')
-                except:
-                    #The above call will produce an error if we're running check immediately after registering an account as 
-                    #the access_health branch hasn't been populated yet. Requery the API for the account_list when this happens.
-                    account_list = falcon_discover.QueryAWSAccounts(parameters={"limit":f"{str(query_limit)}"})["body"]["resources"]
-                    print(f'Account {result["id"]} has a problem: {account_value(result["id"],"access_health")["api"]["reason"]}')
-                #Output the account details to the user to assist with troubleshooting the account
-                print(f'Current settings {json.dumps(account_values_to_check, indent=4)}\n')
-    else:
-        try:
-            #An error has occurred
-            print("Got response error code {} message {}".format(access_response["status_code"], access_response["body"]["errors"][0]["message"]))
-        except:
-            #Handle any egregious errors that break our return error payload
-            print("Got response error code {} message {}".format(access_response["status_code"], access_response["body"]))
-
+    q_max=10    #VerifyAWSAccountAccess has a ID max count of 10
+    for index in range(0, len(id_items), q_max):
+        sub_acct_list = id_items[index:index + q_max]
+        temp_list = ",".join([a for a in sub_acct_list])
+        access_response = falcon_discover.VerifyAWSAccountAccess(body={}, parameters={}, ids=temp_list)
+        if access_response['status_code'] == 200:
+            #Loop through each ID we verified
+            for result in access_response["body"]["resources"]:
+                if result["successful"]:
+                    #This account is correctly configured
+                    print(f'Account {result["id"]} is ok!')
+                else:
+                    #This account is incorrectly configured.  We'll use our account_value function to
+                    #retrieve configuration values from the account list we've already ingested.
+                    account_values_to_check = {
+                        'id': result["id"],
+                        'iam_role_arn': account_value(result["id"],"iam_role_arn"),
+                        'external_id': account_value(result["id"],"external_id"),
+                        'cloudtrail_bucket_owner_id': account_value(result["id"],"cloudtrail_bucket_owner_id"),
+                        'cloudtrail_bucket_region': account_value(result["id"],"cloudtrail_bucket_region"),
+                    }
+                    #Use the account_value function to retrieve the access_health branch, which contains our api failure reason
+                    try:
+                        print(f'Account {result["id"]} has a problem: {account_value(result["id"],"access_health")["api"]["reason"]}')
+                    except:
+                        #The above call will produce an error if we're running check immediately after registering an account as
+                        #the access_health branch hasn't been populated yet. Requery the API for the account_list when this happens.
+                        account_list = falcon_discover.QueryAWSAccounts(parameters={"limit":f"{str(query_limit)}"})["body"]["resources"]
+                        print(f'Account {result["id"]} has a problem: {account_value(result["id"],"access_health")["api"]["reason"]}')
+                    #Output the account details to the user to assist with troubleshooting the account
+                    print(f'Current settings {json.dumps(account_values_to_check, indent=4)}\n')
+        else:
+            try:
+                #An error has occurred
+                print("Got response error code {} message {}".format(access_response["status_code"], access_response["body"]["errors"][0]["message"]))
+            except:
+                #Handle any egregious errors that break our return error payload
+                print("Got response error code {} message {}".format(access_response["status_code"], access_response["body"]))
     return
 
 ############### REGISTER ACCOUNT
