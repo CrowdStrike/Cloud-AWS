@@ -183,11 +183,9 @@ Resources:
       ServiceToken: !GetAtt
         - manageInstanceFalconAPI
         - Arn
-
   CrowdStrikeRegisterAcctLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: CrowdStrikeRegisterAcctLambdaRole
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -195,8 +193,19 @@ Resources:
             Principal:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
-            Condition: { }
       Path: /
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: LambdaExecutionRolePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - '*'
+
+
 

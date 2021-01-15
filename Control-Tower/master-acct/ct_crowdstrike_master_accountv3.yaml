@@ -1,4 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
+# Version 2
+# Added delay timer to allow time between role creation and account registration
+# AWS API calls are eventually consistent. When an API call is made to a service endpoint,
+# there is an expected delay in the resource being available after creation/modification of the resource.
+# In the case with IAM roles/policies, there is a delay in the inter-region replication of the newly
+# created/modified IAM resources.
 Description: Control Tower Lifecycle Events
 Parameters:
   RoleCreationDelayTimer:
@@ -15,7 +21,6 @@ Parameters:
     Description: Your Falcon OAuth2 API Secret.
     NoEcho: 'true'
     Type: String
-
 
   ExternalId:
     Description: ExternalID Used for authenticating assume role requests.
@@ -85,7 +90,10 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       Description: CrowdStrike Credentials
-      Name: CrowdStrikeAPISecret
+      Name: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - CrowdStrikeAPISecret
       SecretString:
         Fn::Join:
           - ''
@@ -98,7 +106,10 @@ Resources:
   launchLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: launchLambdaRole
+      RoleName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - launchLambdaRole
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -164,15 +175,12 @@ Resources:
       SourceAccount: !Ref "AWS::AccountId"
 
   LambdaToLaunchStackSet:
-    DependsOn:
-      - "launchLambdaRole"
-      - CrowdStrikeCredentials
     Type: 'AWS::Lambda::Function'
     DeletionPolicy: Delete
     Properties:
       Code:
         S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
-        S3Key: create_stackset_lambdav2.zip
+        S3Key: create_stackset_lambdav3.zip
       Layers:
         - !Ref lambdaLayer
       Environment:
@@ -185,17 +193,13 @@ Resources:
           CSAccountNumber: !Ref CSAccountNumber
           CSAssumingRoleName: !Ref CSAssumingRoleName
           CrowdstrikeCredentialsSecret: !Ref CrowdStrikeCredentials
-      Handler: create_stackset_lambdav2.lambda_handler
+      Handler: create_stackset_lambdav3.lambda_handler
       Runtime: python3.7
       MemorySize: 128
       Role: !GetAtt "launchLambdaRole.Arn"
       Timeout: 180
   TriggerLambda1:
     Type: 'Custom::TriggerLambda'
-    DependsOn:
-      - LambdaToLaunchStackSet
-      - "launchLambdaRole"
-      - permissionForEventsToInvokeLambda
     Properties:
       FalconSecret: !Ref FalconSecret
       FalconClientId: !Ref FalconClientId
@@ -214,8 +218,6 @@ Resources:
       LayerName: requests-package
 
   CrowdStrikeCaptureControlTowerLifeCycleEvents:
-    DependsOn:
-      - TriggerCustomizationsOnLifeCycleEvent
     Type: AWS::Events::Rule
     Properties:
       Description: Capture Control Tower LifeCycle Events and Trigger an Action
@@ -239,7 +241,10 @@ Resources:
   LambdaRoleToCaptureEvents:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: LambdaRoleToCaptureEvents
+      RoleName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - LambdaRoleToCaptureEvents
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -262,8 +267,6 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
   TriggerCustomizationsOnLifeCycleEvent:
-    DependsOn:
-      - LambdaRoleToCaptureEvents
     Type: AWS::Lambda::Function
     Properties:
       Code:
