@@ -20,5 +20,9 @@ A IAM role with
     
 In some circumstances a customer may already have created the shared S3 bucket in the central "log archive" account and setup the CloudTrail logs.  Templates are included for this scenario.
 
+Once the templates have run the accounts should be registered with or removed from the CrowdStrike discover service via the CrowdStrike API.   A script is provided here for registration, update and deletion
+
+https://github.com/CrowdStrike/Cloud-AWS/tree/master/Discover-for-Cloud-Templates/AWS/troubleshooting/scripts
+
     
     
