@@ -360,15 +360,28 @@ aws_my_region=$(
 )
 
 cs_falcon_client_id=$(
-    aws_ssm_parameter "CS_API_GATEWAY_CLIENT_ID" | json_value Value 1
+    if [ -n "$CS_API_GATEWAY_CLIENT_ID" ]; then
+        echo "$CS_API_GATEWAY_CLIENT_ID"
+    else
+        aws_ssm_parameter "CS_API_GATEWAY_CLIENT_ID" | json_value Value 1
+    fi
 )
 
 cs_falcon_client_secret=$(
-    aws_ssm_parameter "CS_API_GATEWAY_CLIENT_SECRET" | json_value Value 1
+    if [ -n "$CS_API_GATEWAY_CLIENT_SECRET" ]; then
+        echo "$CS_API_GATEWAY_CLIENT_SECRET"
+    else
+        aws_ssm_parameter "CS_API_GATEWAY_CLIENT_SECRET" | json_value Value 1
+    fi
 )
 
 cs_falcon_cid=$(
-    aws_ssm_parameter "FalconCID" | json_value Value 1
+    # shellcheck disable=SC2154
+    if [ -n "$FalconCID" ]; then
+        echo "$FalconCID"
+    else
+        aws_ssm_parameter "FalconCID" | json_value Value 1
+    fi
 )
 
 cs_falcon_oauth_token=$(
