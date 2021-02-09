@@ -154,7 +154,7 @@ Various command-line utilities are required for this demo. The utilities can eit
 
  - Obtain the falcon-sensor container tarball.
    ```
-   falcon_sensor_download --os-name=Container
+   $ falcon_sensor_download --os-name=Container
    Please provide your Falcon Client ID: ABC
    Please provide your Falcon Client Secret: XYZ
    Downloaded Falcon Usermode Container Sensor to falcon-sensor-6.18.0-106.container.x86_64.tar.bz2
