@@ -153,6 +153,12 @@ Various command-line utilities are required for this demo. The utilities can eit
 ### Step 3: Push the falcon sensor image to the Repository
 
  - Obtain the falcon-sensor container tarball.
+   ```
+   falcon_sensor_download --os-name=Container
+   Please provide your Falcon Client ID: ABC
+   Please provide your Falcon Client Secret: XYZ
+   Downloaded Falcon Usermode Container Sensor to falcon-sensor-6.18.0-106.container.x86_64.tar.bz2
+   ```
  - Import the tarball to your local docker. If you are following this guide inside the tooling
    container, you can run this command outside of the container as the docker socket is shared
    between your host system and the said tooling container.
