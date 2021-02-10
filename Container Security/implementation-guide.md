@@ -211,8 +211,8 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
 
  - Instruct Kubernetes cluster to start a detection application
    ```
-   $ kubectl apply -f ~/demo-yamls/detection-app.yaml
-   deployment.apps/detection-app created
+   $ kubectl apply -f ~/demo-yamls/detection-single.yaml
+   deployment.apps/detection-single created
    ```
  - (optional) See the logs of the admission installer to ensure it is responding to the detection app start-up
    ```
@@ -225,11 +225,11 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
    $ watch 'kubectl get pods'
    NAME                            READY   STATUS    RESTARTS   AGE
-   detection-app-767cd557b-267zg   2/2     Running   0          2m26s
+   detection-single-767cd557b-267zg   2/2     Running   0          2m26s
    ```
  - (optional) Ensure that the newly created pod was allocated an Agent ID (AID) from CrowdStrike Falcon platform
    ```
-   $ kubectl exec detection-app-767cd557b-267zg -c falcon-container -- falconctl -g --aid
+   $ kubectl exec detection-single-767cd557b-267zg -c falcon-container -- falconctl -g --aid
    aid="d49dc4fd4b6347e3981fb67a2bf8e6c8".
    ```
 
@@ -237,8 +237,8 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
 
  - Step 1: Uninstall the detection app
    ```
-   $ kubectl delete -f ~/demo-yamls/detection-app.yaml
-   deployment.apps "detection-app" deleted
+   $ kubectl delete -f ~/demo-yamls/detection-single.yaml
+   deployment.apps "detection-single" deleted
    ```
 
  - Step 2: Uninstall the admission Controller
