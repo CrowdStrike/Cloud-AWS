@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-# from botocore.vendored import requests
 import random
 import string
 import time
@@ -46,7 +45,6 @@ def cfnresponse_send(event, context, responseStatus, responseData, physicalResou
 
 
 def get_secret_value(secret):
-    # key = 'falcon_client_secret'
     key = secret
     SM = boto3.client('secretsmanager')
     secret_list = SM.list_secrets()['SecretList']
@@ -84,14 +82,14 @@ def get_master_id():
         return False
 
 
-def launch_crwd_discover(templateUrl, paramList, AdminRoleARN, ExecRole, cList, stacketsetName):
-    """ Launch CRWD Discover Stackset on the Master Account """
+def launch_crwd_horizon(templateUrl, paramList, AdminRoleARN, ExecRole, cList, stacketsetName):
+    """ Create CRWD Horizon Stackset on the Master Account """
     CFT = boto3.client('cloudformation')
     result = {}
     if len(paramList):
         try:
             result = CFT.create_stack_set(StackSetName=stacketsetName,
-                                          Description='Roles for CRWD-Discover',
+                                          Description='Roles for CRWD-Horizon',
                                           TemplateURL=templateUrl,
                                           Parameters=paramList,
                                           AdministrationRoleARN=AdminRoleARN,
@@ -160,22 +158,16 @@ def delete_stackset(stacksetName):
 
 def lambda_handler(event, context):
     try:
-        STACKSETNAME = 'CrowdstrikeDiscover-IAM-ROLES'
+        logger.info('Got event {}'.format(event))
+        logger.info('Context {}'.format(context))
+        STACKSETNAME = 'CrowdStrikeCSPMReader-IAM-ROLES'
 
         AwsRegion = os.environ['AwsRegion']
         RoleName = os.environ['RoleName']
         CSAccountNumber = os.environ['CSAccountNumber']
         CSAssumingRoleName = os.environ['CSAssumingRoleName']
-        LogArchiveBucketRegion = os.environ['LogArchiveBucketRegion']
-        LogArchiveAccount = os.environ['LogArchiveAccount']
-        CredentialsSecret = os.environ['CrowdstrikeCredentialsSecret']
-        RoleCreationDelayTimer = os.environ['RoleCreationDelayTimer']
-        #
-        # Moved to virtual hosted-style URLs.
-        # See https://aws.amazon.com/fr/blogs/aws/amazon-s3-path-deprecation-plan-the-rest-of-the-story/
-        # path-style URLs to be depricated
-        #
-        CrowdstrikeTemplateUrl = f'https://crowdstrike-sa-resources-ct-{AwsRegion}.s3.amazonaws.com/ct_crowdstrike_stacksetv3.yaml'
+
+        CrowdstrikeTemplateUrl = f'https://crowdstrike-sa-resources-ct-{AwsRegion}.s3.amazonaws.com/horizon_new_account_v4.yaml'
         AccountId = get_master_id()
         cList = ['CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND']
         ExecRole = 'AWSControlTowerExecution'
@@ -189,24 +181,15 @@ def lambda_handler(event, context):
 
             # Parameters for CRWD-Discover stackset
             CRWD_Discover_paramList = []
-            secretList = json.loads(get_secret_value(CredentialsSecret))
+
             keyDict = {}
 
-            # LocalAccount:
-            for s in secretList.keys():
-                keyDict = {'ParameterKey': s, 'ParameterValue': secretList[s]}
-                CRWD_Discover_paramList.append(dict(keyDict))
-            ExternalID = get_random_alphanum_string(8)
-            keyDict['ParameterKey'] = 'ExternalID'
-            keyDict['ParameterValue'] = ExternalID
+            keyDict['ParameterKey'] = 'FalconClientId'
+            keyDict['ParameterValue'] = 'Enter value'
             CRWD_Discover_paramList.append(dict(keyDict))
 
-            keyDict['ParameterKey'] = 'RoleCreationDelayTimer'
-            keyDict['ParameterValue'] = RoleCreationDelayTimer
-            CRWD_Discover_paramList.append(dict(keyDict))
-
-            keyDict['ParameterKey'] = 'RoleName'
-            keyDict['ParameterValue'] = RoleName
+            keyDict['ParameterKey'] = 'FalconSecret'
+            keyDict['ParameterValue'] = 'Enter value'
             CRWD_Discover_paramList.append(dict(keyDict))
 
             keyDict['ParameterKey'] = 'CSAccountNumber'
@@ -217,12 +200,12 @@ def lambda_handler(event, context):
             keyDict['ParameterValue'] = CSAssumingRoleName
             CRWD_Discover_paramList.append(dict(keyDict))
 
-            keyDict['ParameterKey'] = 'LogArchiveBucketRegion'
-            keyDict['ParameterValue'] = LogArchiveBucketRegion
+            keyDict['ParameterKey'] = 'accountId'
+            keyDict['ParameterValue'] = 'Enter value'
             CRWD_Discover_paramList.append(dict(keyDict))
 
-            keyDict['ParameterKey'] = 'LogArchiveAccount'
-            keyDict['ParameterValue'] = LogArchiveAccount
+            keyDict['ParameterKey'] = 'organizationalUnitId'
+            keyDict['ParameterValue'] = 'Enter value'
             CRWD_Discover_paramList.append(dict(keyDict))
 
             logger.info('CRWD_Discover ParamList:{}'.format(CRWD_Discover_paramList))
@@ -231,8 +214,8 @@ def lambda_handler(event, context):
             logger.info('ExecRole: {}'.format(ExecRole))
             logger.info('ExecRole: {}'.format(cList))
 
-            CRWD_Discover_result = launch_crwd_discover(CrowdstrikeTemplateUrl, CRWD_Discover_paramList, AdminRoleARN,
-                                                        ExecRole, cList, STACKSETNAME)
+            CRWD_Discover_result = launch_crwd_horizon(CrowdstrikeTemplateUrl, CRWD_Discover_paramList, AdminRoleARN,
+                                                       ExecRole, cList, STACKSETNAME)
             logger.info('CRWD-Discover Stackset: {}'.format(CRWD_Discover_result))
 
             if CRWD_Discover_result:
