@@ -52,7 +52,7 @@ def check_account():
     for index in range(0, len(id_items), q_max):
         sub_acct_list = id_items[index:index + q_max]
         temp_list = ",".join([a for a in sub_acct_list])
-        access_response = falcon_discover.VerifyAWSAccountAccess(body={}, parameters={}, ids=temp_list)
+        access_response = falcon_discover.VerifyAWSAccountAccess( ids=temp_list)
         if access_response['status_code'] == 200:
             #Loop through each ID we verified
             for result in access_response["body"]["resources"]:
