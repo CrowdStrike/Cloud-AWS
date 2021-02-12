@@ -81,7 +81,7 @@ Perform the tasks below to enable Control Tower to automatically register your a
     The GitHub repository contains a folder "Control-Tower/horizon":
 
 
-    * Select the template "Falcon_Horizon_Control_Tower.yaml" from the "Control-Tower/horizon/cloudformation" folder.
+    * Select the template "Falcon_Horizon_Control_Tower.yaml" from the "Control-Tower-For-Horizon/cloudformation" folder.
 
 3) Load the CloudFormation template in the 'master' account
 
