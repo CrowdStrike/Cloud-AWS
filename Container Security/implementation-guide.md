@@ -273,8 +273,8 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    $ aws ecr delete-repository --region eu-west-1 --repository-name falcon-sensor
    {
        "repository": {
-           "repositoryArn": "arn:aws:ecr:eu-west-1:517716713836:repository/falcon-sensor",
-           "registryId": "517716713836",
+           "repositoryArn": "arn:aws:ecr:eu-west-1:123456789123:repository/falcon-sensor",
+           "registryId": "123456789123",
            "repositoryName": "falcon-sensor",
            "repositoryUri": "123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-sensor",
            "createdAt": "2021-02-04T10:30:30+00:00",
