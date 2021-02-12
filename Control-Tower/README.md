@@ -8,7 +8,7 @@ For setting up Control Tower for Discover
 
 Please see the [Implementation Guide](https://github.com/CrowdStrike/Cloud-AWS/blob/master/Control-Tower/documentation-implementation-guide.md)
 
-For setting up Control Tower for Discover
+For setting up Control Tower for Horizon
 
 Please see the [Implementation Guide](https://github.com/CrowdStrike/Cloud-AWS/blob/horizon/Control-Tower-For-Horizon/documentation/implementation-guide.md)
 
