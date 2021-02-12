@@ -29,7 +29,7 @@ Account Factory creates a new AWS account and applies baseline guardrails.
 4) A CloudWatch event rule triggers a Lambda function (push_horizon_stackset_lambda.py).   
 
 
-5) The Lambda function fetches CrowdStrike API credentials from secrets manager 
+5) The Lambda function fetches CrowdStrike API credentials from secrets manager.
 
 
 6) The lambda function then applies the secrets obtained from secrets manager as input parameters to the stackset (CrowdStrikeCSPMReader-IAM-ROLES) that is sent to the new account.
@@ -38,7 +38,7 @@ Account Factory creates a new AWS account and applies baseline guardrails.
 7) The StackSet creates a lambda function that registers the new account with the CrowdStrike. 
    
 
-8) The lambda function then downloads a cloudformation template for the IAM role that is applied to the account.   The response from the api call is parsed the values extracted provide the input parameters for the cloudformation template.
+8) The lambda function then downloads a cloudformation template for the IAM role that is applied to the account.  The response from the api call is parsed the values extracted provide the input parameters for the cloudformation template.
 
 
 # Pre-requisites
@@ -66,7 +66,7 @@ To get started with AWS Control Tower, review the User Guide:
 # Deployment Configuration Steps
 
 
-Perform the tasks below to enable Control Tower to automatically register your account with CrowdStrike CSPM (Horizon)
+Perform the tasks below to enable Control Tower to automatically register your account with CrowdStrike CSPM (Horizon).
 
 
 1) Generate CrowdStrike Falcon API Keys.
@@ -93,10 +93,10 @@ Perform the tasks below to enable Control Tower to automatically register your a
    Parameters that are fixed and should only be modifed if advised by CrowdStrike:
    
    | Parameter Name | Parameter Description | 
-   | :---         |     :---      | 
-   | CSAccountNumber   | The CrowdStrike account number supplied in the template     |
-   | CSAssumingRoleName   | The name of the Role used by CrowdStrike to assume the role in the account. `CrowdStrikeCSPMConnector`   |
-   | CrowdStrikeCSPMRoleTemplateURL   | The URL for the Template the describes the IAM role to be applied for Horizon access    | YES    |
+   | :-----------------|:-----------------------|
+   | CSAccountNumber | The CrowdStrike account number supplied in the template |
+   | CSAssumingRoleName | The name of the Role used by CrowdStrike to assume the role in the account. `CrowdStrikeCSPMConnector` |
+   | CrowdStrikeCSPMRoleTemplateURL | The URL for the Template the describes the IAM role to be applied for Horizon access | YES |
    | CrowdStrikeCSPMStackName | The name of the Cloudformation stack applied in the new account |
 
 
