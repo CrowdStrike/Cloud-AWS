@@ -129,7 +129,7 @@ Various command-line utilities are required for this demo. The utilities can eit
    {
        "repository": {
            "repositoryArn": "arn:aws:ecr:eu-west-1:123456789123:repository/falcon-sensor",
-           "registryId": "517716713836",
+           "registryId": "12345678912345",
            "repositoryName": "falcon-sensor",
            "repositoryUri": "123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-sensor",
            "createdAt": "2021-02-04T10:30:30+00:00",
