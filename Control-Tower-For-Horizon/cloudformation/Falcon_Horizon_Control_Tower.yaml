@@ -6,7 +6,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Creates a Stackset in AWS Control Tower to Enable CrowdStrike Horizon
 Parameters:
   FalconClientId:
-    Description: Your Falcon OAuth2 API Key.
+    Description: Your Falcon OAuth2 Client ID.
     NoEcho: 'true'
     Type: String
   FalconSecret:
