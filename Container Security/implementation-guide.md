@@ -30,9 +30,9 @@ Various command-line utilities are required for this demo. The utilities can eit
  - Enter the [tooling container](https://github.com/CrowdStrike/cloud-tools-image)
    ```
    docker run --privileged=true \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    -v ~/.aws:/root/.aws -it --rm \
-    quay.io/crowdstrike/cloud-tools-image
+       -v /var/run/docker.sock:/var/run/docker.sock \
+       -v ~/.aws:/root/.aws -it --rm \
+       quay.io/crowdstrike/cloud-tools-image
    ```
    The above command creates new container runtime that contains tools needed by this guide. All the
    following commands should be run inside this container. If you have previously used AWS CLI tool,
@@ -44,9 +44,9 @@ Various command-line utilities are required for this demo. The utilities can eit
     Example output
     ```
     {
-    "UserId": "AIDAXRCSSEFWMXXXXXXXX",
-    "Account": "123456789123",
-    "Arn": "arn:aws:iam::123456789123:user/xxxxxxx"
+        "UserId": "AIDAXRCSSEFWMXXXXXXXX",
+        "Account": "123456789123",
+        "Arn": "arn:aws:iam::123456789123:user/xxxxxxx"
     }
     ````
 
