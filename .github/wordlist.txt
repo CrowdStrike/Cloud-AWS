@@ -27,6 +27,9 @@ CFT
 CLI
 CROWDSTRIKE
 CRWD
+CSAccountNumber
+CSAssumingRoleName
+CSPM
 CentOS
 ClientID
 ClientSecret
@@ -36,8 +39,12 @@ CloudWatch
 Cloudformation
 Cloudtrail
 CoreDNS
+CreateManagedAccount
 CrowdStrike
 CrowdStrike's
+CrowdStrikeCSPMReader
+CrowdStrikeCSPMRoleTemplateURL
+CrowdStrikeCSPMStackName
 CrowdStrike’s
 Crowdstrike
 DLQ
@@ -61,7 +68,9 @@ ExecStart
 ExecutionRole
 FQL
 FW
+FalconClientId
 FalconPy
+FalconSecret
 FalconSensorDeploy
 Fargate
 GW
@@ -107,6 +116,7 @@ SSM
 SSMExecutionRole
 Splunk
 StackSet
+StackSets
 Stateful
 StatelessRules
 StatelessRulesAndCustomActions
@@ -165,6 +175,7 @@ ec
 eks
 eksctl
 eu
+externalID
 externalid
 getObject
 github
@@ -189,6 +200,7 @@ lifecycle
 linux
 md
 mins
+misconfigurations
 msg
 namespace
 namespaces
@@ -215,6 +227,7 @@ sk
 sns
 sqs
 ssm
+stackset
 stdout
 sublicensable
 subnet
