@@ -207,6 +207,35 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    injector-6499dbd4b5-v5gqr   1/1     Running   0          2d3h
    ```
 
+ - (optional) Run the installer without any command-line arguments to get sense of configuration options are available for the deployment.
+   ```
+   $ docker run --rm --entrypoint installer $FALCON_IMAGE_URI
+   usage:
+   installer -cid <cid> [other arguments]
+     -cid string
+       	Customer id to use
+     -days int
+       	Validity of certificate in days. (default 3650)
+     -falconctl-env value
+       	FALCONCTL options in key=value format.
+     -image string
+       	Image URI to load (default "crowdstrike/falcon")
+     -mount-docker-socket
+       	A boolean flag to mount docker socket of worker node with sensor.
+     -namespaces string
+       	Comma separated namespaces with which image pull secret need to be created, applicable only with -pullsecret (default "default")
+     -pullpolicy string
+       	Pull policy to be defined for sensor image pulls (default "IfNotPresent")
+     -pullsecret string
+       	Secret name that is used to pull image (default "crowdstrike-falcon-pull-secret")
+     -pulltoken string
+       	Secret token, stringified dockerconfig json or base64 encoded dockerconfig json, that is used with pulling image
+     -sensor-resources string
+       	A valid json string or base64 encoded string of the same, which is used as k8s resources specification.
+   ```
+   Full explanation of various configuration options and deployment scenarios is available through [Falcon Console](https://falcon.crowdstrike.com/support/documentation/146/falcon-container-sensor-for-linux#additional-installation-options).
+
+
 ### Step 5: Spin-up a detection pod
 
  - Instruct Kubernetes cluster to start a detection application
