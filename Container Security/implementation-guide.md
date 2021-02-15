@@ -207,7 +207,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    injector-6499dbd4b5-v5gqr   1/1     Running   0          2d3h
    ```
 
- - (optional) Run the installer without any command-line arguments to get sense of configuration options are available for the deployment.
+ - (optional) Run the installer without any command-line arguments to output available configuration options for the deployment.
    ```
    $ docker run --rm --entrypoint installer $FALCON_IMAGE_URI
    usage:
