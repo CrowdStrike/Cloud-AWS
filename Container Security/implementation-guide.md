@@ -30,9 +30,9 @@ Various command-line utilities are required for this demo. The utilities can eit
  - Enter the [tooling container](https://github.com/CrowdStrike/cloud-tools-image)
    ```
    docker run --privileged=true \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    -v ~/.aws:/root/.aws -it --rm \
-    quay.io/crowdstrike/cloud-tools-image
+       -v /var/run/docker.sock:/var/run/docker.sock \
+       -v ~/.aws:/root/.aws -it --rm \
+       quay.io/crowdstrike/cloud-tools-image
    ```
    The above command creates new container runtime that contains tools needed by this guide. All the
    following commands should be run inside this container. If you have previously used AWS CLI tool,
@@ -44,9 +44,9 @@ Various command-line utilities are required for this demo. The utilities can eit
     Example output
     ```
     {
-    "UserId": "AIDAXRCSSEFWMXXXXXXXX",
-    "Account": "123456789123",
-    "Arn": "arn:aws:iam::123456789123:user/xxxxxxx"
+        "UserId": "AIDAXRCSSEFWMXXXXXXXX",
+        "Account": "123456789123",
+        "Arn": "arn:aws:iam::123456789123:user/xxxxxxx"
     }
     ````
 
@@ -163,7 +163,7 @@ Various command-line utilities are required for this demo. The utilities can eit
    container, you can run this command outside of the container as the docker socket is shared
    between your host system and the said tooling container.
    ```
-   $ docker load -i ~/Downloads/falcon-sensor-6.18.0-106.container.x86_64.tar.bz2
+   $ docker load -i falcon-sensor-6.18.0-106.container.x86_64.tar.bz2
    30cbe59c0010: Loading layer  39.07MB/39.07MB
    Loaded image: falcon-sensor:6.18.0-106.container.x86_64.Release.Beta
    ```
@@ -206,6 +206,34 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    NAME                        READY   STATUS    RESTARTS   AGE
    injector-6499dbd4b5-v5gqr   1/1     Running   0          2d3h
    ```
+
+ - (optional) Run the installer with `--help` command-line argument to output available configuration options for the deployment.
+   ```
+   $ docker run --rm --entrypoint installer $FALCON_IMAGE_URI --help
+   usage:
+     -cid string
+       	Customer id to use
+     -days int
+       	Validity of certificate in days. (default 3650)
+     -falconctl-env value
+       	FALCONCTL options in key=value format.
+     -image string
+       	Image URI to load (default "crowdstrike/falcon")
+     -mount-docker-socket
+       	A boolean flag to mount docker socket of worker node with sensor.
+     -namespaces string
+       	Comma separated namespaces with which image pull secret need to be created, applicable only with -pullsecret (default "default")
+     -pullpolicy string
+       	Pull policy to be defined for sensor image pulls (default "IfNotPresent")
+     -pullsecret string
+       	Secret name that is used to pull image (default "crowdstrike-falcon-pull-secret")
+     -pulltoken string
+       	Secret token, stringified dockerconfig json or base64 encoded dockerconfig json, that is used with pulling image
+     -sensor-resources string
+       	A valid json string or base64 encoded string of the same, which is used as k8s resources specification.
+   ```
+   Full explanation of various configuration options and deployment scenarios is available through [Falcon Console](https://falcon.crowdstrike.com/support/documentation/146/falcon-container-sensor-for-linux#additional-installation-options).
+
 
 ### Step 5: Spin-up a detection pod
 
