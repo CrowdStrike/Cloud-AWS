@@ -111,7 +111,7 @@ Perform the tasks below to enable Control Tower to automatically register your a
 
     Fill in the missing parameter values 
 
-   Parameters that are fixed and should only be modifed if advised by CrowdStrike:
+   Parameters that are fixed and should only be modified if advised by CrowdStrike:
    
    | Parameter Name | Parameter Description | 
    | :-----------------|:-----------------------|
