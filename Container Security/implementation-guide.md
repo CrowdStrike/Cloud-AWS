@@ -163,7 +163,7 @@ Various command-line utilities are required for this demo. The utilities can eit
    container, you can run this command outside of the container as the docker socket is shared
    between your host system and the said tooling container.
    ```
-   $ docker load -i ~/Downloads/falcon-sensor-6.18.0-106.container.x86_64.tar.bz2
+   $ docker load -i falcon-sensor-6.18.0-106.container.x86_64.tar.bz2
    30cbe59c0010: Loading layer  39.07MB/39.07MB
    Loaded image: falcon-sensor:6.18.0-106.container.x86_64.Release.Beta
    ```
