@@ -185,7 +185,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
 
  - Provide CrowdStrike Falcon Customer ID as environment variable. This CID will be later used to register newly deployed pods to CrowdStrike Falcon platform.
    ```
-   $ CID=3a66aXXXXXXbb4b248162e9be885e4309-XX
+   $ CID=1234567890ABCDEFG1234567890ABCDEF-12
    ```
 
  - Install the admission controller
