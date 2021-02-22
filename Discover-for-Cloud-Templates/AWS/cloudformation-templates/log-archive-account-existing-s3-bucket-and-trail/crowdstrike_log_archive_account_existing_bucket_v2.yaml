@@ -15,7 +15,7 @@ Metadata:
           - RoleName
           - ExternalID
       - Label:
-          default: Crowdstrike Falcom API keys.
+          default: Crowdstrike Falcon API keys.
         Parameters:
           - FalconClientId
           - FalconSecret
@@ -26,7 +26,7 @@ Metadata:
 
     ParameterLabels:
       LogArchiveBucketName:
-        default: Cloudtrail log bucket (Already Created)
+        default: Cloudtrail log bucket created by Control Tower
       RoleName:
         default: Default IAM Role (Can be modified)
       ExternalID:
@@ -97,9 +97,6 @@ Parameters:
     Type: String
     Description: Log Archive Bucket Name
 
-  LambdaFunctionsBucketName:
-    Type: String
-    Description: S3 bucket where the lambda files are located. (Must be in the same region)
 
 
 Resources:
@@ -114,7 +111,7 @@ Resources:
             Principal:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
-            Condition: {}
+            Condition: { }
       Path: /
       Policies:
         - PolicyName: Get_Values
@@ -132,6 +129,31 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSLambdaExecute
 
+  publishToSnsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: LambdaRoleToPublishtoSNS
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+            Condition: { }
+      Path: /
+      Policies:
+        - PolicyName: PublishSNS
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              Sid: VisualEditor1
+              Effect: Allow
+              Action:
+                - sns:Publish
+              Resource: "*"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLambdaExecute
 
   lambdaLayer:
     Type: AWS::Lambda::LayerVersion
@@ -139,12 +161,14 @@ Resources:
       CompatibleRuntimes:
         - python3.7
       Content:
-        S3Bucket: !Ref 'LambdaFunctionsBucketName'
+        S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
         S3Key: layer.zip
       Description: Layer for requests package
       LayerName: requests-package
 
-  AddNotificationToBucket:
+  AddNotificationToBucketLambda:
+    DependsOn:
+      - launchLambdaRole
     Type: AWS::Lambda::Function
     Properties:
       Environment:
@@ -158,19 +182,19 @@ Resources:
           LocalAccount: !Ref AWS::AccountId
 
       Code:
-        S3Bucket: !Ref 'LambdaFunctionsBucketName'
-        S3Key: add_S3_notification.zip
+        S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
+        S3Key: s3_lambda_sns.zip
       Layers:
         - !Ref lambdaLayer
       Handler: add_S3_notification.lambda_handler
       MemorySize: 128
-
       Role: !GetAtt launchLambdaRole.Arn
       Runtime: python3.7
       Timeout: 60
 
   TriggerAddNotificationLambda:
     Type: 'Custom::TriggerLambda'
+    DependsOn: AddNotificationToBucketLambda
     Properties:
       FalconSecret: !Ref FalconSecret
       FalconClientId: !Ref FalconClientId
@@ -183,7 +207,7 @@ Resources:
           - !Ref 'AWS::Region'
           - ':292230061137:cs-cloudconnect-aws-cloudtrail'
       ServiceToken: !GetAtt
-        - AddNotificationToBucket
+        - AddNotificationToBucketLambda
         - Arn
 
 
@@ -226,6 +250,8 @@ Resources:
         Version: '2012-10-17'
       Roles:
         - !Ref 'S3AccessiamRole'
+    DependsOn:
+      - S3AccessiamRole
   iamPolicyDescribeAccess:
     Type: AWS::IAM::Policy
     Properties:
@@ -249,19 +275,21 @@ Resources:
         Version: '2012-10-17'
       Roles:
         - !Ref 'S3AccessiamRole'
+    DependsOn: S3AccessiamRole
 
   RegisterAcctLambdaRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: CrowdstrikeRegisterAcctLambdaRole1
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
         Statement:
-          - Effect: Allow
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
             Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-            Condition: {}
+              Service:
+                - lambda.amazonaws.com
+        Version: 2012-10-17
       Path: /
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSLambdaExecute
@@ -271,6 +299,7 @@ Resources:
     Type: 'Custom::TriggerLambda'
     DependsOn:
       - "RegisterAcctLambdaRole"
+      - "RegisterAccountWithDiscover"
     Properties:
       FalconSecret: !Ref FalconSecret
       FalconClientId: !Ref FalconClientId
@@ -280,6 +309,8 @@ Resources:
         - Arn
 
   RegisterAccountWithDiscover:
+    DependsOn:
+      - "RegisterAcctLambdaRole"
     Type: AWS::Lambda::Function
     Properties:
       Environment:
@@ -292,7 +323,7 @@ Resources:
           LocalAccount: !Ref AWS::AccountId
 
       Code:
-        S3Bucket: !Ref 'LambdaFunctionsBucketName'
+        S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
         S3Key: register_logarchive_account.zip
       Layers:
         - !Ref lambdaLayer
