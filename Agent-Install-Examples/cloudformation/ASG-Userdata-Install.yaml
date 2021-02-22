@@ -55,7 +55,7 @@ Parameters:
   CCID:
     Type: String
     Description: Your CID
-    Default: "797BCD0BF5AE4F39A2B770FF52517125-08"
+    Default: "1234567890ABCDEFG1234567890ABCDEF-12"
   Owner:
     Type: String
     Description: Owner/Creator of resource
