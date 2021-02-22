@@ -103,7 +103,7 @@ Parameters:
 
 
 Resources:
-  launchLambdaRole1:
+  launchLambdaRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: LambdaRoleToCaptureEvents
@@ -174,7 +174,7 @@ Resources:
 
   AddNotificationToBucketLambda:
     DependsOn:
-      - launchLambdaRole1
+      - launchLambdaRole
     Type: AWS::Lambda::Function
     Properties:
       Environment:
@@ -194,7 +194,7 @@ Resources:
         - !Ref lambdaLayer
       Handler: add_S3_notification.lambda_handler
       MemorySize: 128
-      Role: !GetAtt launchLambdaRole1.Arn
+      Role: !GetAtt launchLambdaRole.Arn
       Runtime: python3.7
       Timeout: 60
 
