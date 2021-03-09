@@ -100,6 +100,7 @@ Lifecycle
 ListAccountAliases
 MERCHANTABILITY
 MatchAttributes
+Microk
 OAuth
 Optimise
 PackageName
@@ -158,6 +159,7 @@ boto
 botocore
 cd
 cft
+cid
 classtype
 cli
 cloudconnect
@@ -214,6 +216,7 @@ licensors
 lifecycle
 linux
 md
+microk
 mins
 misconfigurations
 msg
