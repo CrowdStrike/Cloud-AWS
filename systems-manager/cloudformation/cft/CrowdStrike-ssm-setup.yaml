@@ -171,7 +171,7 @@ Resources:
       Environment:
         Variables:
           aws_region: !Ref AWS::Region
-          document_name: !Ref AutomationDocumentName
+          ssm_automation_doc_name: !Ref AutomationDocumentName
           s3bucket: !Ref S3Bucket
           package_name: !Ref InstallPackageName
       Code:

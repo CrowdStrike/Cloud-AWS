@@ -1,21 +1,22 @@
-import os
-import zipfile
+import argparse
 import hashlib
 import json
-import boto3
 import logging
-import argparse
+import os
 import sys
 import time
-from os.path import basename
+import zipfile
 from functools import cached_property
 from logging.handlers import RotatingFileHandler
+from os.path import basename
+
+import boto3
 from botocore.exceptions import ClientError
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 # handler = logging.StreamHandler()
-handler = RotatingFileHandler("../s3-bucket/packager.log", maxBytes=20971520, backupCount=5)
+handler = RotatingFileHandler("./s3-bucket/packager.log", maxBytes=20971520, backupCount=5)
 formatter = logging.Formatter('%(levelname)-8s %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
@@ -97,6 +98,7 @@ class S3BucketUpdater:
         if not self._bucket_exists(bucket_name):
             self._create_bucket(bucket_name)
         for f in files:
+            f = './s3-bucket/' + f
             self._upload_file(f, bucket_name, "falcon/" + f)
 
     def _bucket_exists(self, bucket_name):
@@ -182,6 +184,7 @@ class DistributorPackager:
             self._create_zip_files(dir)
         hashes_list = self._get_digest(files)
         self._generate_manifest(installer_list, hashes_list)
+        files.add('manifest.json')
         return files
 
     @classmethod
@@ -226,12 +229,14 @@ class DistributorPackager:
             manifest_dict.update(files)
         except Exception as e:
             print('Exception {}'.format(e))
-
-        with open('manifest.json', 'w') as file:
-            file.write(json.dumps(manifest_dict))
+        try:
+            with open('./s3-bucket/manifest.json', 'w') as file:
+                file.write(json.dumps(manifest_dict))
+        except Exception as e:
+            print(e)
 
     def _create_zip_files(self, dir):
-        zipf = zipfile.ZipFile(dir + '.zip', 'w', zipfile.ZIP_DEFLATED)
+        zipf = zipfile.ZipFile('./s3-bucket/' + dir + '.zip', 'w', zipfile.ZIP_DEFLATED)
 
         for root, dirs, files in os.walk(dir + '/'):
             for file in files:
@@ -247,18 +252,18 @@ class DistributorPackager:
         """
         hashes = []
         for file in files:
-            file_path = file
+            file_path = './s3-bucket/' + file
             with open(file_path, 'rb') as f:
                 bytes = f.read()  # read entire file as bytes
                 readable_hash = hashlib.sha256(bytes).hexdigest()
-                hashes.append({file_path: readable_hash})
+                hashes.append({file: readable_hash})
         return hashes
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create and upload Distributor packages to the AWS SSM')
     parser.add_argument('-r', '--aws_region', help='AWS Region')
-    parser.add_argument('-p', '--package_name', help='Package Name')
+    parser.add_argument('-p', '--ssm_automation_doc_name', help='Package Name')
     parser.add_argument('-b', '--s3bucket', help='Package Name')
 
     args = parser.parse_args()
@@ -270,8 +275,9 @@ if __name__ == '__main__':
     files = DistributorPackager().build('agent_list.json')
 
     if region is None or package_name is None or s3bucket is None:
-        print("Skipping AWS upload: please provide --aws_region, --package_name, and --s3bucket command-line options for upload")
+        print(
+            "Skipping AWS upload: please provide --aws_region, --ssm_automation_doc_name, and --s3bucket command-line options for upload")
         print("Package has been built successfully.")
     else:
         S3BucketUpdater(region).update(s3bucket, files)
-        SSMPackageUpdater(region).update(package_name, "../s3-bucket/manifest.json")
+        SSMPackageUpdater(region).update(package_name, "./s3-bucket/manifest.json")

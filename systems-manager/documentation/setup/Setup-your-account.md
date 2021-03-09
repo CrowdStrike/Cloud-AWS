@@ -1,14 +1,19 @@
-Setup Systems Manager 
+Setup Systems Manager
 =====================
+
+# Prerequisites
+
+Complete the section [Create your AWS SSM package]()
 
 Introduction
 ------------
 
-CrowdStrike provide a CloudFormation template to assist with the setup of an account so that systems manager can be used to push the Falcon agent to ec2 instances. The CloudFormation template performs three operations
+CrowdStrike provide a CloudFormation template to assist with the setup of an account so that systems manager can be used
+to push the Falcon agent to ec2 instances. The CloudFormation template performs three operations
 
-1.  Creates an IAM Role CrowdStrike-SSMExecutionRole.  
-    The role has the Amazon managed policy AmazonSSMAutomationRole attached to it
-    ![](media/image1.png)
+1. Creates an IAM Role CrowdStrike-SSMExecutionRole.  
+   The role has the Amazon managed policy AmazonSSMAutomationRole attached to it
+   ![](media/image1.png)
 
 2.  Adds parameters to the Systems Manager Parameter Store
 
@@ -24,29 +29,29 @@ Deploy the cloudformation template
 
     Go to
 
-    [https://github.com/CrowdStrike/Cloud-AWS/tree/master/systems-manager/cloudformation](https://github.com/crowdstrike/cloud-aws/systems-manager/cloudformation)
+   [https://github.com/CrowdStrike/Cloud-AWS/tree/master/systems-manager/cloudformation](https://github.com/crowdstrike/cloud-aws/systems-manager/cloudformation)
 
-    Download the template *CrowdStrike-ssm-setup.yaml* from the
-    cloudformation folder
+   Download the template *CrowdStrike-ssm-setup.yaml* from the cloudformation folder
 
-    *Download the files from the S3 folder and the Packaging Utilities folder
-    
-    Review the installation scripts in the Falcon folder under S3.   If you are happy with the scripts then proceed to Step 2.  If you wish to modify the scripts   
-    then follow the guide ["creating new install scripts and manifest file"](https://github.com/CrowdStrike/Cloud-AWS/tree/master/systems-manager/Packaging%20utilities).
+   *Download the files from the S3 folder and the Packaging Utilities folder
 
-2. Create an S3 Bucket in the region where you will be running the CloudFormation template
+   Review the installation scripts in the Falcon folder under S3. If you are happy with the scripts then proceed to Step
+   2. If you wish to modify the scripts   
+   then follow the
+   guide ["creating new install scripts and manifest file"](https://github.com/CrowdStrike/Cloud-AWS/tree/master/systems-manager/Packaging%20utilities)
+   .
 
-    Upload all the files in the s3 folder to the S3 bucket.  Ensure that the folder structure is maintained. 
+2. Upload all the files in the cloudformation-s3-bucket folder to the S3 bucket that you used in the prerequisites
+   section for creating the package. Ensure that the folder structure is maintained.
 
-    ![](media/s3-bucket.png)
-    
-3. Create the OAuth2 API keys in the CrowdStrike Console
-    The API key will require
+   ![](media/s3-bucket.png)
+
+3. Create the OAuth2 API keys in the CrowdStrike Console The API key will require
 
         -   "Installation Tokens" -- "Read" + "Write"
         -   "Sensor Download" -- "Read"
 
-    <https://falcon.crowdstrike.com/support/documentation/93/oauth2-auth-token-apis#get-an-auth-token>
+   <https://falcon.crowdstrike.com/support/documentation/93/oauth2-auth-token-apis#get-an-auth-token>
 
     Create an OAuth2 api key pair with permissions to "Read" and "Write"
     Installation Tokens and "Read" for Sensor Download.

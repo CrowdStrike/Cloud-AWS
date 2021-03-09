@@ -3,7 +3,7 @@
 #######################################################################################################################
 #######################################################################################################################
 #
-# Usage Examples - python3 example_aws_ssm_package_installation.py --package_version 5.31.0-9606 --package_name
+# Usage Examples - python3 example_aws_ssm_package_installation.py --package_version 5.31.0-9606 --ssm_automation_doc_name
 # FalconSensor-Windows [--target_instances=[]]
 #
 #######################################################################################################################
@@ -82,9 +82,10 @@ def __get_automation_execution(client, exec_id):
 def usage():
     print(
         'Usage: python example_aws_ssm_package_installation.py --package_version=<package_version>  '
-        '--package_name=<package_name> --target_instances=[] '
+        '--ssm_automation_doc_name=<ssm_automation_doc_name> --target_instances=[] '
     )
-    print('  --package_name=<String>     [Required]  Sensor install version for which we are building the package')
+    print(
+        '  --ssm_automation_doc_name=<String>     [Required]  Sensor install version for which we are building the package')
     print('  --package_version=<String>  [Required]  Sensor type supported values are linux/windows ')
     print('  --target_instances=[]     [Required]  [CAUTION] instance ids to target ')
     sys.exit(2)
@@ -189,7 +190,7 @@ def main():
     # Loading command line arguments
     try:
         opts, args = getopt.getopt(sys.argv[1:], "",
-                                   ["package_name=", "package_version=",
+                                   ["ssm_automation_doc_name=", "package_version=",
                                     "target_instances="])
 
     except getopt.GetoptError as err:
@@ -200,7 +201,7 @@ def main():
     package_version = ""
     target_instances = []
     for opt, arg in opts:
-        if opt == '--package_name':
+        if opt == '--ssm_automation_doc_name':
             package_name = arg
         if opt == '--package_version':
             package_version = arg
