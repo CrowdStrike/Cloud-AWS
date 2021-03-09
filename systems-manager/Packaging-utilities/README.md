@@ -11,10 +11,10 @@ Systems Manager.
 zip-files - A folder containing two zip files
 
 * `Package-sensor-download.zip` contains the files required to create a package where the sensor is downloaded from the
-  CrowdStrike sensor download API.
+  CrowdStrike sensor download API.  
 
 * `Package-with-binary.zip` contains the files required to create a package where the sensor is bundled with the
-  installer scripts and pushed to the host using the systems manager agent.
+  installer scripts and pushed to the host using the systems manager agent. A copy of the instructions with examples is here [README.md](https://github.com/CrowdStrike/Cloud-AWS/tree/systems-manager/systems-manager/Packaging-utilities/examples/linux-sensor-binary)
 
 Select one of the above zip files and unzip its contents to a new location. Once unzipped follow the instructions in the
 README.md file.
