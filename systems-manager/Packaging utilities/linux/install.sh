@@ -145,7 +145,7 @@ os_install_package() {
             rpm_install_package "$pkg"
             ;;
         Debian)
-            DEBIAN_FRONTEND=noninteractive apt-get -qq install -y "$pkg" > /dev/nul
+            DEBIAN_FRONTEND=noninteractive apt-get -qq install -y "$pkg" > /dev/null
             ;;
         Oracle)
             rpm_install_package "$pkg"
@@ -311,7 +311,7 @@ set -e
 os_name=$(
     # returns either: Amazon, Ubuntu, CentOS, RHEL, or SLES
     # lsb_release is not always present
-    name=$(cat /etc/*release | grep ^NAME= | awk -F'=' '{ print $2 }' | sed "s/\"//g;s/Red Hat.*/RHEL/g;s/ Linux$//g")
+    name=$(cat /etc/*release | grep ^NAME= | awk -F'=' '{ print $2 }' | sed "s/\"//g;s/Red Hat.*/RHEL/g;s/ Linux$//g;s/ GNU\/Linux$//g")
     if [ -z "$name" ]; then
         if lsb_release -s -i | grep -q ^RedHat; then
             name="RHEL"
@@ -326,9 +326,13 @@ os_name=$(
 
 os_version=$(
     version=$(cat /etc/*release | grep VERSION_ID= | awk '{ print $1 }' | awk -F'=' '{ print $2 }' | sed "s/\"//g")
-    if [ -z "$version" ] && type rpm > /dev/null 2>&1; then
-        # older systems may have *release files of different form
-        version=$(rpm -qf /etc/redhat-release --queryformat '%{VERSION}' | sed 's/\([[:digit:]]\+\).*/\1/g')
+    if [ -z "$version" ]; then
+        if type rpm > /dev/null 2>&1; then
+            # older systems may have *release files of different form
+            version=$(rpm -qf /etc/redhat-release --queryformat '%{VERSION}' | sed 's/\([[:digit:]]\+\).*/\1/g')
+        elif [ -f /etc/debian_version ]; then
+            version=$(cat /etc/debian_version)
+        fi
     fi
     if [ -z "$version" ]; then
         cat /etc/*release >&2
