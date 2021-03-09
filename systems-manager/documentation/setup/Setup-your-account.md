@@ -3,7 +3,7 @@ Setup Systems Manager
 
 # Prerequisites
 
-Complete the section [Create your AWS SSM package]()
+Complete the section [Create your AWS SSM package](https://github.com/CrowdStrike/Cloud-AWS/blob/systems-manager/systems-manager/Packaging-utilities/README.md)
 
 Introduction
 ------------
