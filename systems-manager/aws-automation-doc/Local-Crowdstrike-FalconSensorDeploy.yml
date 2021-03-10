@@ -28,10 +28,6 @@ parameters:
     type: String
     description: '(Optional) The version of the package to install or uninstall. If you don’t specify a version, the system installs the latest published version by default. The system will only attempt to uninstall the version that is currently installed. If no version of the package is installed, the system returns an error.'
     default: ''
-  CSFalconVersion:
-    type: String
-    description: '(Optional) The version of the package to install or uninstall. If you don’t specify a version, the system installs the latest published version by default. The system will only attempt to uninstall the version that is currently installed. If no version of the package is installed, the system returns an error.'
-    default: ''
   APIGatewayHostKey:
     type: String
     description: '(Required) Crowdstrike''s API Gateway host address Key, this key is retrieved from the Parameter Store Service.'
@@ -69,13 +65,8 @@ mainSteps:
 
           print('Fetching required configuration from Parameter Service')
 
-          print('... Fetching CSFalconVersion')
-          apiGatewayHostResponse = ssm.get_parameter(Name=events["CSFalconVersion"], WithDecryption=False)
-          if apiGatewayHostResponse['ResponseMetadata']['HTTPStatusCode'] != 200:
-            raise ValueError('Required property {} not found'.format(events["CSFalconVersion"]))
-
           print('... Fetching APIGatewayHostKey')
-          apiGatewayHostResponse = ssm.get_parameter(Name=events["APIGatewayHostKey"], WithDecryption=False)
+          apiGatewayHostResponse = ssm.get_parameter(Name=events["APIGatewayHostKey"], WithDecryption=True)
           if apiGatewayHostResponse['ResponseMetadata']['HTTPStatusCode'] != 200:
             raise ValueError('Required property {} not found'.format(events["APIGatewayHostKey"]))
 
@@ -110,10 +101,10 @@ mainSteps:
           except Exception as e:
             raise ValueError('Failure while interacting with Crowdstrike backend. Error: {}'.format(e))
       InputPayload:
+        AWSRegion: '{{AWSRegion}}'
         APIGatewayHostKey: '{{APIGatewayHostKey}}'
         APIGatewayClientIDKey: '{{APIGatewayClientIDKey}}'
         APIGatewayClientSecretKey: '{{APIGatewayClientSecretKey}}'
-        CSFalconVersion: '{{CSFalconVersion}}'
     outputs:
       - Name: AuthToken
         Selector: $.Payload.AuthToken

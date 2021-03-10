@@ -584,7 +584,7 @@ Substitue values for ```<<automation document name>>``` and ```<<distributor pac
 in the cloudformation template.
 
  ```console
-aws ssm start-automation-execution --document-name "<<automation document name>>" --document-version "\$DEFAULT" --parameters '{"InstallerParams":[""],"Action":["Install"],"InstallationType":["Uninstall and reinstall"],"PackageName":["<<distributor package name>>"],"PackageVersion":[""],"APIGatewayHostKey":["CS_API_GATEWAY_HOST"],"APIGatewayClientIDKey":["CS_API_GATEWAY_CLIENT_ID\n"],"APIGatewayClientSecretKey":["CS_API_GATEWAY_CLIENT_SECRET"],"Targets":[]}' --region eu-west-1
+ aws ssm start-automation-execution --document-name "Local-FalconSensor" --document-version "\$DEFAULT" --parameters '{"InstallerParams":[""],"Action":["Install"],"InstallationType":["Uninstall and reinstall"],"PackageName":["CS-Falcon-Install"],"PackageVersion":[""],"CSFalconVersion":[""],"APIGatewayHostKey":["CS_API_GATEWAY_HOST"],"APIGatewayClientIDKey":["CS_API_GATEWAY_CLIENT_ID\n"],"APIGatewayClientSecretKey":["CS_API_GATEWAY_CLIENT_SECRET"],"InstanceIds":["i-0c37e5a0ba8836e49"],"Targets":[],"AutomationAssumeRole":["arn:aws:iam::517716713836:role/CrowdStrike-SSMExecutionRole"]}' --region eu-west-1
 ```
 
 ### Installing With Python
