@@ -1,4 +1,4 @@
-# Python Utility to Create AWS Systems Manager Package (Packaged CrowdStrike Binary)
+# Creating a Package with the Installer
 
 This guide describes how to setup AWS systems manager where the CrowdStrike binary is packaged with the sensor install
 script.
