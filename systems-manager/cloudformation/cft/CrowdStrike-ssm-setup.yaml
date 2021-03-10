@@ -54,8 +54,8 @@ Parameters:
 
 Resources:
 
-  TriggerLambda:
-    Type: 'Custom::TriggerLambda'
+  TriggerCreateParamsLambda:
+    Type: 'Custom::TriggerCreateParamsLambda'
     DependsOn:
       - createSsmParamsLambdaRole
     Properties:
@@ -156,8 +156,8 @@ Resources:
 
       RoleName: CrowdStrike-SSMExecutionRole
 
-  TriggerLambda1:
-    Type: 'Custom::TriggerLambda'
+  TriggerCreateDocsLambda:
+    Type: 'Custom::TriggerCreateDocsLambda'
     DependsOn:
       - LambdaDocsSetup
     Properties:
