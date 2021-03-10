@@ -74,10 +74,10 @@ mainSteps:
           if apiGateWayHostResponse['ResponseMetadata']['HTTPStatusCode'] != 200:
           raise ValueError('Required property {} not found'.format(events["CSFalconVersion"]))
 
-          print('... Fetching APIGateWayHostKey')
-          apiGateWayHostResponse = ssm.get_parameter(Name=events["APIGateWayHostKey"], WithDecryption=False)
+          print('... Fetching :APIGatewayHostKey')
+          apiGateWayHostResponse = ssm.get_parameter(Name=events[":APIGatewayHostKey"], WithDecryption=False)
           if apiGateWayHostResponse['ResponseMetadata']['HTTPStatusCode'] != 200:
-            raise ValueError('Required property {} not found'.format(events["APIGateWayHostKey"]))
+            raise ValueError('Required property {} not found'.format(events[":APIGatewayHostKey"]))
 
           print('... Fetching APIGatewayClientIDKey')
           apiGatewayClientIDResponse = ssm.get_parameter(Name=events["APIGatewayClientIDKey"], WithDecryption=True)
@@ -110,7 +110,7 @@ mainSteps:
           except Exception as e:
             raise ValueError('Failure while interacting with Crowdstrike backend. Error: {}'.format(e))
       InputPayload:
-        APIGateWayHostKey: '{{APIGatewayHostKey}}'
+        :APIGatewayHostKey: '{{APIGatewayHostKey}}'
         APIGatewayClientIDKey: '{{APIGatewayClientIDKey}}'
         APIGatewayClientSecretKey: '{{APIGatewayClientSecretKey}}'
         CSFalconVersion: '{{CSFalconVersion}}'
