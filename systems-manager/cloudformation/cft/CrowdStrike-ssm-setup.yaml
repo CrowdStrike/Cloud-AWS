@@ -59,7 +59,7 @@ Resources:
     DependsOn:
       - createSsmParamsLambdaRole
     Properties:
-      CS_API_GATEWAY_HOST: !Ref APIGatewayHostKey
+      APIGatewayHostKey: !Ref APIGatewayHostKey
       CS_API_GATEWAY_CLIENT_ID: !Ref APIGatewayClientIDKey
       CS_API_GATEWAY_CLIENT_SECRET: !Ref APIGatewayClientSecretKey
       ServiceToken: !GetAtt
@@ -173,7 +173,7 @@ Resources:
           aws_region: !Ref AWS::Region
           ssm_automation_doc_name: !Ref AutomationDocumentName
           s3bucket: !Ref S3Bucket
-          package_name: !Ref InstallPackageName
+          document_name: !Ref InstallPackageName
       Code:
         S3Bucket: !Ref S3Bucket
         S3Key: lambda_ssm_setup.zip
