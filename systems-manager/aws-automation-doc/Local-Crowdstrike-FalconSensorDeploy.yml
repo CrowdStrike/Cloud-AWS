@@ -70,13 +70,13 @@ mainSteps:
           print('Fetching required configuration from Parameter Service')
 
           print('... Fetching CSFalconVersion')
-          apiGateWayHostResponse = ssm.get_parameter(Name=events["CSFalconVersion"], WithDecryption=False)
-          if apiGateWayHostResponse['ResponseMetadata']['HTTPStatusCode'] != 200:
+          apiGatewayHostResponse = ssm.get_parameter(Name=events["CSFalconVersion"], WithDecryption=False)
+          if apiGatewayHostResponse['ResponseMetadata']['HTTPStatusCode'] != 200:
             raise ValueError('Required property {} not found'.format(events["CSFalconVersion"]))
 
-          print('... Fetching APIGateWayHostKey')
-          apiGateWayHostResponse = ssm.get_parameter(Name=events["APIGatewayHostKey"], WithDecryption=False)
-          if apiGateWayHostResponse['ResponseMetadata']['HTTPStatusCode'] != 200:
+          print('... Fetching APIGatewayHostKey')
+          apiGatewayHostResponse = ssm.get_parameter(Name=events["APIGatewayHostKey"], WithDecryption=False)
+          if apiGatewayHostResponse['ResponseMetadata']['HTTPStatusCode'] != 200:
             raise ValueError('Required property {} not found'.format(events["APIGatewayHostKey"]))
 
           print('... Fetching APIGatewayClientIDKey')
@@ -95,7 +95,7 @@ mainSteps:
 
           try:
             print('Requesting Authentication token from Crowdstrike backend.')
-            conn = http.client.HTTPSConnection(apiGateWayHostValue)
+            conn = http.client.HTTPSConnection(apiGatewayHostValue)
             params = urllib.parse.urlencode({'client_id': apiGatewayClientIDValue, 'client_secret': apiGatewayClientSecretValue})
             headers = {'Content-Type': 'application/x-www-form-urlencoded'}
             conn.request("POST", "/oauth2/token", params, headers)
@@ -110,7 +110,7 @@ mainSteps:
           except Exception as e:
             raise ValueError('Failure while interacting with Crowdstrike backend. Error: {}'.format(e))
       InputPayload:
-        APIGateWayHostKey: '{{APIGatewayHostKey}}'
+        APIGatewayHostKey: '{{APIGatewayHostKey}}'
         APIGatewayClientIDKey: '{{APIGatewayClientIDKey}}'
         APIGatewayClientSecretKey: '{{APIGatewayClientSecretKey}}'
         CSFalconVersion: '{{CSFalconVersion}}'
