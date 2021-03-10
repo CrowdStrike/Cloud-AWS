@@ -197,12 +197,12 @@ Select from one of two methods of delivering the CrowdStrike agent to the ec2 in
 
 Option-A - Create an install package that combines the installation scripts with the CrowdStrike Falcon installer. For
 information on how to complete these steps follow the
-guide [here](https://github.com/CrowdStrike/Cloud-AWS/blob/systems-manager/systems-manager/Packaging-utilities/examples/linux-sensor-binary/README.md)
+guide [here](https://github.com/CrowdStrike/Cloud-AWS/blob/master/systems-manager/Packaging-utilities/examples/linux-sensor-binary/README.md)
 .
 
 Option-B - Create an install package that uses installation scripts to download the CrowdStrike Falcon installer during
 installation. For information on how to complete these steps follow the
-guide [here](https://github.com/CrowdStrike/Cloud-AWS/blob/systems-manager/systems-manager/Packaging-utilities/examples/linux-sensor-download/README.md)
+guide [here](https://github.com/CrowdStrike/Cloud-AWS/blob/master/systems-manager/Packaging-utilities/examples/linux-sensor-download/README.md)
 
 Two zip files are included in the *Packaging-utilities/zip-files* folder that contain example files for creating a
 CrowdStrike package for AWS Systems Manager.
