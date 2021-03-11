@@ -19,6 +19,7 @@ AmazonEC
 AmazonSQSFullAccess
 AmazonSSMAutomationRole
 AmazonSSMManagedInstanceCore
+AutomationAssumeRole
 Autoscale
 BootStrap
 Boto
@@ -29,6 +30,7 @@ CROWDSTRIKE
 CRWD
 CSAccountNumber
 CSAssumingRoleName
+CSFalconVersion
 CSPM
 CentOS
 ClientID
@@ -48,6 +50,7 @@ CrowdStrikeCSPMStackName
 CrowdStrike’s
 Crowdstrike
 DLQ
+DaemonSet
 Decrypt
 DescribeImages
 DescribeInstances
@@ -71,6 +74,7 @@ FW
 FalconClientId
 FalconPy
 FalconSecret
+FalconSensor
 FalconSensorDeploy
 Fargate
 GCloud
@@ -100,6 +104,7 @@ Lifecycle
 ListAccountAliases
 MERCHANTABILITY
 MatchAttributes
+Microk
 OAuth
 Optimise
 PackageName
@@ -153,11 +158,13 @@ auth
 autoscale
 aws
 backend
+ba
 bd
 boto
 botocore
 cd
 cft
+cid
 classtype
 cli
 cloudconnect
@@ -214,6 +221,7 @@ licensors
 lifecycle
 linux
 md
+microk
 mins
 misconfigurations
 msg
