@@ -21,10 +21,6 @@ Metadata:
       APIGatewayHostKey:
         default: URL for CrowdStrike API
 
-Outputs:
-  RoleARN:
-    Description: The ARN of the role that can be assumed by the other account.
-    Value: !GetAtt 'createSsmParamsLambdaRole.Arn'
 Parameters:
   InstallPackageName:
     Description: The name of the install package that you wish to create
@@ -54,8 +50,8 @@ Parameters:
 
 Resources:
 
-  TriggerLambda:
-    Type: 'Custom::TriggerLambda'
+  TriggerCreateParamsLambda:
+    Type: 'Custom::TriggerCreateParamsLambda'
     DependsOn:
       - createSsmParamsLambdaRole
     Properties:
@@ -147,17 +143,16 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              Service: lambda.amazonaws.com
+              Service: ssm.amazonaws.com
             Action: sts:AssumeRole
       Path: /
       Description: String
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole
-
       RoleName: CrowdStrike-SSMExecutionRole
 
-  TriggerLambda1:
-    Type: 'Custom::TriggerLambda'
+  TriggerCreateDocsLambda:
+    Type: 'Custom::TriggerCreateDocsLambda'
     DependsOn:
       - LambdaDocsSetup
     Properties:
@@ -171,9 +166,9 @@ Resources:
       Environment:
         Variables:
           aws_region: !Ref AWS::Region
-          document_name: !Ref AutomationDocumentName
+          ssm_automation_doc_name: !Ref AutomationDocumentName
           s3bucket: !Ref S3Bucket
-          package_name: !Ref InstallPackageName
+          document_name: !Ref InstallPackageName
       Code:
         S3Bucket: !Ref S3Bucket
         S3Key: lambda_ssm_setup.zip
