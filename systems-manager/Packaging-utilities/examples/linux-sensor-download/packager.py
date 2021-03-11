@@ -279,6 +279,10 @@ if __name__ == '__main__':
         print(
             "Skipping AWS upload: please provide --aws_region, --ssm_automation_doc_name, and --s3bucket command-line options for upload")
         print("Package has been built successfully.")
-    else:
+    elif region and s3bucket:
+        S3BucketUpdater(region).update(s3bucket, files)
+    elif region and s3bucket and package_name:
         S3BucketUpdater(region).update(s3bucket, files)
         SSMPackageUpdater(region).update(package_name, "./s3-bucket/manifest.json")
+    else:
+        print("Nothing to do ... specify region + bucket or region + bucket + package_name")
