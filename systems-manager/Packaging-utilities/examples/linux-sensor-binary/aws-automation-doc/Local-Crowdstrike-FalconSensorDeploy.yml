@@ -2,12 +2,12 @@ description: Automation Document for installing the Crowdstike's Falcon Sensor .
 schemaVersion: '0.3'
 assumeRole: '{{AutomationAssumeRole}}'
 parameters:
-  AWSRegion:
-    type: String
   InstallerParams:
     type: String
     default: ''
-    description: (Optional) Enter CrowdStrike's install time params here. For more info refer Falcon console documentation.
+    description: |-
+      (Optional) Enter CrowdStrike's install time params here. For more info refer Falcon console documentation.
+
   Action:
     type: String
     allowedValues:
@@ -25,6 +25,10 @@ parameters:
     type: String
     description: '(Required) The CrowdStrike package name. For Windows use FalconSensor-Windows, for linux use FalconSensor-linux.'
   PackageVersion:
+    type: String
+    description: '(Optional) The version of the package to install or uninstall. If you don’t specify a version, the system installs the latest published version by default. The system will only attempt to uninstall the version that is currently installed. If no version of the package is installed, the system returns an error.'
+    default: ''
+  CSFalconVersion:
     type: String
     description: '(Optional) The version of the package to install or uninstall. If you don’t specify a version, the system installs the latest published version by default. The system will only attempt to uninstall the version that is currently installed. If no version of the package is installed, the system returns an error.'
     default: ''
@@ -61,14 +65,19 @@ mainSteps:
         import boto3
         import json
         def script_handler(events, context):
-          ssm = boto3.client('ssm', region_name=events["AWSRegion"])
+          ssm = boto3.client('ssm', region_name='us-east-1')
 
           print('Fetching required configuration from Parameter Service')
 
-          print('... Fetching APIGatewayHostKey')
-          apiGatewayHostResponse = ssm.get_parameter(Name=events["APIGatewayHostKey"], WithDecryption=True)
-          if apiGatewayHostResponse['ResponseMetadata']['HTTPStatusCode'] != 200:
-            raise ValueError('Required property {} not found'.format(events["APIGatewayHostKey"]))
+          print('... Fetching CSFalconVersion')
+          apiGateWayHostResponse = ssm.get_parameter(Name=events["CSFalconVersion"], WithDecryption=False)
+          if apiGateWayHostResponse['ResponseMetadata']['HTTPStatusCode'] != 200:
+          raise ValueError('Required property {} not found'.format(events["CSFalconVersion"]))
+
+          print('... Fetching :APIGatewayHostKey')
+          apiGateWayHostResponse = ssm.get_parameter(Name=events[":APIGatewayHostKey"], WithDecryption=False)
+          if apiGateWayHostResponse['ResponseMetadata']['HTTPStatusCode'] != 200:
+            raise ValueError('Required property {} not found'.format(events[":APIGatewayHostKey"]))
 
           print('... Fetching APIGatewayClientIDKey')
           apiGatewayClientIDResponse = ssm.get_parameter(Name=events["APIGatewayClientIDKey"], WithDecryption=True)
@@ -80,13 +89,13 @@ mainSteps:
           if apiGatewayClientSecretResponse['ResponseMetadata']['HTTPStatusCode'] != 200:
             raise ValueError('Required property {} not found'.format(events["APIGatewayClientSecretKey"]))
 
-          apiGatewayHostValue = apiGatewayHostResponse['Parameter']['Value']
+          apiGateWayHostValue = apiGateWayHostResponse['Parameter']['Value']
           apiGatewayClientIDValue = apiGatewayClientIDResponse['Parameter']['Value']
           apiGatewayClientSecretValue = apiGatewayClientSecretResponse['Parameter']['Value']
 
           try:
             print('Requesting Authentication token from Crowdstrike backend.')
-            conn = http.client.HTTPSConnection(apiGatewayHostValue)
+            conn = http.client.HTTPSConnection(apiGateWayHostValue)
             params = urllib.parse.urlencode({'client_id': apiGatewayClientIDValue, 'client_secret': apiGatewayClientSecretValue})
             headers = {'Content-Type': 'application/x-www-form-urlencoded'}
             conn.request("POST", "/oauth2/token", params, headers)
@@ -97,14 +106,14 @@ mainSteps:
 
             data = res.read()
             print('Successfully received OAuth token.')
-            return {'AuthToken': json.loads(data)['access_token'],'ApiGatewayHost': apiGatewayHostValue}
+            return {'AuthToken': json.loads(data)['access_token'],'ApiGatewayHost': apiGateWayHostValue}
           except Exception as e:
             raise ValueError('Failure while interacting with Crowdstrike backend. Error: {}'.format(e))
       InputPayload:
-        AWSRegion: '{{AWSRegion}}'
-        APIGatewayHostKey: '{{APIGatewayHostKey}}'
+        :APIGatewayHostKey: '{{APIGatewayHostKey}}'
         APIGatewayClientIDKey: '{{APIGatewayClientIDKey}}'
         APIGatewayClientSecretKey: '{{APIGatewayClientSecretKey}}'
+        CSFalconVersion: '{{CSFalconVersion}}'
     outputs:
       - Name: AuthToken
         Selector: $.Payload.AuthToken
@@ -202,7 +211,7 @@ mainSteps:
     inputs:
       Targets: '{{ Targets }}'
       InstanceIds: '{{ InstanceIds }}'
-      DocumentName: AWS-ConfigureAWSPackage
+      DocumentName: 'AWS-ConfigureAWSPackage'
       Parameters:
         name: '{{PackageName}}'
         action: '{{Action}}'

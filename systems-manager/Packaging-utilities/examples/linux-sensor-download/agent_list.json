@@ -1,0 +1,12 @@
+[
+  {
+    "os": "windows",
+    "dir": "CS_WINDOWS",
+    "file": "CS_WINDOWS.zip"
+  },
+  {
+    "os": "amazon",
+    "dir": "CS_AMAZON",
+    "file": "CS_AMAZON.zip"
+  }
+]
