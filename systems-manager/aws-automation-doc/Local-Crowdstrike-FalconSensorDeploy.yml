@@ -2,12 +2,12 @@ description: Automation Document for installing the Crowdstike's Falcon Sensor .
 schemaVersion: '0.3'
 assumeRole: '{{AutomationAssumeRole}}'
 parameters:
+  AWSRegion:
+    type: String
   InstallerParams:
     type: String
     default: ''
-    description: |-
-      (Optional) Enter CrowdStrike's install time params here. For more info refer Falcon console documentation.
-
+    description: (Optional) Enter CrowdStrike's install time params here. For more info refer Falcon console documentation.
   Action:
     type: String
     allowedValues:
@@ -61,14 +61,14 @@ mainSteps:
         import boto3
         import json
         def script_handler(events, context):
-          ssm = boto3.client('ssm', region_name='us-east-1')
+          ssm = boto3.client('ssm', region_name=events["AWSRegion"])
 
           print('Fetching required configuration from Parameter Service')
 
-          print('... Fetching APIGateWayHostKey')
-          apiGateWayHostResponse = ssm.get_parameter(Name=events["APIGateWayHostKey"], WithDecryption=False)
-          if apiGateWayHostResponse['ResponseMetadata']['HTTPStatusCode'] != 200:
-            raise ValueError('Required property {} not found'.format(events["APIGateWayHostKey"]))
+          print('... Fetching APIGatewayHostKey')
+          apiGatewayHostResponse = ssm.get_parameter(Name=events["APIGatewayHostKey"], WithDecryption=True)
+          if apiGatewayHostResponse['ResponseMetadata']['HTTPStatusCode'] != 200:
+            raise ValueError('Required property {} not found'.format(events["APIGatewayHostKey"]))
 
           print('... Fetching APIGatewayClientIDKey')
           apiGatewayClientIDResponse = ssm.get_parameter(Name=events["APIGatewayClientIDKey"], WithDecryption=True)
@@ -80,13 +80,13 @@ mainSteps:
           if apiGatewayClientSecretResponse['ResponseMetadata']['HTTPStatusCode'] != 200:
             raise ValueError('Required property {} not found'.format(events["APIGatewayClientSecretKey"]))
 
-          apiGateWayHostValue = apiGateWayHostResponse['Parameter']['Value']
+          apiGatewayHostValue = apiGatewayHostResponse['Parameter']['Value']
           apiGatewayClientIDValue = apiGatewayClientIDResponse['Parameter']['Value']
           apiGatewayClientSecretValue = apiGatewayClientSecretResponse['Parameter']['Value']
 
           try:
             print('Requesting Authentication token from Crowdstrike backend.')
-            conn = http.client.HTTPSConnection(apiGateWayHostValue)
+            conn = http.client.HTTPSConnection(apiGatewayHostValue)
             params = urllib.parse.urlencode({'client_id': apiGatewayClientIDValue, 'client_secret': apiGatewayClientSecretValue})
             headers = {'Content-Type': 'application/x-www-form-urlencoded'}
             conn.request("POST", "/oauth2/token", params, headers)
@@ -97,11 +97,12 @@ mainSteps:
 
             data = res.read()
             print('Successfully received OAuth token.')
-            return {'AuthToken': json.loads(data)['access_token'],'ApiGatewayHost': apiGateWayHostValue}
+            return {'AuthToken': json.loads(data)['access_token'],'ApiGatewayHost': apiGatewayHostValue}
           except Exception as e:
             raise ValueError('Failure while interacting with Crowdstrike backend. Error: {}'.format(e))
       InputPayload:
-        APIGateWayHostKey: '{{APIGatewayHostKey}}'
+        AWSRegion: '{{AWSRegion}}'
+        APIGatewayHostKey: '{{APIGatewayHostKey}}'
         APIGatewayClientIDKey: '{{APIGatewayClientIDKey}}'
         APIGatewayClientSecretKey: '{{APIGatewayClientSecretKey}}'
     outputs:
@@ -201,7 +202,7 @@ mainSteps:
     inputs:
       Targets: '{{ Targets }}'
       InstanceIds: '{{ InstanceIds }}'
-      DocumentName: 'AWS-ConfigureAWSPackage'
+      DocumentName: AWS-ConfigureAWSPackage
       Parameters:
         name: '{{PackageName}}'
         action: '{{Action}}'
