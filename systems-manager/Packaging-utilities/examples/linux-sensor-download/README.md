@@ -63,7 +63,7 @@ An example 'agent_list.json' file.
 
 ## Generating the Required Package Files
 
-Execute the script "packager.py". The file peforms the following functions dependent on the parameters provided
+Execute the script "packager.py". The file performs the following functions dependent on the parameters provided
 
 * No Params - The script will parse the agent_list.json file and generate the *.zip and manifest.json file that is added
   to the s3bucket folder.

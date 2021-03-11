@@ -17,11 +17,7 @@ while (( "$#" )); do
 done
 
 # Paramters
-<<<<<<< HEAD
-INSTALLER="falcon-sensor-6.16.0-11308.amzn2.x86_64.rpm"
-=======
 INSTALLER="<<INSTALLER_NAME>>"
->>>>>>> origin/master
 #Get configs params
 echo 'Getting required config params ...'
 

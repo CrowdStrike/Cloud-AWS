@@ -98,8 +98,8 @@ class S3BucketUpdater:
         if not self._bucket_exists(bucket_name):
             self._create_bucket(bucket_name)
         for f in files:
-            file_path = './s3-bucket/' + f
-            self._upload_file(file_path, bucket_name, "falcon/" + f)
+            f = './s3-bucket/' + f
+            self._upload_file(f, bucket_name, "falcon/" + f)
 
     def _bucket_exists(self, bucket_name):
         """
@@ -263,8 +263,8 @@ class DistributorPackager:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create and upload Distributor packages to the AWS SSM')
     parser.add_argument('-r', '--aws_region', help='AWS Region')
-    parser.add_argument('-p', '--package_name', help='Package Name')
-    parser.add_argument('-b', '--s3bucket', help='S3 Bucket Name ')
+    parser.add_argument('-p', '--ssm_automation_doc_name', help='Package Name')
+    parser.add_argument('-b', '--s3bucket', help='Package Name')
 
     args = parser.parse_args()
 
@@ -272,18 +272,12 @@ if __name__ == '__main__':
     package_name = args.package_name
     s3bucket = args.s3bucket
 
-    files = DistributorPackager().build('./agent_list.json')
+    files = DistributorPackager().build('agent_list.json')
 
-    if region is None and package_name is None and s3bucket is None:
+    if region is None or package_name is None or s3bucket is None:
         print(
             "Skipping AWS upload: please provide --aws_region, --ssm_automation_doc_name, and --s3bucket command-line options for upload")
-        print("Package files have been built successfully.")
-    elif package_name is None and s3bucket and region:
+        print("Package has been built successfully.")
+    else:
         S3BucketUpdater(region).update(s3bucket, files)
-        print("Generating files and uploading to S3")
-        print("Skipping package generation.")
-    elif region and package_name and s3bucket:
-        S3BucketUpdater(region).update(s3bucket, files)
-        print("Generating files and uploading to S3")
         SSMPackageUpdater(region).update(package_name, "./s3-bucket/manifest.json")
-        print("Generated package {}".format(package_name))
