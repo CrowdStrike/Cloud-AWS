@@ -9,5 +9,5 @@ uninstall the CrowdStrike Falcon agent in AWS.
 
 Overview of the integration
 
-[https://github.com/CrowdStrike/Cloud-AWS/blob/master/systems-manager/documentation/overview/AWS-Systems-Manager-Intro.md](https://github.com/CrowdStrike/Cloud-AWS/blob/master/systems-manager/documentation/overview/AWS-Systems-Manager-Intro.md)
+[User Guide](https://github.com/CrowdStrike/Cloud-AWS/blob/master/systems-manager/documentation/AWS-Systems-Manager-Intro.md)
 
