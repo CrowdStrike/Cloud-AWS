@@ -15,7 +15,7 @@ Example commands in this guide are tailored and tested on Ubuntu 20.04.
 
 ### Step 1: Install Microk8s
 
- - Install [microk8s](https://microk8s.io/) Kubernetes. You can use any flavour of Kubernetes to follow this guide, Microk8s is referred to by this guide as it is very easy get up and running.
+ - Install [microk8s](https://microk8s.io/) Kubernetes. You can use any flavor of Kubernetes to follow this guide, Microk8s is referred to by this guide as it is very easy get up and running.
    ```
    $ sudo snap install microk8s --classic
    microk8s (1.20/stable) v1.20.2 from Canonical✓ installed
