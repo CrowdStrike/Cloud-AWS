@@ -98,8 +98,8 @@ class S3BucketUpdater:
         if not self._bucket_exists(bucket_name):
             self._create_bucket(bucket_name)
         for f in files:
-            f = './s3-bucket/' + f
-            self._upload_file(f, bucket_name, "falcon/" + f)
+            file_path = './s3-bucket/' + f
+            self._upload_file(file_path, bucket_name, "falcon/" + f)
 
     def _bucket_exists(self, bucket_name):
         """
@@ -263,7 +263,7 @@ class DistributorPackager:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create and upload Distributor packages to the AWS SSM')
     parser.add_argument('-r', '--aws_region', help='AWS Region')
-    parser.add_argument('-p', '--ssm_automation_doc_name', help='Package Name')
+    parser.add_argument('-p', '--package_name', help='Package Name')
     parser.add_argument('-b', '--s3bucket', help='Package Name')
 
     args = parser.parse_args()
