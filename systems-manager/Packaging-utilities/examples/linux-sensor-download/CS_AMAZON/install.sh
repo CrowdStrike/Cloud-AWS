@@ -20,6 +20,7 @@ Script to download and install the CrowdStrike Falcon sensor.
 Usage:
 This script supports two modes of execution and two methods of ingesting variables.
 Using parameter arguments:
+
    cssensor_install <CLIENT_ID> <CLIENT_SECRET> <CLIENT_CID> <INSTALL_PARAMS> <INSTALL_TOKEN>
 or
    cssensor_install <CLIENT_OATH_TOKEN> <CLIENT_CID> <INSTALL_PARAMS> <INSTALL_TOKEN>
@@ -44,6 +45,7 @@ Environment Variables:
   CS_FALCON_CLIENT_SECRET: Required if CS_FALCON_OAUTH_TOKEN is unset.
     This is the client_secret for the CrowdStrike API Credentials. Needs at least "Sensor Download" permissions.
   CS_FALCON_CID: This is the Customer CID for the CrowdStrike Falcon API.
+
   CS_INSTALL_PARAMS will set installer parameters
   CS_INSTALL_TOKEN will set the provisioning token
 
@@ -53,6 +55,7 @@ AWS Systems Manager (SSM) integration:
   SSM_CS_NCNT will set the "N-" version count. (2 = N-2 version)
   SSM_CS_INSTALLPARAMS will set installer parameters, overriding environment / parameter values
   SSM_CS_INSTALLTOKEN will set the provisioning token, overriding environment / parameter values
+
 EOF
 }
 
@@ -123,8 +126,8 @@ else
     	CS_FALCON_CLIENT_ID=$1
     	CS_FALCON_CLIENT_SECRET=$2
     	CS_FALCON_CID=$3
-        CS_INSTALL_PARAMS=$4
-        CS_INSTALL_TOKEN="--provisioning-token=$5"
+      CS_INSTALL_PARAMS=$4
+      CS_INSTALL_TOKEN="--provisioning-token=$5"
     fi
 fi
 
@@ -251,5 +254,3 @@ if [[ "$PACKAGER" == "apt" ]]
 then
 	aptInstall $filename $CS_FALCON_CID $CS_INSTALL_PARAMS $CS_INSTALL_TOKEN
 fi
-
-
