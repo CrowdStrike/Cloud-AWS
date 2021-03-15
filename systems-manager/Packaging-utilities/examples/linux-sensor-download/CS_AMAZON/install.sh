@@ -1,7 +1,6 @@
 #!/bin/bash
 
 CS_API_BASE=${CS_API_BASE:-api.crowdstrike.com}
-filename="falcon-sensor-6.16.0-11308.amzn2.x86_64.rpm"
 
 echoRed() {
     echo -e "\033[0;31m$1\033[0m"
@@ -19,6 +18,34 @@ usage() {
 Script to download and install the CrowdStrike Falcon sensor.
 
 Usage:
+This script supports two modes of execution and two methods of ingesting variables.
+Using parameter arguments:
+   cssensor_install <CLIENT_ID> <CLIENT_SECRET> <CLIENT_CID> <INSTALL_PARAMS> <INSTALL_TOKEN>
+or
+   cssensor_install <CLIENT_OATH_TOKEN> <CLIENT_CID> <INSTALL_PARAMS> <INSTALL_TOKEN>
+
+Using environment variables:
+   export CS_FALCON_OAUTH_TOKEN={TOKEN_HERE}
+   export CS_FALCON_CID={CID_HERE}
+   cssensor_install
+
+Parameter Arguments:
+  CLIENT_ID: This is the client_id for the CrowdStrike API Credentials.
+  CLIENT_SECRET: This is the client_secret for the CrowdStrike API Credentials.
+  CLIENT_CID: This is the Customer CID for the CrowdStrike Falcon API.
+  CLIENT_OAUTH_TOKEN: This is the token returned post authentication to the API. 
+    If this parameter is passed, CLIENT_ID and CLIENT_SECRET should not be provided.
+  
+Environment Variables:
+  CS_FALCON_OAUTH_TOKEN: Required unless CS_FALCON_CLIENT_ID and CS_FALCON_CLIENT_SECRET are provided
+    This is the OAUTH2 token from the CrowdStrike API
+  CS_FALCON_CLIENT_ID: Required if CS_FALCON_OAUTH_TOKEN is unset.
+    This is the client_id for the CrowdStrike API Credentials. Needs at least "Sensor Download" permissions.
+  CS_FALCON_CLIENT_SECRET: Required if CS_FALCON_OAUTH_TOKEN is unset.
+    This is the client_secret for the CrowdStrike API Credentials. Needs at least "Sensor Download" permissions.
+  CS_FALCON_CID: This is the Customer CID for the CrowdStrike Falcon API.
+  CS_INSTALL_PARAMS will set installer parameters
+  CS_INSTALL_TOKEN will set the provisioning token
 
 AWS Systems Manager (SSM) integration:
   SSM_CS_AUTH_TOKEN will override the value of CS_FALCON_OAUTH_TOKEN.
@@ -26,7 +53,6 @@ AWS Systems Manager (SSM) integration:
   SSM_CS_NCNT will set the "N-" version count. (2 = N-2 version)
   SSM_CS_INSTALLPARAMS will set installer parameters, overriding environment / parameter values
   SSM_CS_INSTALLTOKEN will set the provisioning token, overriding environment / parameter values
-
 EOF
 }
 
@@ -76,7 +102,10 @@ if ! [ -z "$SSM_CS_AUTH_TOKEN" ]
 then
     CS_FALCON_OAUTH_TOKEN=${SSM_CS_AUTH_TOKEN}
 fi
-
+CS_FALCON_CLIENT_ID=${CS_FALCON_CLIENT_ID}
+CS_FALCON_CLIENT_SECRET=${CS_FALCON_CLIENT_SECRET}
+CS_INSTALL_PARAMS=${CS_INSTALL_PARAMS}
+CS_INSTALL_TOKEN=${CS_INSTALL_TOKEN}
 if ! [ -z "$SSM_CS_CCID" ]
 then
     CS_FALCON_CID=${SSM_CS_CCID}
@@ -94,8 +123,8 @@ else
     	CS_FALCON_CLIENT_ID=$1
     	CS_FALCON_CLIENT_SECRET=$2
     	CS_FALCON_CID=$3
-      CS_INSTALL_PARAMS=$4
-      CS_INSTALL_TOKEN="--provisioning-token=$5"
+        CS_INSTALL_PARAMS=$4
+        CS_INSTALL_TOKEN="--provisioning-token=$5"
     fi
 fi
 
@@ -136,7 +165,7 @@ then
 fi
 
 osDetail
-
+OUTPUT_DESTINATION="."
 
 case "$OS_NAME" in
     deb?*|Deb?*|ubu?*|Ubu?* )
@@ -161,14 +190,70 @@ case "$OS_NAME" in
         ;;
 esac
 
+OS_VERSION=2
+if [[ "$(uname -p)" != *86* ]]
+then
+    OS_VERSION="$OS_VERSION - arm64"
+fi
+
+## Get Installer Versions
+jsonResult=$(curl -s -L -G "https://$CS_API_BASE/sensors/combined/installers/v1" --data-urlencode "filter=os:\"$OS_NAME\"" -H "Authorization: Bearer $CS_FALCON_OAUTH_TOKEN")
+
+if [[ $jsonResult == *"denied"* ]]; then
+    echoRed "Invalid Access Token"
+    exit 1
+fi
+#echo $jsonResult
+sha_list=$(echo "$jsonResult" | jsonValue "sha256")
+if [ -z "$sha_list" ]; then
+    echoRed "No sensor found for with OS Name: $OS_NAME"
+    exit 1
+fi
+
+INDEX=1
+if [ -n "$OS_VERSION" ]; then
+    found=0
+    IFS=$'\n'
+	for l in $(echo "$jsonResult" | jsonValue "os_version"); do
+        l=$(echo "$l" | sed 's/ *$//g' | sed 's/^ *//g')
+		if [ "$l" = "$OS_VERSION" ]; then
+            ((found+=1))
+            if [ "$found" == "$((NCNT+1))" ]
+            then
+	            break
+	    fi
+        fi
+		((INDEX+=1))
+    done
+    if [ $found = 0 ]; then
+        echoRed "Unable to locate matching sensor: $OS_NAME@$OS_VERSION"
+        exit 1
+    fi
+fi
+
+sha=$(echo "$jsonResult" | jsonValue "sha256" "$INDEX" | sed 's/ *$//g' | sed 's/^ *//g')
+file_type=$(echo "$jsonResult" | jsonValue "file_type" "$INDEX" | sed 's/ *$//g' | sed 's/^ *//g')
+name=$(echo "$jsonResult" | jsonValue "name" "$INDEX" | sed 's/ *$//g' | sed 's/^ *//g')
+
+if [ -z "$sha" ]; then
+    echoRed "Unable to identify a sha matching sensor: $OS_NAME@$OS_VERSION"
+    exit 1
+fi
+
+filename="$OUTPUT_DESTINATION/$name.$file_type"
+#clean up our calculated sha
+sha=$(echo $sha | xargs)
+curl -s -L "https://$CS_API_BASE/sensors/entities/download-installer/v1?id=$sha" -H "Authorization: Bearer $CS_FALCON_OAUTH_TOKEN" -o "$filename"
 
 echo "Sensor binary output to: $filename"
 
 if [[ "$PACKAGER" == "yum" || "$PACKAGER" == "zypper" ]]
 then
-	rpmInstall "$filename" "$CS_FALCON_CID" "$CS_INSTALL_PARAMS" "$CS_INSTALL_TOKEN"
+	rpmInstall $filename $CS_FALCON_CID $CS_INSTALL_PARAMS $CS_INSTALL_TOKEN
 fi
 if [[ "$PACKAGER" == "apt" ]]
 then
-	aptInstall "$filename" "$CS_FALCON_CID" "$CS_INSTALL_PARAMS" "$CS_INSTALL_TOKEN"
+	aptInstall $filename $CS_FALCON_CID $CS_INSTALL_PARAMS $CS_INSTALL_TOKEN
 fi
+
+

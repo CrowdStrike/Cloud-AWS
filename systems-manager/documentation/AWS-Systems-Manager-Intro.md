@@ -246,6 +246,30 @@ The example contains the directories CS_AMAZON and CS_WINDOWS. Each directory sh
 * Uninstall script
 * Sensor Binary for the particular OS
 
+The Install Script At the top of the install script enter values for the the following
+filename=<<filename of the rpm package>>
+TARGET_VER=<<minimum version>> example format =5.38.10404
+
+On execution the script will first check if the falcon sensor is installed and if it meets the minimum version
+requirements. If either condition is not met the sensor install will continue.
+
+```bash
+if pgrep falcon-sensor >/dev/null; then
+  FALCON_VER=$(sudo /opt/CrowdStrike/falconctl -g --version | awk -F= '{ print  $2}' | awk -F. '{ print  $1$2$3$4}')
+  if [ "$FALCON_VER" -lt "$TARGET_VER" ]; then
+    echo "Install required"
+    install
+  else
+    echo "Install not required"
+    exit
+  fi
+else
+  echo "Falcon-sensor not found"
+  echo "Install required"
+  install
+fi
+```
+
 ```text
 user@host CS_WINDOWS % ls -al
 total 82056
@@ -277,7 +301,22 @@ An example 'agent_list.json' file.
 ]
   ```
 
+Save the file in the current directory
+
 Execute the script "packager.py". The file performs the following functions dependent on the parameters provided
+
+```python
+    if region is None or package_name is None or s3bucket is None:
+    print(
+        "Skipping AWS upload: please provide --aws_region, --ssm_automation_doc_name, and --s3bucket command-line options for upload")
+elif region and s3bucket and package_name is None:
+S3BucketUpdater(region).update(s3bucket, files)
+elif region and s3bucket and package_name:
+S3BucketUpdater(region).update(s3bucket, files)
+SSMPackageUpdater(region).update(package_name, "./s3-bucket/manifest.json")
+else:
+print("Nothing to do ... specify region + bucket or region + bucket + package_name")
+```
 
 * No Params - The script will parse the agent_list.json file and generate the *.zip and manifest.json file that is added
   to the s3bucket folder.

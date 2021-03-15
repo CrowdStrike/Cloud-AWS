@@ -40,11 +40,11 @@ osDetail(){
 install(){
     if [[ "$PACKAGER" == "yum" || "$PACKAGER" == "zypper" ]]
       then
-	    rpmInstall $filename "$CS_FALCON_CID" "$CS_INSTALL_PARAMS" "$CS_INSTALL_TOKEN"
+	    rpmInstall $filename "$CS_FALCON_CID" "$CS_INSTALL_TOKEN"
     fi
     if [[ "$PACKAGER" == "apt" ]]
       then
-	    aptInstall $filename "$CS_FALCON_CID" "$CS_INSTALL_PARAMS" "$CS_INSTALL_TOKEN"
+	    aptInstall $filename "$CS_FALCON_CID" "$CS_INSTALL_TOKEN"
     fi
 }
 
