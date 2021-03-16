@@ -7,6 +7,8 @@ script.
 
 1) Create a new directory
 2) Unzip the file package-with-binary.zip
+3) Add the Falcon installer file to the relevant directory. For example add the amazon linux rpm file to the CS_AMAZON
+   folder.
 
 ```text
 user@host linux-sensor-binary % ls -al
@@ -20,6 +22,30 @@ drwxr-xr-x  5 jharris  staff    160  5 Mar 17:14 CS_WINDOWS
 drwxr-xr-x  3 jharris  staff     96  5 Mar 18:13 aws-automation-doc
 -rw-r--r--  1 jharris  staff  10040  9 Mar 11:00 packager.py
 drwxr-xr-x  4 jharris  staff    128  9 Mar 20:05 s3-bucket
+```
+
+The Install Script At the top of the install script enter values for the the following
+filename=<<filename of the rpm package>>
+TARGET_VER=<<minimum version>> example format =5.38.10404
+
+On execution the script will first check if the falcon sensor is installed and if it meets the minimum version
+requirements. If either condition is not met the sensor install will continue.
+
+```bash
+if pgrep falcon-sensor >/dev/null; then
+  FALCON_VER=$(sudo /opt/CrowdStrike/falconctl -g --version | awk -F= '{ print  $2}' | awk -F. '{ print  $1$2$3$4}')
+  if [ "$FALCON_VER" -lt "$TARGET_VER" ]; then
+    echo "Install required"
+    install
+  else
+    echo "Install not required"
+    exit
+  fi
+else
+  echo "Falcon-sensor not found"
+  echo "Install required"
+  install
+fi
 ```
 
 The example contains the directories CS_AMAZON and CS_WINDOWS. Each directory should contain the following
