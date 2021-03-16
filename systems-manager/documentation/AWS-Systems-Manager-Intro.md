@@ -286,47 +286,49 @@ following keys * os * dir * file
 
 An example 'agent_list.json' file.
 
-  ```yaml
-[
-  {
-    "os": "windows",
-    "dir": "CS_WINDOWS",
-    "file": "CS_WINDOWS.zip"
-  },
-  {
-    "os": "amazon",
-    "dir": "CS_AMAZON",
-    "file": "CS_AMAZON.zip"
-  }
-]
+  ```json
+{
+  "linux": [
+    {
+      "id": "amzn2",
+      "dir": "CS_AMAZON2_x86_64",
+      "file": "CS_AMAZON2_x86_64.zip",
+      "name": "amazon",
+      "major_version": "2",
+      "minor_version": "",
+      "arch_type": "x86_64",
+      "install_tool": "yum"
+    },
+    {
+      "id": "amzn2",
+      "dir": "CS_AMAZON2_ARM64",
+      "file": "CS_AMAZON2_arm64.zip",
+      "name": "amazon",
+      "major_version": "2",
+      "minor_version": "",
+      "arch_type": "arm64",
+      "install_tool": "yum"
+    }
+  ],
+  "windows": [
+    {
+      "dir": "CS_WINDOWS",
+      "file": "CS_WINDOWS.zip",
+      "id": "windows",
+      "name": "windows",
+      "major_version": "_any",
+      "minor_version": "",
+      "arch_type": "_any",
+      "install_tool": "",
+      "installer_matcher": "exe"
+    }
+  ]
+}
   ```
 
 Save the file in the current directory
 
 Execute the script "packager.py". The file performs the following functions dependent on the parameters provided
-
-```python
-    if region is None or package_name is None or s3bucket is None:
-    print(
-        "Skipping AWS upload: please provide --aws_region, --ssm_automation_doc_name, and --s3bucket command-line options for upload")
-elif region and s3bucket and package_name is None:
-S3BucketUpdater(region).update(s3bucket, files)
-elif region and s3bucket and package_name:
-S3BucketUpdater(region).update(s3bucket, files)
-SSMPackageUpdater(region).update(package_name, "./s3-bucket/manifest.json")
-else:
-print("Nothing to do ... specify region + bucket or region + bucket + package_name")
-```
-
-* No Params - The script will parse the agent_list.json file and generate the *.zip and manifest.json file that is added
-  to the s3bucket folder.
-
-
-* AWS_REGION and S3BUCKET Params - The script will generate the zip and manifest files and upload them to an s3bucket
-
-
-* AWS_REGION and S3BUCKET and PACKAGE_NAME Params - The script will generate the zip and manifest files upload to the
-  bucket and generate the package document in systems manager.
 
 Usage
 
@@ -340,20 +342,41 @@ Usage
     1) Iterates over the "dir's" and creates a Zip file of the contents with the name of "file".
     2) Checks for the existence of the S3 bucket and creates it if it does not exist
     3) Uploads the Zip files to a /falcon folder in the bucket.
-```   
+```  
+Script Parameter options
+
+* No Params - The script will exit
+
+
+* AWS_REGION and S3BUCKET Params - The script will generate the zip and manifest files, upload the 
+  contents of the `s3-bucket` folder to S3.
+
+
+* AWS_REGION and S3BUCKET and PACKAGE_NAME Params - The script will generate the zip and manifest files, upload the 
+  contents of the `s3-bucket` folder to S3 and generate the package document in systems manager.
+
+ 
 
 Example of the generated files in the s3bucket folder
 
 ```text
 user@host s3-bucket % ls -al
-total 86072
-drwxr-xr-x  7 jharris  staff       224  9 Mar 20:58 .
-drwxr-xr-x  9 jharris  staff       288  9 Mar 20:38 ..
--rw-r--r--  1 jharris  staff   2072000  9 Mar 20:42 CS_AMAZON.zip
--rw-r--r--  1 jharris  staff  41759324  9 Mar 20:42 CS_WINDOWS.zip
--rw-r--r--  1 jharris  staff     10038  5 Mar 18:13 Local-CrowdStrike-Automation-Doc.yml
--rw-r--r--  1 jharris  staff       414  9 Mar 20:42 manifest.json
--rw-r--r--  1 jharris  staff       148  9 Mar 20:42 packager.log
+total 145336
+drwxr-xr-x  14 user  staff       448 Mar 16 12:25 .
+drwxr-xr-x  17 user  staff       544 Mar 16 12:28 ..
+-rw-r--r--   1 user  staff   4895244 Mar 15 22:50 CS_AMAZON.zip
+-rw-r--r--   1 user  staff      3460 Mar 16 12:28 CS_AMAZON2_ARM64.zip
+-rw-r--r--   1 user  staff   4895244 Mar 16 12:28 CS_AMAZON2_x86_64.zip
+-rw-r--r--   1 user  staff      3460 Mar 15 12:37 CS_AMAZON_ARM.zip
+-rw-r--r--   1 user  staff  62840963 Mar 16 12:28 CS_WINDOWS.zip
+-rw-r--r--   1 user  staff      9333 Mar 11 14:51 Local-Crowdstrike-FalconSensorDeploy.yml
+-rw-r--r--   1 user  staff      2269 Mar 11 14:51 createSsmParams.zip
+-rw-r--r--   1 user  staff     10173 Mar 10 18:14 lambda_ssm_setup.zip
+-rw-r--r--   1 user  staff    929360 Mar 11 14:51 layer.zip
+-rw-r--r--   1 user  staff       587 Mar 16 12:27 manifest.json
+-rw-r--r--   1 user  staff     10154 Mar 16 11:30 new_manifest.json
+-rw-r--r--   1 user  staff      2664 Mar 16 12:27 packager.log
+
 ```
 
 #### Option B - Creating a Package without the Installer
@@ -369,17 +392,17 @@ API.
 2) Unzip the file package-without-binary.zip
 
 ```text
-user@host linux-sensor-binary % ls -al
+user@host linux-sensor-download % ls -al
 total 40
-drwxr-xr-x  9 jharris  staff    288  9 Mar 20:07 .
-drwx------@ 9 jharris  staff    288  9 Mar 20:04 ..
-drwxr-xr-x  6 jharris  staff    192  8 Mar 18:35 CS_AMAZON
-drwxr-xr-x  5 jharris  staff    160  5 Mar 17:14 CS_WINDOWS
--rw-r--r--  1 jharris  staff   1725  5 Mar 17:11 README.md
--rw-r--r--@ 1 jharris  staff    167  8 Mar 16:08 agent_list.json
-drwxr-xr-x  3 jharris  staff     96  5 Mar 18:13 aws-automation-doc
--rw-r--r--  1 jharris  staff  10040  9 Mar 11:00 packager.py
-drwxr-xr-x  4 jharris  staff    128  9 Mar 20:05 s3-bucket
+drwxr-xr-x  9 user  staff    288  9 Mar 20:07 .
+drwx------@ 9 user  staff    288  9 Mar 20:04 ..
+drwxr-xr-x  6 user  staff    192  8 Mar 18:35 CS_AMAZON
+drwxr-xr-x  5 user  staff    160  5 Mar 17:14 CS_WINDOWS
+-rw-r--r--  1 user  staff   1725  5 Mar 17:11 README.md
+-rw-r--r--@ 1 user  staff    167  8 Mar 16:08 agent_list.json
+drwxr-xr-x  3 user  staff     96  5 Mar 18:13 aws-automation-doc
+-rw-r--r--  1 user  staff  10040  9 Mar 11:00 packager.py
+drwxr-xr-x  4 user  staff    128  9 Mar 20:05 s3-bucket
 ```
 
 The example contains the directories CS_AMAZON and CS_WINDOWS. Each directory should contain the following
@@ -402,32 +425,48 @@ following keys * os * dir * file
 
 An example 'agent_list.json' file.
 
-  ```yaml
-[
-  {
-    "os": "windows",
-    "dir": "CS_WINDOWS",
-    "file": "CS_WINDOWS.zip"
-  },
-  {
-    "os": "amazon",
-    "dir": "CS_AMAZON",
-    "file": "CS_AMAZON.zip"
-  }
-]
+ ```json
+{
+  "linux": [
+    {
+      "id": "amzn2",
+      "dir": "CS_AMAZON2_x86_64",
+      "file": "CS_AMAZON2_x86_64.zip",
+      "name": "amazon",
+      "major_version": "2",
+      "minor_version": "",
+      "arch_type": "x86_64",
+      "install_tool": "yum"
+    },
+    {
+      "id": "amzn2",
+      "dir": "CS_AMAZON2_ARM64",
+      "file": "CS_AMAZON2_arm64.zip",
+      "name": "amazon",
+      "major_version": "2",
+      "minor_version": "",
+      "arch_type": "arm64",
+      "install_tool": "yum"
+    }
+  ],
+  "windows": [
+    {
+      "dir": "CS_WINDOWS",
+      "file": "CS_WINDOWS.zip",
+      "id": "windows",
+      "name": "windows",
+      "major_version": "_any",
+      "minor_version": "",
+      "arch_type": "_any",
+      "install_tool": "",
+      "installer_matcher": "exe"
+    }
+  ]
+}
   ```
+Save the file in the current directory
 
 Execute the script "packager.py". The file performs the following functions dependent on the parameters provided
-
-* No Params - The script will parse the agent_list.json file and generate the *.zip and manifest.json file that is added
-  to the s3bucket folder.
-
-
-* AWS_REGION and S3BUCKET Params - The script will generate the zip and manifest files and upload them to an s3bucket
-
-
-* AWS_REGION and S3BUCKET and PACKAGE_NAME Params - The script will generate the zip and manifest files upload to the
-  bucket and generate the package document in systems manager.
 
 Usage
 
@@ -441,20 +480,41 @@ Usage
     1) Iterates over the "dir's" and creates a Zip file of the contents with the name of "file".
     2) Checks for the existence of the S3 bucket and creates it if it does not exist
     3) Uploads the Zip files to a /falcon folder in the bucket.
-```   
+```  
+Script Parameter options
+
+* No Params - The script will exit
+
+
+* AWS_REGION and S3BUCKET Params - The script will generate the zip and manifest files, upload the 
+  contents of the `s3-bucket` folder to S3.
+
+
+* AWS_REGION and S3BUCKET and PACKAGE_NAME Params - The script will generate the zip and manifest files, upload the 
+  contents of the `s3-bucket` folder to S3 and generate the package document in systems manager.
+
+  
 
 Example of the generated files in the s3bucket folder
 
 ```text
 user@host s3-bucket % ls -al
-total 86072
-drwxr-xr-x  7 jharris  staff       224  9 Mar 20:58 .
-drwxr-xr-x  9 jharris  staff       288  9 Mar 20:38 ..
--rw-r--r--  1 jharris  staff   2072000  9 Mar 20:42 CS_AMAZON.zip
--rw-r--r--  1 jharris  staff  41759324  9 Mar 20:42 CS_WINDOWS.zip
--rw-r--r--  1 jharris  staff     10038  5 Mar 18:13 Local-CrowdStrike-Automation-Doc.yml
--rw-r--r--  1 jharris  staff       414  9 Mar 20:42 manifest.json
--rw-r--r--  1 jharris  staff       148  9 Mar 20:42 packager.log
+total 145336
+drwxr-xr-x  14 user  staff       448 Mar 16 12:25 .
+drwxr-xr-x  17 user  staff       544 Mar 16 12:28 ..
+-rw-r--r--   1 user  staff   4895244 Mar 15 22:50 CS_AMAZON.zip
+-rw-r--r--   1 user  staff      3460 Mar 16 12:28 CS_AMAZON2_ARM64.zip
+-rw-r--r--   1 user  staff   4895244 Mar 16 12:28 CS_AMAZON2_x86_64.zip
+-rw-r--r--   1 user  staff      3460 Mar 15 12:37 CS_AMAZON_ARM.zip
+-rw-r--r--   1 user  staff  62840963 Mar 16 12:28 CS_WINDOWS.zip
+-rw-r--r--   1 user  staff      9333 Mar 11 14:51 Local-Crowdstrike-FalconSensorDeploy.yml
+-rw-r--r--   1 user  staff      2269 Mar 11 14:51 createSsmParams.zip
+-rw-r--r--   1 user  staff     10173 Mar 10 18:14 lambda_ssm_setup.zip
+-rw-r--r--   1 user  staff    929360 Mar 11 14:51 layer.zip
+-rw-r--r--   1 user  staff       587 Mar 16 12:27 manifest.json
+-rw-r--r--   1 user  staff     10154 Mar 16 11:30 new_manifest.json
+-rw-r--r--   1 user  staff      2664 Mar 16 12:27 packager.log
+
 ```
 
 ### Step 2 - Verify the files in the S3 bucket
@@ -462,12 +522,8 @@ drwxr-xr-x  9 jharris  staff       288  9 Mar 20:38 ..
 You should now have an s3 bucket that contains all the files required to create the package, automation documents and
 secure Parameters in Systems Manager.
 
-The bucket should contain the following files:-
+The bucket should contain all the files from the local se-bucket folder:-
 
-    createSsmParams.zip
-    lambda_ssm_setup.zip
-    layer.zip
-    Local-CrowdStrike-Automation-Doc.yml
 
 ![](media/cft-s3-bucket.png)
 
