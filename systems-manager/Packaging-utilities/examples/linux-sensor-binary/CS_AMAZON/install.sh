@@ -157,8 +157,9 @@ esac
 echo "Sensor binary output to: $filename"
 
 if pgrep falcon-sensor >/dev/null; then
+  TARGET_VER_INT=$(echo $TARGET_VER | awk -F. '{ print  $1$2$3$4}')
   FALCON_VER=$(sudo /opt/CrowdStrike/falconctl -g --version | awk -F= '{ print  $2}' | awk -F. '{ print  $1$2$3$4}')
-  if [ "$FALCON_VER" -lt "$TARGET_VER" ]; then
+  if [ "$FALCON_VER" -lt "$TARGET_VER_INT" ]; then
     echo "Install required"
     install
   else
