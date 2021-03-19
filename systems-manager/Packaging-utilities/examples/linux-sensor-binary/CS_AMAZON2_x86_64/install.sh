@@ -1,4 +1,8 @@
 #!/bin/bash
+#
+# Modify the `filename` value to match the installer in the directory
+# Modify the `TARGET_VER` value to match your desired minimum version
+#
 filename="falcon-sensor-6.16.0-11308.amzn2.x86_64.rpm"
 TARGET_VER=5.38.10404
 CS_API_BASE=${CS_API_BASE:-api.crowdstrike.com}
@@ -48,6 +52,7 @@ install() {
 rpmInstall() {
   yum install libnl -y
   rpm -ivh "$1"
+  echo "/opt/CrowdStrike/falconctl -s -f --cid=$2 $3 $4"
   /opt/CrowdStrike/falconctl -s -f --cid="$2" "$3" "$4"
   systemctl restart falcon-sensor
   rm $1

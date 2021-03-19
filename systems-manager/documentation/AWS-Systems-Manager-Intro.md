@@ -522,7 +522,7 @@ drwxr-xr-x  17 user  staff       544 Mar 16 12:28 ..
 You should now have an s3 bucket that contains all the files required to create the package, automation documents and
 secure Parameters in Systems Manager.
 
-The bucket should contain all the files from the local se-bucket folder:-
+The bucket should contain all the files from the local s3-bucket folder:-
 
 
 ![](media/cft-s3-bucket.png)

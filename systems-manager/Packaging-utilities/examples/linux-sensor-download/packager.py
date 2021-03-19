@@ -207,10 +207,10 @@ class DistributorPackager:
         :param hashes: list of dictionary items {filename : sha256hash}
         :return:
         """
-        manifest_data = {"schemaVersion": "2.0", "publisher": "Crowdstrike Inc.", "description": PACKAGE_DESCRIPTION,
-                         "version": INSTALLER_VERSION}
         manifest_dict = {}
         manifest_packages_meta = {}
+        manifest_dict = {"schemaVersion": "2.0", "publisher": "Crowdstrike Inc.", "description": PACKAGE_DESCRIPTION,
+                         "version": INSTALLER_VERSION}
         manifest_files_meta = {}
         for os_type in OS_LIST:
             for each_zip_distro_meta in zip_distros_meta_list[os_type]:

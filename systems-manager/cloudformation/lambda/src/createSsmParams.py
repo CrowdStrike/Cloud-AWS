@@ -32,6 +32,7 @@ import sys
 import boto3
 import requests
 import urllib3
+import oauth2 as FalconAuth
 
 # import requests
 
@@ -74,7 +75,14 @@ def get_auth_token(falcon_client_secret, falcon_client_id):
 
 def check_for_install_token(credentials) -> bool:
     url = "https://api.crowdstrike.com/installation-tokens/queries/tokens/v1?filter=status:'valid'"
-    auth_token = get_auth_token(credentials['CS_API_GATEWAY_CLIENT_ID'], credentials['CS_API_GATEWAY_CLIENT_SECRET'])
+    authorization = FalconAuth.OAuth2(creds={
+        'client_id': credentials['CS_API_GATEWAY_CLIENT_ID'],
+        'client_secret': credentials['CS_API_GATEWAY_CLIENT_SECRET']
+    })
+    try:
+        auth_token = authorization.token()['body']['access_token']
+    except:
+        token = False
     if auth_token:
         auth_header = get_auth_header(auth_token)
     else:
@@ -216,11 +224,6 @@ def lambda_handler(event, context):
         logger.info('Event = {}'.format(event))
         original_params = event['ResourceProperties']
         params = {key: val for key, val in original_params.items() if key != 'ServiceToken'}
-        # params = {
-        #         CS_API_GATEWAY_HOST: <URL>,
-        #         CS_API_GATEWAY_CLIENT_ID: <clientID>
-        #         CS_API_GATEWAY_CLIENT_SECRET: <clientSecret>
-        # }
 
         logger.info('Parameter are {}'.format(params))
         if check_for_install_token(params):
@@ -232,7 +235,7 @@ def lambda_handler(event, context):
             else:
                 logger.info('Failed to create installation token in CrowdStrike Console')
         if event['RequestType'] in ['Create']:
-            overwrite_action = False
+            overwrite_action = True
             create_params(params, overwrite_action)
             if create_params:
                 cfnresponse_send(event, context, SUCCESS, "CustomResourcePhysicalID")
@@ -263,6 +266,24 @@ def lambda_handler(event, context):
 
 
 if __name__ == '__main__':
+    event = {
+        "RequestType": "Create",
+        "ServiceToken": "arn: aws: lambda: eu-west-1: 517716713836: function: ssm-setup-crowdstrike-createSsmParams-IJPLKDZ835SY",
+        "ResponseURL": "https: //cloudformation-custom-resource-response-euwest1.s3-eu-west-1.amazonaws.com/arn%3Aaws%3Acloudformation%3Aeu-west-1%3A517716713836%3Astack/ssm-setup-crowdstrike/e917b540-8848-11eb-a032-0a7e5392a9f9%7CTriggerCreateParamsLambda%7Cf98d1353-0c54-40f5-abb8-b10db4320868?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20210319T002101Z&X-Amz-SignedHeaders=host&X-Amz-Expires=7200&X-Amz-Credential=AKIAJ7MCS7PVEUOADEEA%2F20210319%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Signature=f24cf4ac877fcff23748af4b29c27a7c4dff847da38d4fae607d2c3293385d39",
+        "StackId": "arn: aws: cloudformation: eu-west-1: 517716713836: stack/ssm-setup-crowdstrike/e917b540-8848-11eb-a032-0a7e5392a9f9",
+        "RequestId": "f98d1353-0c54-40f5-abb8-b10db4320868",
+        "LogicalResourceId": "TriggerCreateParamsLambda",
+        "ResourceType": "Custom: : TriggerCreateParamsLambda",
+        "ResourceProperties": {
+            "ServiceToken": "arn: aws: lambda: eu-west-1: 517716713836: function: ssm-setup-crowdstrike-createSsmParams-IJPLKDZ835SY",
+            "CS_API_GATEWAY_CLIENT_SECRET": "jPzZK87f2oa4u10QFYvESiN95bDJq6sH3VcUdAMe",
+            "CS_SENSOR_VERSION": "2",
+            "CS_API_GATEWAY_HOST": "api.crowdstrike.com",
+            "CS_API_GATEWAY_CLIENT_ID": "641dc606e230483e9678de95f8edf8ee"
+        }
+    }
+    context = ()
+    lambda_handler(event, context)
     # CS_API_GATEWAY_HOST: !Ref
     # APIGatewayHostKey
     # CS_API_GATEWAY_CLIENT_ID: !Ref
@@ -270,4 +291,4 @@ if __name__ == '__main__':
     # CS_API_GATEWAY_CLIENT_SECRET: !Ref
     # APIGatewayClientSecretKey
 
-    result = create_ssm_param("test", "A test parameter", "value", "SecureString", True)
+    # result = create_ssm_param("test", "A test parameter", "value", "SecureString", True)
