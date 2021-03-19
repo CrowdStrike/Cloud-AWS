@@ -7,7 +7,7 @@ while (( "$#" )); do
   shift
 done
 # Paramters
-INSTALLER="<<INSTALLER_NAME>>"
+
 
 
 #Get configs params

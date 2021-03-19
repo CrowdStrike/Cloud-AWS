@@ -52,8 +52,8 @@ install() {
 rpmInstall() {
   yum install libnl -y
   rpm -ivh "$1"
-  echo "/opt/CrowdStrike/falconctl -s -f --cid=$2 $3 $4"
-  /opt/CrowdStrike/falconctl -s -f --cid="$2" "$3" "$4"
+  echo "/opt/CrowdStrike/falconctl -s -f --cid=$2 $3 $4" >>log.txt
+  /opt/CrowdStrike/falconctl -s -f --cid="$2" $3 $4
   systemctl restart falcon-sensor
   rm $1
 }
@@ -63,7 +63,7 @@ aptInstall() {
   apt-get -y install libnl-genl-3-200 libnl-3-200
   sudo dpkg -i $1
   apt-get -y --fix-broken install
-  /opt/CrowdStrike/falconctl -s -f --cid="$2" "$3" $4
+  /opt/CrowdStrike/falconctl -s -f --cid="$2" $3 $4
   service falcon-sensor restart
   rm $1
 }
@@ -161,18 +161,19 @@ esac
 
 echo "Sensor binary output to: $filename"
 
-if pgrep falcon-sensor >/dev/null; then
+if pgrep -x falcon-sensor >/dev/null; then
+  echo "grep true" >>log.txt
   TARGET_VER_INT=$(echo $TARGET_VER | awk -F. '{ print  $1$2$3$4}')
   FALCON_VER=$(sudo /opt/CrowdStrike/falconctl -g --version | awk -F= '{ print  $2}' | awk -F. '{ print  $1$2$3$4}')
   if [ "$FALCON_VER" -lt "$TARGET_VER_INT" ]; then
-    echo "Install required"
+    echo "Install required" >>log.txt
     install
   else
-    echo "Install not required"
+    echo "Install not required" >>log.txt
     exit
   fi
 else
-  echo "Falcon-sensor not found"
+  echo "Falcon-sensor not found" >>log.txt
   echo "Install required"
   install
 fi
