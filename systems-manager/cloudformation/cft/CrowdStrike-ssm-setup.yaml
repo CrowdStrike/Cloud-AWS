@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: This template sets up a cross account IAM role in order to
-  enable CrowdStrike Falcon Discover for AWS functionality.
+Description: This template sets CrowdStrike with AWS Systems Manager.
+  The script will create an ssm package document and a ssm automation document
+  together with the required parameters in the ssm parameter store.
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -41,11 +42,15 @@ Parameters:
     Description: Falcon OAuth2 Client ID.
     Type: String
     NoEcho: 'true'
-
   APIGatewayClientSecretKey:
     Description: Falcon Oath2 API secret.
     Type: String
     NoEcho: 'true'
+  FalconSensorDownloadVersion:
+    Description: Enter the number of versions behind current that the install script should download from the API.
+    Type: String
+    AllowedValues: ['0','1','2']
+    Default: 2
 
 
 Resources:
@@ -58,6 +63,7 @@ Resources:
       CS_API_GATEWAY_HOST: !Ref APIGatewayHostKey
       CS_API_GATEWAY_CLIENT_ID: !Ref APIGatewayClientIDKey
       CS_API_GATEWAY_CLIENT_SECRET: !Ref APIGatewayClientSecretKey
+      CS_SENSOR_VERSION: !Ref FalconSensorDownloadVersion
       ServiceToken: !GetAtt
         - createSsmParams
         - Arn

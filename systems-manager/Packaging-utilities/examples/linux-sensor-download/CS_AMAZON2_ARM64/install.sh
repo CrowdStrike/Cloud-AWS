@@ -20,9 +20,9 @@ Script to download and install the CrowdStrike Falcon sensor.
 Usage:
 This script supports two modes of execution and two methods of ingesting variables.
 Using parameter arguments:
-   cssensor_install <CLIENT_ID> <CLIENT_SECRET> <CLIENT_CID>
+   cssensor_install <CLIENT_ID> <CLIENT_SECRET> <CLIENT_CID> <INSTALL_PARAMS> <INSTALL_TOKEN>
 or
-   cssensor_install <CLIENT_OATH_TOKEN> <CLIENT_CID>
+   cssensor_install <CLIENT_OATH_TOKEN> <CLIENT_CID> <INSTALL_PARAMS> <INSTALL_TOKEN>
 
 Using environment variables:
    export CS_FALCON_OAUTH_TOKEN={TOKEN_HERE}
@@ -35,7 +35,7 @@ Parameter Arguments:
   CLIENT_CID: This is the Customer CID for the CrowdStrike Falcon API.
   CLIENT_OAUTH_TOKEN: This is the token returned post authentication to the API. 
     If this parameter is passed, CLIENT_ID and CLIENT_SECRET should not be provided.
-
+  
 Environment Variables:
   CS_FALCON_OAUTH_TOKEN: Required unless CS_FALCON_CLIENT_ID and CS_FALCON_CLIENT_SECRET are provided
     This is the OAUTH2 token from the CrowdStrike API
@@ -44,11 +44,15 @@ Environment Variables:
   CS_FALCON_CLIENT_SECRET: Required if CS_FALCON_OAUTH_TOKEN is unset.
     This is the client_secret for the CrowdStrike API Credentials. Needs at least "Sensor Download" permissions.
   CS_FALCON_CID: This is the Customer CID for the CrowdStrike Falcon API.
+  CS_INSTALL_PARAMS will set installer parameters
+  CS_INSTALL_TOKEN will set the provisioning token
 
 AWS Systems Manager (SSM) integration:
   SSM_CS_AUTH_TOKEN will override the value of CS_FALCON_OAUTH_TOKEN.
   SSM_CS_CCID will override the value of CS_FALCON_CID
   SSM_CS_NCNT will set the "N-" version count. (2 = N-2 version)
+  SSM_CS_INSTALLPARAMS will set installer parameters, overriding environment / parameter values
+  SSM_CS_INSTALLTOKEN will set the provisioning token, overriding environment / parameter values
 EOF
 }
 
@@ -68,7 +72,7 @@ osDetail(){
 rpmInstall(){
    yum install libnl -y
    rpm -ivh $1
-   /opt/CrowdStrike/falconctl -s -f --cid=$2
+   /opt/CrowdStrike/falconctl -s -f --cid=$2 $3 $4
    systemctl restart falcon-sensor
    rm $1
 }
@@ -78,7 +82,7 @@ aptInstall(){
    apt-get -y install libnl-genl-3-200 libnl-3-200
    sudo dpkg -i $1
    apt-get -y --fix-broken install
-   /opt/CrowdStrike/falconctl -s -f --cid=$2
+   /opt/CrowdStrike/falconctl -s -f --cid=$2 $3 $4
    service falcon-sensor restart
    rm $1
 }
@@ -100,6 +104,8 @@ then
 fi
 CS_FALCON_CLIENT_ID=${CS_FALCON_CLIENT_ID}
 CS_FALCON_CLIENT_SECRET=${CS_FALCON_CLIENT_SECRET}
+CS_INSTALL_PARAMS=${CS_INSTALL_PARAMS}
+CS_INSTALL_TOKEN=${CS_INSTALL_TOKEN}
 if ! [ -z "$SSM_CS_CCID" ]
 then
     CS_FALCON_CID=${SSM_CS_CCID}
@@ -109,13 +115,26 @@ if ! [ -z "$3" ] || ! [ -z "$4" ]
 then
     CS_FALCON_OAUTH_TOKEN=$1
     CS_FALCON_CID=$2
+    CS_INSTALL_PARAMS=$3
+    CS_INSTALL_TOKEN="--provisioning-token=$4"
 else
     if ! [ -z "$1" ]
     then
     	CS_FALCON_CLIENT_ID=$1
     	CS_FALCON_CLIENT_SECRET=$2
     	CS_FALCON_CID=$3
+        CS_INSTALL_PARAMS=$4
+        CS_INSTALL_TOKEN="--provisioning-token=$5"
     fi
+fi
+
+if ! [ -z "$SSM_CS_INSTALLPARAMS" ]
+then
+    CS_INSTALL_PARAMS=${SSM_CS_INSTALLPARAMS}
+fi
+if ! [ -z "$SSM_CS_INSTALLTOKEN" ]
+then
+    CS_INSTALL_TOKEN="--provisioning-token=${SSM_CS_INSTALLTOKEN}"
 fi
 
 if [ -z "$CS_FALCON_OAUTH_TOKEN" ] && [ -z "$CS_FALCON_CLIENT_ID" ] && [ -z "$CS_FALCON_CLIENT_SECRET" ]; then
@@ -172,6 +191,10 @@ case "$OS_NAME" in
 esac
 
 OS_VERSION=2
+if [[ "$(uname -p)" != *86* ]]
+then
+    OS_VERSION="$OS_VERSION - arm64"
+fi
 
 ## Get Installer Versions
 jsonResult=$(curl -s -L -G "https://$CS_API_BASE/sensors/combined/installers/v1" --data-urlencode "filter=os:\"$OS_NAME\"" -H "Authorization: Bearer $CS_FALCON_OAUTH_TOKEN")
@@ -226,11 +249,11 @@ echo "Sensor binary output to: $filename"
 
 if [[ "$PACKAGER" == "yum" || "$PACKAGER" == "zypper" ]]
 then
-	rpmInstall $filename $CS_FALCON_CID
+	rpmInstall $filename $CS_FALCON_CID $CS_INSTALL_PARAMS $CS_INSTALL_TOKEN
 fi
 if [[ "$PACKAGER" == "apt" ]]
 then
-	aptInstall $filename $CS_FALCON_CID
+	aptInstall $filename $CS_FALCON_CID $CS_INSTALL_PARAMS $CS_INSTALL_TOKEN
 fi
 
 

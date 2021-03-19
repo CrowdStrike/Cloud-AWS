@@ -1,31 +1,63 @@
-Write-Output 'Start Installing Crowdstrike on Windows...'
-Write-Output 'Getting AWS Region'
-$region = (Invoke-WebRequest -UseBasicParsing -Uri http://169.254.169.254/latest/dynamic/instance-identity/document | ConvertFrom-Json | Select region).region
-Write-Output 'Setting AWS Region'
-Set-DefaultAWSRegion -Region $region
-Write-Output 'Getting CID from SSM '
-$AGENTACTIVATIONKEY = (Get-SSMParameter -Name AgentActivationKey).value
-Write-Output $AGENTACTIVATIONKEY
+<#
+.SYNOPSIS
+    Installs CrowdStrike Falcon
+#>
+[CmdletBinding()]
+param()
+Write-Output 'Installing Falcon Sensor...'
 
-Write-Output 'Getting S3Bucket from SSM '
-$S3BUCKETLOCATION = (Get-SSMParameter -Name AgentInstallLocation).value
-Write-Output $S3BUCKETLOCATION
+$InstallerName = 'WindowsSensor.exe'
+$InstallerPath = Join-Path -Path $PSScriptRoot -ChildPath $InstallerName
 
+if (-not (Test-Path -Path $InstallerPath))
+{
+    throw "${InstallerName} not found."
+}
 
-#PS V3
-$S3URL = "https://s3.amazonaws.com/"
-$FILENAME = "/WindowsSensor.exe"
-$S3URL = $S3URL + $S3BUCKETLOCATION + $FILENAME
+if (-not $env:SSM_CS_CCID)
+{
+    throw 'Missing required param SSM_CS_CCID. Ensure the target instance is running the latest SSM agent version'
+}
 
-Write-Output $S3URL
+$InstallArguments = @(
+    , '/install'
+    , '/quiet'
+    , '/norestart'
+    , "CID=${env:SSM_CS_CCID}"
+    , 'ProvWaitTime=1200000'
+)
 
-(New-Object System.Net.WebClient).DownloadFile($S3URL, "C:\Windows\Temp\WindowsSensor.exe")
+if ($env:SSM_CS_INSTALLTOKEN)
+{
+    $InstallArguments += "ProvToken=${env:SSM_CS_INSTALLTOKEN}"
+}
 
-C:\Windows\Temp\WindowsSensor.exe /install /quiet /norestart CID = "$AGENTACTIVATIONKEY"
-Write-Output 'Sensor Install Done'
+$Space = ' '
+if ($env:SSM_CS_INSTALLPARAMS)
+{
+    $InstallArguments += $env:SSM_CS_INSTALLPARAMS.Split($Space)
+}
 
-Write-Output 'Running malware'
-C:\Windows\Temp\22.exe
+Write-Output 'Running installer...'
+$InstallerProcess = Start-Process -FilePath $InstallerPath -ArgumentList $InstallArguments -PassThru -Wait
 
+if ($InstallerProcess.ExitCode -ne 0)
+{
+    throw "Installer returned exit code $($InstallerProcess.ExitCode)"
+}
 
-# Add command to call installer.  For example "msiexec /i .\ExamplePackage.deb /quiet"
+$AgentService = Get-Service -Name CSAgent -ErrorAction SilentlyContinue
+if (-not $AgentService)
+{
+    throw 'Installer completed, but CSAgent service is missing...'
+}
+elseif ($AgentService.Status -eq 'Running')
+{
+    Write-Output 'CSAgent service running...'
+}
+else
+{
+    throw 'Installer completed, but CSAgent service is not running...'
+}
+
+Write-Output 'Successfully completed installation...'
