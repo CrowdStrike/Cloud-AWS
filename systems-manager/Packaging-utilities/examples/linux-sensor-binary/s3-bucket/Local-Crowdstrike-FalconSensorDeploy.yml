@@ -41,11 +41,15 @@ parameters:
     type: String
     description: '(Required) Crowdstrike''s API Gateway Client Secret Key, this key is retrieved from the Parameter Store Service.'
     default: CS_API_GATEWAY_CLIENT_SECRET
+  FalconSensorVersion:
+    type: String
+    description: '(Required) The version -x of latest that the sensor download option will install eg 0,1,2'
+    default: CS_SENSOR_VERSION
   InstanceIds:
     type: StringList
   Targets:
     type: MapList
-    default: [ ]
+    default: []
   AutomationAssumeRole:
     type: String
 mainSteps:
@@ -65,6 +69,11 @@ mainSteps:
 
           print('Fetching required configuration from Parameter Service')
 
+          print('... Fetching FalconSensorVersion')
+          falconSensorVersionResponse = ssm.get_parameter(Name=events["FalconSensorVersion"], WithDecryption=True)
+          if falconSensorVersionResponse['ResponseMetadata']['HTTPStatusCode'] != 200:
+            raise ValueError('Required property {} not found'.format(events["FalconSensorVersion"]))
+
           print('... Fetching APIGatewayHostKey')
           apiGatewayHostResponse = ssm.get_parameter(Name=events["APIGatewayHostKey"], WithDecryption=True)
           if apiGatewayHostResponse['ResponseMetadata']['HTTPStatusCode'] != 200:
@@ -81,6 +90,7 @@ mainSteps:
             raise ValueError('Required property {} not found'.format(events["APIGatewayClientSecretKey"]))
 
           apiGatewayHostValue = apiGatewayHostResponse['Parameter']['Value']
+          falconSensorVersionValue = falconSensorVersionResponse['Parameter']['Value']
           apiGatewayClientIDValue = apiGatewayClientIDResponse['Parameter']['Value']
           apiGatewayClientSecretValue = apiGatewayClientSecretResponse['Parameter']['Value']
 
@@ -97,7 +107,7 @@ mainSteps:
 
             data = res.read()
             print('Successfully received OAuth token.')
-            return {'AuthToken': json.loads(data)['access_token'],'ApiGatewayHost': apiGatewayHostValue}
+            return {'AuthToken': json.loads(data)['access_token'],'ApiGatewayHost': apiGatewayHostValue,'FalconSensorVersionVal': falconSensorVersionValue}
           except Exception as e:
             raise ValueError('Failure while interacting with Crowdstrike backend. Error: {}'.format(e))
       InputPayload:
@@ -105,12 +115,16 @@ mainSteps:
         APIGatewayHostKey: '{{APIGatewayHostKey}}'
         APIGatewayClientIDKey: '{{APIGatewayClientIDKey}}'
         APIGatewayClientSecretKey: '{{APIGatewayClientSecretKey}}'
+        FalconSensorVersion: '{{FalconSensorVersion}}'
     outputs:
       - Name: AuthToken
         Selector: $.Payload.AuthToken
         Type: String
       - Name: ApiGatewayHost
         Selector: $.Payload.ApiGatewayHost
+        Type: String
+      - Name: FalconSensorVersionVal
+        Selector: $.Payload.FalconSensorVersionVal
         Type: String
   - name: GetCustomerIdentifier
     action: 'aws:executeScript'
@@ -212,3 +226,4 @@ mainSteps:
           SSM_CS_CCID: '{{GetCustomerIdentifier.CCID}}'
           SSM_CS_INSTALLPARAMS: '{{InstallerParams}}'
           SSM_CS_AUTH_TOKEN: '{{GetAuthenticationToken.AuthToken}}'
+          SSM_CS_NCNT: '{{GetAuthenticationToken.FalconSensorVersionVal}}'

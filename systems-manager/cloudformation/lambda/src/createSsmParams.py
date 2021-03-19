@@ -32,6 +32,7 @@ import sys
 import boto3
 import requests
 import urllib3
+import oauth2 as FalconAuth
 
 # import requests
 
@@ -74,7 +75,14 @@ def get_auth_token(falcon_client_secret, falcon_client_id):
 
 def check_for_install_token(credentials) -> bool:
     url = "https://api.crowdstrike.com/installation-tokens/queries/tokens/v1?filter=status:'valid'"
-    auth_token = get_auth_token(credentials['CS_API_GATEWAY_CLIENT_ID'], credentials['CS_API_GATEWAY_CLIENT_SECRET'])
+    authorization = FalconAuth.OAuth2(creds={
+        'client_id': credentials['CS_API_GATEWAY_CLIENT_ID'],
+        'client_secret': credentials['CS_API_GATEWAY_CLIENT_SECRET']
+    })
+    try:
+        auth_token = authorization.token()['body']['access_token']
+    except:
+        token = False
     if auth_token:
         auth_header = get_auth_header(auth_token)
     else:
@@ -216,11 +224,6 @@ def lambda_handler(event, context):
         logger.info('Event = {}'.format(event))
         original_params = event['ResourceProperties']
         params = {key: val for key, val in original_params.items() if key != 'ServiceToken'}
-        # params = {
-        #         CS_API_GATEWAY_HOST: <URL>,
-        #         CS_API_GATEWAY_CLIENT_ID: <clientID>
-        #         CS_API_GATEWAY_CLIENT_SECRET: <clientSecret>
-        # }
 
         logger.info('Parameter are {}'.format(params))
         if check_for_install_token(params):
@@ -232,7 +235,7 @@ def lambda_handler(event, context):
             else:
                 logger.info('Failed to create installation token in CrowdStrike Console')
         if event['RequestType'] in ['Create']:
-            overwrite_action = False
+            overwrite_action = True
             create_params(params, overwrite_action)
             if create_params:
                 cfnresponse_send(event, context, SUCCESS, "CustomResourcePhysicalID")
@@ -261,13 +264,3 @@ def lambda_handler(event, context):
         logger.error(e)
         cfnresponse_send(event, context, 'FAILED', "CustomResourcePhysicalID")
 
-
-if __name__ == '__main__':
-    # CS_API_GATEWAY_HOST: !Ref
-    # APIGatewayHostKey
-    # CS_API_GATEWAY_CLIENT_ID: !Ref
-    # APIGatewayClientIDKey
-    # CS_API_GATEWAY_CLIENT_SECRET: !Ref
-    # APIGatewayClientSecretKey
-
-    result = create_ssm_param("test", "A test parameter", "value", "SecureString", True)
