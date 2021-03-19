@@ -111,6 +111,7 @@ PackageName
 PackageVersion
 Params
 PowerShell
+POSIX
 Pre
 RDP
 README
