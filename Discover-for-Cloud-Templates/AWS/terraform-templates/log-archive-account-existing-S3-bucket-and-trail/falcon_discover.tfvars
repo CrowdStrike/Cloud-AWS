@@ -1,6 +1,0 @@
-RoleName = "CrowdStrikeFalcon"
-ExternalID = ""
-CloudTrailS3BucketName = ""
-CloudTrailName = "logging-acct-trail"
-aws_local_account = ""
-aws_region = ""
