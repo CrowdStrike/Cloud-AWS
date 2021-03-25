@@ -22,19 +22,19 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
+PATH_TO_BUCKET_FOLDER = './s3-bucket/'
+PACKAGE_DESCRIPTION = 'CrowdStrike custom Install Package'
+INSTALLER_VERSION = '1.0'
+OS_LIST = ['windows','linux']
+
+
 
 class SSMPackageUpdater:
     def __init__(self, region_name):
         self.region = region_name
 
     def update(self, package_name, file_to_upload):
-        """
 
-        :param region:
-        :param filepath: Path to the maniftest file in this case "manifest.json"
-        :param package_name: The name of the package in SSM
-        :return: True or False
-        """
         with open(file_to_upload) as openFile:
             documentContent = openFile.read()
         self._doc_update_or_create(Content=documentContent,
@@ -60,10 +60,10 @@ class SSMPackageUpdater:
 
     def _doc_exists(self, package_name):
         try:
-            self._client.get_document(Name=package_name)
-            return True
+            current_doc = self._client.get_document(Name=package_name)
         except self._client.exceptions.InvalidDocument:
-            return False
+            current_doc = {}
+        return current_doc
 
     def _doc_update(self, **kwargs):
         del kwargs['DocumentType']
@@ -77,7 +77,8 @@ class SSMPackageUpdater:
             self._doc_cleanup_versions(kwargs['Name'])
             updated = self._client.update_document(**kwargs)
 
-        self._client.update_document_default_version(Name=kwargs['Name'], DocumentVersion=updated['DocumentDescription']['DocumentVersion'])
+        self._client.update_document_default_version(Name=kwargs['Name'],
+                                                     DocumentVersion=updated['DocumentDescription']['DocumentVersion'])
 
     def _doc_cleanup_versions(self, package_name):
         for version in self._client.list_document_versions(Name=package_name)['DocumentVersions']:
@@ -98,8 +99,8 @@ class S3BucketUpdater:
         if not self._bucket_exists(bucket_name):
             self._create_bucket(bucket_name)
         for f in files:
-            f = './s3-bucket/' + f
-            self._upload_file(f, bucket_name, "falcon/" + f)
+            file_path = PATH_TO_BUCKET_FOLDER + f
+            self._upload_file(file_path, bucket_name, "falcon/" + f)
 
     def _bucket_exists(self, bucket_name):
         """
@@ -168,13 +169,15 @@ class DistributorPackager:
     def build(self, mappings_file):
         dirs = set()
         files = set()
+        arch = set()
 
         installer_list = self._parse_mappings(mappings_file)
         dir_list = os.listdir()
 
-        for installer in installer_list:
-            dirs.add(installer['dir'])
-            files.add(installer['file'])
+        for os_type in OS_LIST:
+            for installer in installer_list[os_type]:
+                dirs.add(installer['dir'])
+                files.add(installer['file'])
 
         folders_exist = all(item in dir_list for item in dirs)
         if not folders_exist:
@@ -197,7 +200,7 @@ class DistributorPackager:
             json_data = json.loads(fh.read())
         return json_data
 
-    def _generate_manifest(self, installer_list, hashes):
+    def _generate_manifest(self, zip_distros_meta_list, hashes):
         """
         Generates the manifest.json file required to create the ssm document
         :param installer_list: List containing key value pairs required to construct the file
@@ -205,38 +208,57 @@ class DistributorPackager:
         :return:
         """
         manifest_dict = {}
+        manifest_packages_meta = {}
+        manifest_dict = {"schemaVersion": "2.0", "publisher": "Crowdstrike Inc.", "description": PACKAGE_DESCRIPTION,
+                         "version": INSTALLER_VERSION}
+        manifest_files_meta = {}
+        for os_type in OS_LIST:
+            for each_zip_distro_meta in zip_distros_meta_list[os_type]:
+                name = each_zip_distro_meta['name']
+                arch_type = each_zip_distro_meta['arch_type']
+                version = each_zip_distro_meta['major_version']
+                if not len(each_zip_distro_meta['minor_version']) == 0:
+                    version = version + "." + each_zip_distro_meta['minor_version']
+
+                if name in manifest_packages_meta:
+                    pass
+                else:
+                    manifest_packages_meta[name] = {}
+
+                if version in manifest_packages_meta[name]:
+                    pass
+                else:
+                    manifest_packages_meta[name][version] = {}
+
+                if arch_type in manifest_packages_meta[name][version]:
+                    pass
+                else:
+                    manifest_packages_meta[name][version][arch_type] = {}
+
+                manifest_packages_meta[name][version][arch_type] = {'file': each_zip_distro_meta['file']}
+
+                # manifest_files_meta[each_zip_distro_meta['zip_name']] = {
+                #     'checksums': {'sha256': each_zip_distro_meta['sha256']}}
+
         try:
-            manifest_dict.update({
-                "schemaVersion": "2.0",
-                "version": "3.0.1"
-            })
-            os_packages_dict = {}
-            for installer in installer_list:
-                os_packages_dict.update({
-                    installer['os']: {
-                        "_any": {
-                            "x86_64": {"file": installer['file']}
-                        }
-                    }
-                })
-            manifest_dict["packages"] = os_packages_dict
+            manifest_dict["packages"] = manifest_packages_meta
             obj = {}
             for hash in hashes:
                 for k, v in hash.items():
                     obj.update({k: {'checksums': {"sha256": v}}})
             print(obj)
-            files = {"files": obj}
-            manifest_dict.update(files)
+            file_list = {"files": obj}
+            manifest_dict.update(file_list)
         except Exception as e:
             print('Exception {}'.format(e))
         try:
-            with open('./s3-bucket/manifest.json', 'w') as file:
+            with open((PATH_TO_BUCKET_FOLDER + 'manifest.json'), 'w') as file:
                 file.write(json.dumps(manifest_dict))
         except Exception as e:
             print(e)
 
     def _create_zip_files(self, dir):
-        zipf = zipfile.ZipFile('./s3-bucket/' + dir + '.zip', 'w', zipfile.ZIP_DEFLATED)
+        zipf = zipfile.ZipFile(PATH_TO_BUCKET_FOLDER + dir + '.zip', 'w', zipfile.ZIP_DEFLATED)
 
         for root, dirs, files in os.walk(dir + '/'):
             for file in files:
@@ -252,7 +274,7 @@ class DistributorPackager:
         """
         hashes = []
         for file in files:
-            file_path = './s3-bucket/' + file
+            file_path = PATH_TO_BUCKET_FOLDER + file
             with open(file_path, 'rb') as f:
                 bytes = f.read()  # read entire file as bytes
                 readable_hash = hashlib.sha256(bytes).hexdigest()
@@ -263,7 +285,7 @@ class DistributorPackager:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create and upload Distributor packages to the AWS SSM')
     parser.add_argument('-r', '--aws_region', help='AWS Region')
-    parser.add_argument('-p', '--ssm_automation_doc_name', help='Package Name')
+    parser.add_argument('-p', '--package_name', help='Package Name')
     parser.add_argument('-b', '--s3bucket', help='Package Name')
 
     args = parser.parse_args()
@@ -274,10 +296,15 @@ if __name__ == '__main__':
 
     files = DistributorPackager().build('agent_list.json')
 
-    if region is None or package_name is None or s3bucket is None:
+    if region is None or s3bucket is None:
         print(
-            "Skipping AWS upload: please provide --aws_region, --ssm_automation_doc_name, and --s3bucket command-line options for upload")
+            "Skipping AWS upload: please provide --aws_region, --ssm_automation_doc_name, and --s3bucket command-line "
+            "options for upload")
         print("Package has been built successfully.")
-    else:
+    elif region and s3bucket and package_name is None:
         S3BucketUpdater(region).update(s3bucket, files)
-        SSMPackageUpdater(region).update(package_name, "./s3-bucket/manifest.json")
+    elif region and s3bucket and package_name:
+        S3BucketUpdater(region).update(s3bucket, files)
+        SSMPackageUpdater(region).update(package_name, PATH_TO_BUCKET_FOLDER + "manifest.json")
+    else:
+        print("Nothing to do ... specify region + bucket or region + bucket + package_name")
