@@ -1,0 +1,6 @@
+RoleName = "CrowdStrikeFalcon1"
+ExternalID = "fdsfsdf"
+CloudTrailS3BucketName = "dfdsfd"
+aws_region = "eu-west-1"
+CloudTrailS3BucketAccountNumber = "12345"
+aws_local_account = "5678980"
