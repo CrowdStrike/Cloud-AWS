@@ -2,8 +2,9 @@
 
 The terraform templates here are examples that customers may use or modify as required.  The templates assume that you are using a shared "log archive" account.  Two templates are included.
 
-1) A template for the log archive account in the directory `log-archive-account`. 
-   This template is an example of the required settings for the log archive account but cannot be applied directly if a bucket storing Cloudtrail logs already exists.  It is provided as an example. 
+1) Log archive account directory `log-archive-account`. 
+   This template is an example of the required settings for the log archive account.
+   The template has two resources
    
     - IAM role that grants s3Get:Object permissions to a role that Crowdstrike will assume when accessing log files that with a trusted entity of a CrowdStrike Role arn:aws:iam::292230061137:role/CS-Prod-HG-CsCloudconnectaws.
     
@@ -64,8 +65,10 @@ The terraform templates here are examples that customers may use or modify as re
     }
     }
     ```
-2) A template for additional accounts in the directory `additional-acount-existing-trail` directory. 
-   The template contains the following
+2) The additional accounts in the directory `additional-acount-existing-trail`.
+   This template should be used for all accounts that contain resources that should be monitored and which forward logs to the log archive account
+   The template contains the following resources
+   
     -   A IAM role that Crowdstrike can assume to gather information about resources of interest. 
 ```text
     data "aws_iam_policy_document" "DescribeAPICalls" {
