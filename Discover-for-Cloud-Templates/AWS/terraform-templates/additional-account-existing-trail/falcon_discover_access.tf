@@ -1,8 +1,8 @@
 # IAM Role used by CrowdStrike Discover 
 resource "aws_iam_role" "CrowdStrike_Discover_Role" {
-  name               = var.RoleName
+  name = var.RoleName
   description = "Role assumed by Falcon Discover to Describe API calls"
-  path               = "/"
+  path = "/"
   assume_role_policy = data.aws_iam_policy_document.CrowdStrikeDiscoverAssumeRolePolicyDocument.json
 }
 # Resources queried by CrowdStrike Discover
@@ -37,7 +37,6 @@ data "aws_iam_policy_document" "CrowdStrikeDiscoverAssumeRolePolicyDocument" {
     condition {
       test = "StringEquals"
       variable = "sts:ExternalId"
-
       values = [
         var.ExternalID
       ]
