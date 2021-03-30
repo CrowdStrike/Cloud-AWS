@@ -87,7 +87,6 @@ Parameters:
     Type: String
     NoEcho: 'true'
 
-
   FalconSecret:
     Description: Falcon Oath2 API secret.
     Type: String
@@ -96,8 +95,6 @@ Parameters:
   LogArchiveBucketName:
     Type: String
     Description: Log Archive Bucket Name
-
-
 
 
 Resources:

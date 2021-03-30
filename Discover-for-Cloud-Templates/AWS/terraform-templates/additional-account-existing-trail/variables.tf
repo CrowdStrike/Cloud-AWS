@@ -10,8 +10,6 @@ variable "CSAccountNumber" {
   type = string
   default = "292230061137"
 }
-variable "CloudTrailName" {
-}
 variable "CloudTrailS3BucketName" {
   type = string
 }

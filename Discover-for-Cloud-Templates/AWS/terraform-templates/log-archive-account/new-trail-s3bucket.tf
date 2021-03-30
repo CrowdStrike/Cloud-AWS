@@ -5,6 +5,8 @@ provider "aws" {
 }
 
 //
+// Example configuration of S3 bucket
+//
 resource "aws_s3_bucket" "CloudTrail_bucket" {
   bucket = var.CloudTrailS3BucketName
   acl = "bucket-owner-full-control"
@@ -21,7 +23,9 @@ resource "aws_s3_bucket" "CloudTrail_bucket" {
     }
   }
 }
-
+//
+// Example of required notification policy
+//
 resource "aws_s3_bucket_notification" "bucket_notification" {
   bucket = aws_s3_bucket.CloudTrail_bucket.id
 
@@ -34,7 +38,9 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
   }
 }
 
-
+//
+// Example bucket ACL policy allowing s3:GetBucketAcl and s3:PutObject for CloudTrail
+//
 data "aws_iam_policy_document" "s3BucketACLPolicy" {
   statement {
 
@@ -79,7 +85,8 @@ data "aws_iam_policy_document" "s3BucketACLPolicy" {
 }
 
 //
-
+// Example of the IAM policy required by CrowdStrike allowing s3:GetObject
+//
 resource "aws_iam_policy" "ReadS3CloudTrailFiles" {
   name = "iamPolicyFalconDiscoverAccess"
   description = "S3 access policy for role assumed by Falcon Discover"
@@ -100,7 +107,9 @@ resource "aws_iam_policy" "ReadS3CloudTrailFiles" {
 }
 EOF
 }
-
+//
+// Allow the CrowdStrike role to assume above role in the account to read S3 logs
+//
 data "aws_iam_policy_document" "FalconAssumeRolePolicyDocument" {
   statement {
 
@@ -125,7 +134,9 @@ data "aws_iam_policy_document" "FalconAssumeRolePolicyDocument" {
     }
   }
 }
-
+//
+// Maybe required if resources are created in this account.  If this account is only used for logs then this is not required
+//
 data "aws_iam_policy_document" "DescribeAPICalls" {
   statement {
 
@@ -186,7 +197,7 @@ resource "aws_cloudtrail" "crwd_trail" {
 }
 
 //
-// Outputs are the inputs for "register_account.py"
+// Outputs are the inputs for "fd_accounts.py"
 //
 output "cloudtrail_bucket_owner_id" {
   value = var.aws_local_account

@@ -1,1 +1,2 @@
-requests
+crowdstrike-falconpy>=0.4.2
+requests>=2.24.0

@@ -1,6 +1,0 @@
-boto3
-argparse
-logging
-json
-requests
-sys
