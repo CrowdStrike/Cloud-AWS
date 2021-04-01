@@ -113,7 +113,7 @@ def update_account():
 ############### DELETE ACCOUNT
 def delete_account():
     #Call the API to delete the requested account, multiple IDs can be deleted by passing in a comma-delimited list
-    delete_response = falcon_discover.DeleteAWSAccounts(parameters={}, ids=local_account)
+    delete_response = falcon_discover.DeleteAWSAccounts(ids=local_account)
     if delete_response["status_code"] == 200:
         print("Successfully deleted account.")
     else:
