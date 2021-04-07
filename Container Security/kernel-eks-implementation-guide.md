@@ -169,6 +169,9 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
         -n falcon-system --create-namespace \
         --set falcon.cid="$CID" \
         --set node.image.repository=$FALCON_NODE_IMAGE_URI
+   ```
+   Example output:
+   ```
    Release "falcon-helm" does not exist. Installing it now.
    NAME: falcon-helm
    LAST DEPLOYED: Fri Mar  5 17:07:54 2021
@@ -224,6 +227,9 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
    $ aws ecr batch-delete-image --region eu-west-1 \
        --repository-name falcon-node-sensor \
        --image-ids imageTag=latest
+   ```
+   Example output:
+   ```
    {
        "imageIds": [
            {
@@ -237,6 +243,9 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
  - Step 4: Delete the AWS ECR repository
    ```
    $ aws ecr delete-repository --region eu-west-1 --repository-name falcon-node-sensor
+   ```
+   Example output:
+   ```
    {
        "repository": {
            "repositoryArn": "arn:aws:ecr:eu-west-1:123456789123:repository/falcon-sensor",
