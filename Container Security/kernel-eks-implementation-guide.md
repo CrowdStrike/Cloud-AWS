@@ -26,12 +26,13 @@ You will need AWS credentials and docker tool installed locally.
        -v ~/.aws:/root/.aws -it --rm \
        quay.io/crowdstrike/cloud-tools-image
    ```
-   The above command creates new container runtime that contains tools needed by this guide. All the
+   The above command creates a new container runtime that contains tools needed by this guide. All the
    following commands should be run inside this container. If you have previously used AWS CLI tool,
    you may already have AWS Credentials stored on your system in `~/.aws` directory. If that is the case,
-   it is preferential to start the container with `-v ~/.aws:/root/.aws:ro` option. This option should be
-   omitted if you don't want to share your AWS credentials with the container. You can review your
-   credentials with `aws sts get-caller-identity` command.
+   it is preferential to start the container with `-v ~/.aws:/root/.aws:ro` option to ensure these variables
+   are passed through to your container. This option should be omitted if you don't want to share your
+   AWS credentials with the container. You can review your credentials with `aws sts get-caller-identity`
+   command.
 
     Example output
     ```
