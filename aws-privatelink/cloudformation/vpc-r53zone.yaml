@@ -1,0 +1,258 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  This template deploys a VPC with a pair of private subnets spread across
+  two Availabilty Zones. Creates a VPC endpoint for CrowdStrike Falcon Services and a private
+  hosted Zone
+Parameters:
+  TrustedIP:
+    Description: Trusted IP
+    Type: String
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+    Default: 1.1.1.1/32
+  EnvironmentName:
+    Description: An environment name that will be prefixed to resource names
+    Type: String
+
+  CSPrivLinkVpcCIDR:
+    Description: Please enter the IP range (CIDR notation) for this CSPrivLinkVPC
+    Type: String
+    Default: 10.192.0.0/24
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+
+  TestVpcCIDR:
+    Description: Please enter the IP range (CIDR notation) for this CSPrivLinkVPC
+    Type: String
+    Default: 10.0.0.0/24
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+
+  CSPrivLinkPrivateSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the first Availability Zone
+    Type: String
+    Default: 10.192.0.0/28
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+
+  CSPrivLinkPrivateSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the second Availability Zone
+    Type: String
+    Default: 10.192.0.32/28
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+
+  CSPrivLinkTGWAttachSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the first Availability Zone
+    Type: String
+    Default: 10.192.0.96/28
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+
+  CSPrivLinkTGWAttachSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the second Availability Zone
+    Type: String
+    Default: 10.192.0.64/28
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+
+  TestVPCTGWAttachSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the first Availability Zone
+    Type: String
+    Default: 10.0.0.0/28
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+
+  TestVPCTGWAttachSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the second Availability Zone
+    Type: String
+    Default: 10.0.0.32/28
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+
+  TestVPCPrivateSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the first Availability Zone
+    Type: String
+    Default: 10.0.0.64/28
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+
+  TestVPCPrivateSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the second Availability Zone
+    Type: String
+    Default: 10.0.0.96/28
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+
+  LinuxAMI:
+    Description: Managed AMI ID for Amazon Linux
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/amzn-ami-hvm-x86_64-gp2'
+
+  CrowdStrikeServiceName:
+    Description: CrowdStrike
+    Type: String
+    Default: 'com.amazonaws.vpce.us-west-1.vpce-svc-08744dea97b26db5d'
+
+Resources:
+
+
+
+  CSPrivLinkVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: !Ref 'CSPrivLinkVpcCIDR'
+      Tags:
+        - Key: Name
+          Value: !Ref EnvironmentName
+
+  CSPrivLinkTGWAttachSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref 'CSPrivLinkVPC'
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ''
+      CidrBlock: !Ref CSPrivLinkTGWAttachSubnet1CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} TGW Subnet (AZ1)
+  CSPrivLinkTGWAttachSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref 'CSPrivLinkVPC'
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: ''
+      CidrBlock: !Ref CSPrivLinkTGWAttachSubnet2CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} TGW Subnet (AZ2)
+  CSPrivLinkPrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref 'CSPrivLinkVPC'
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ''
+      CidrBlock: !Ref 'CSPrivLinkPrivateSubnet1CIDR'
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Private Subnet (AZ1)
+  CSPrivLinkPrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref 'CSPrivLinkVPC'
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: ''
+      CidrBlock: !Ref 'CSPrivLinkPrivateSubnet2CIDR'
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Private Subnet (AZ2)
+
+  CSPrivLinkPrivateRouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'CSPrivLinkVPC'
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} CrowdStrikeServices Private Routes (AZ2)
+
+  CSPrivLinkPrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref 'CSPrivLinkPrivateRouteTable1'
+      SubnetId: !Ref 'CSPrivLinkPrivateSubnet1'
+
+  CSPrivLinkPrivateSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref 'CSPrivLinkPrivateRouteTable1'
+      SubnetId: !Ref 'CSPrivLinkPrivateSubnet2'
+
+  CrowdStrikeEndpointSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: 'Traffic into CloudFormation Endpoint'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: '0.0.0.0/0'
+      VpcId: !Ref 'CSPrivLinkVPC'
+      Tags:
+        - Key: Name
+          Value: EndpointSG
+
+  # This is the interface endpoint for CloudFormation. You can only deploy this
+  # once per region since it will consume the unique DNS entry for the endpoint.
+  CrowdStrikeEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref 'CSPrivLinkVPC'
+      ServiceName: !Ref 'CrowdStrikeServiceName'
+      VpcEndpointType: 'Interface'
+      PrivateDnsEnabled: False
+      SubnetIds:
+        - !Ref 'CSPrivLinkPrivateSubnet1'
+        - !Ref 'CSPrivLinkPrivateSubnet2'
+      SecurityGroupIds:
+        - !Ref 'CrowdStrikeEndpointSG'
+
+
+  TenantHostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      HostedZoneConfig:
+        Comment: Private HostedZone (split-horizon DNS) for CrowdStrike sensor connectivity
+      Name: 'cloudsink.net.'
+      VPCs:
+        - VPCId: !Ref 'CSPrivLinkVPC'
+          VPCRegion: !Ref AWS::Region
+  CrowdStrikeAliasTS01b:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref TenantHostedZone
+      Name: 'ts01-b.cloudsink.net'
+      Type: A
+      AliasTarget:
+        DNSName: !Select
+          - 1
+          - !Split
+            - ':'
+            - !Select
+              - 0
+              - !GetAtt 'CrowdStrikeEndpoint.DnsEntries'
+        HostedZoneId: !Select
+          - 0
+          - !Split
+            - ':'
+            - !Select
+              - 0
+              - !GetAtt 'CrowdStrikeEndpoint.DnsEntries'
+        EvaluateTargetHealth: False
+      Comment: CS domain override
+  CrowdStrikeAliaslfodown:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref TenantHostedZone
+      Name: 'lfodown01-b.cloudsink.net'
+      Type: A
+      AliasTarget:
+        DNSName: !Select
+          - 1
+          - !Split
+            - ':'
+            - !Select
+              - 0
+              - !GetAtt 'CrowdStrikeEndpoint.DnsEntries'
+        HostedZoneId: !Select
+          - 0
+          - !Split
+            - ':'
+            - !Select
+              - 0
+              - !GetAtt 'CrowdStrikeEndpoint.DnsEntries'
+        EvaluateTargetHealth: False
+      Comment: CS domain override
