@@ -9,6 +9,7 @@ Note: In Kubernetes clusters where kernel module loading is supported by the wor
 
  - Falcon Sensor for Linux - deploying kernel-mode agent directly to the nodes
    - [Implementation Guide - Using Helm Charts in microk8s](kernel-microk8s-implementation-guide.md)
+   - [Implementation Guide - Using Helm Charts in EKS](kernel-eks-implementation-guide.md)
  - Falcon Container Sensor - setting up cluster to deploy user space agent to each pod
    - [Implementation Guide for AWS EKS / Fargate](eks-implementation-guide.md)
    - [Implementation Guide for GKE](gke-implementation-guide.md) (Technology Preview)
