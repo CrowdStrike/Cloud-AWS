@@ -391,17 +391,6 @@ Resources:
       GroupSet:
         - !Ref SSHSecurityGroup
       SourceDestCheck: true
-      Tags:
-        - Key: Name
-          Value: Private
-        - Key: cstag-accounting
-          Value: 'dev'
-        - Key: cstag-business
-          Value: 'Sales - 310000'
-        - Key: cstag-department
-          Value: 'Sales'
-        - Key: cstag-owner
-          Value: 'Justin Harris'
 
   TestInstance:
     Type: AWS::EC2::Instance
