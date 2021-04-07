@@ -85,7 +85,7 @@ You will need AWS credentials and docker tool installed locally.
    }
    ```
 
- - Note the URI of the newly created repository to the environment variable for further use. Falcon Container Sensor will be available under this URI.
+ - Note the `registryURI` of the newly created repository to the environment variable for further use. Falcon Container Sensor will be available under this URI.
    ```
    $ FALCON_NODE_IMAGE_URI=123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-node-sensor
    ```
