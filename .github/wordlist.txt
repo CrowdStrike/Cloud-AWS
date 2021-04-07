@@ -37,6 +37,7 @@ ClientID
 ClientSecret
 CloudFormation
 CloudTrail
+CloudTrailFiles
 CloudWatch
 Cloudformation
 Cloudtrail
@@ -66,6 +67,7 @@ EBS
 ECR
 EEAB
 EIP
+EOF
 Env
 ExecStart
 ExecutionRole
@@ -107,15 +109,16 @@ MatchAttributes
 Microk
 OAuth
 Optimise
+POSIX
 PackageName
 PackageVersion
 Params
 PowerShell
-POSIX
 Pre
 RDP
 README
 ReadOnlyAccess
+ReadS
 RoleforSSM
 RuleDefinition
 RulesSource
@@ -141,6 +144,7 @@ URI
 UserData
 UserGuide
 UserId
+VER
 VPC
 VPCs
 WorkingDirectory
@@ -158,8 +162,8 @@ asia
 auth
 autoscale
 aws
-backend
 ba
+backend
 bd
 boto
 botocore
@@ -195,6 +199,7 @@ eksctl
 eu
 externalID
 externalid
+falconpy
 fe
 gcloud
 gcr
@@ -206,6 +211,7 @@ html
 http
 https
 iam
+iamPolicyFalconDiscoverAccess
 icmp
 init
 initialisation
