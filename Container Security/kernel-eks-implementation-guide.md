@@ -111,7 +111,7 @@ You will need AWS credentials and docker tool installed locally.
 
 ### Step 4: Push falcon-node-sensor image to the kube registry
 
- - Push the image to the kube registry
+ - Push the image to the kube registry:
    ```
    $ docker tag falcon-node-sensor:latest $FALCON_NODE_IMAGE_URI:latest
    ```
