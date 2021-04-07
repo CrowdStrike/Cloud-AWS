@@ -1,6 +1,6 @@
 # Implementation Guide for CrowdStrike Falcon Sensor for Linux on EKS Kubernetes cluster using Helm Chart
 
-This guide works through creation of new Kubernetes cluster, deployment of Falcon Sensor for Linux using Helm Chart, and demonstration of detection capabilities of Falcon Container Workload Protection.
+This guide works through creation of a new Kubernetes cluster, deployment of the Falcon Sensor for Linux using Helm Chart, and demonstration of detection capabilities of Falcon Container Workload Protection.
 
 No prior Kubernetes or Falcon knowledge is needed to follow this guide. First sections of this guide focus on creation of EKS cluster, these sections may be skipped if you have access to an existing cluster.
 
