@@ -63,7 +63,7 @@ You will need AWS credentials and docker tool installed locally.
 
 ### Step 3: Create ECR Container Repository
 
- - Create container repository in AWS ECR. AWS ECR (Elastic Container Registry) is a cloud service providing a container registry. The bellow command creates a new repository in the registry and this repository will be subsequently used to store the Falcon Node sensor image.
+ - Create container repository in AWS Elastic Container Registry (ECR). AWS ECR is a cloud service providing a container registry. The below command creates a new repository in the registry and this repository will be subsequently used to store the Falcon Node sensor image.
    ```
    $ aws ecr create-repository --region eu-west-1 --repository-name falcon-node-sensor
    {
