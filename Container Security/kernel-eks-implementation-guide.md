@@ -13,7 +13,7 @@ Time needed to follow this guide: 45 minutes.
 - You will need a workstation with a linux platform
 - You will need AWS credentials and [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html) configured
 - Docker installed locally on the workstation
-- API Credentials from FALCON with Sensor Download Permissions^^^&&&^^&&
+- [API Credentials from FALCON with Sensor Download Permissions](./assets/falcon-api-perms.png)
 - Verify connectivity with AWS CLI
   * ``aws ec2 describe-instances`` should return without error
 
