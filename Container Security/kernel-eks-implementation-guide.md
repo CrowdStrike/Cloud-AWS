@@ -61,7 +61,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
     }
     ````
 
-### Step 2: Create EKS Cluster
+### Step 2: Create EKS Cluster (Move to step 4 for existing EKS cluster)
  - Set the cloud region
    ```$ CLOUD_REGION=us-west-1```
  - Create new EKS cluster. It may take couple minutes before cluster is fully up and functioning.
