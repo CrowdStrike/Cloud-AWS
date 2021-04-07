@@ -225,7 +225,7 @@ You will need AWS credentials and docker tool installed locally.
        }
    }
    ```
- - Step 5: Delete the AWS EKS Fargate Cluster
+ - Step 5: Delete the AWS EKS Fargate Cluster, replacing `eu-west-1` with the AWS region your cluster is running on.
    ```
    $ eksctl delete cluster --region eu-west-1 demo-cluster
    ```
