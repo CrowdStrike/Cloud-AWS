@@ -60,7 +60,7 @@ You will need AWS credentials and docker tool installed locally.
 
    To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
    ```
-   kubectl is command line tool that lets you control Kubernetes clusters. For configuration, kubectl looks for a file named config in the `$HOME/.kube` directory. This config was created previously by `eksctl create cluster` command and contains login information for your newly created cluster.
+   `kubectl` is the command line tool that lets you control Kubernetes clusters. For configuration, `kubectl` looks for a file named config in the `$HOME/.kube` directory. This config was created previously by `eksctl create cluster` command and contains login information for your newly created cluster.
 
 ### Step 3: Create ECR Container Repository
 
