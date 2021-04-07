@@ -9,16 +9,32 @@ Time needed to follow this guide: 45 minutes.
 
 ## Pre-requisites
 
-You will need AWS credentials and docker tool installed locally.
+- Existing AWS Account and VPC
+- You will need a workstation with a linux platform
+- You will need AWS credentials and [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html) configured
+- Docker installed locally on the workstation
+- API Credentials from FALCON with Sensor Download Permissions^^^&&&^^&&
+- Verify connectivity with AWS CLI
+  * ``aws ec2 describe-instances`` should return without error
 
 ## Deployment
 
 ### Step 1: Enter the tooling container
 
  - Install [docker](https://www.docker.com/products/docker-desktop) container runtime
+ - Configure environtment variables for FALCON
+
+From the terminal run the following to set the environment variables.
+
+ ```
+$ FALCON_CLIENT_ID=1234567890ABCDEFG1234567890ABCDEF
+$ FALCON_CLIENT_SECRET=1234567890ABCDEFG1234567890ABCDEF
+$ CID=1234567890ABCDEFG1234567890ABCDEF-HH
+
+ ```
  - Enter the [tooling container](https://github.com/CrowdStrike/cloud-tools-image)
    ```
-   docker run --privileged=true \
+   sudo docker run --privileged=true \
        -e FALCON_CLIENT_ID="$FALCON_CLIENT_ID" \
        -e FALCON_CLIENT_SECRET="$FALCON_CLIENT_SECRET" \
        -e CID="$CID" \
@@ -26,6 +42,8 @@ You will need AWS credentials and docker tool installed locally.
        -v ~/.aws:/root/.aws -it --rm \
        quay.io/crowdstrike/cloud-tools-image
    ```
+   You will be placed inside of the running container. 
+   
    The above command creates a new container runtime that contains tools needed by this guide. All the
    following commands should be run inside this container. If you have previously used AWS CLI tool,
    you may already have AWS Credentials stored on your system in `~/.aws` directory. If that is the case,
@@ -34,7 +52,7 @@ You will need AWS credentials and docker tool installed locally.
    AWS credentials with the container. You can review your credentials with `aws sts get-caller-identity`
    command.
 
-    Example output
+    Example output:
     ```
     {
         "UserId": "AIDAXRCSSEFWMXXXXXXXX",
@@ -44,11 +62,12 @@ You will need AWS credentials and docker tool installed locally.
     ````
 
 ### Step 2: Create EKS Cluster
-
+ - Set the cloud region
+   ```$ CLOUD_REGION=us-west-1```
  - Create new EKS cluster. It may take couple minutes before cluster is fully up and functioning.
    ```
-   $ eksctl create cluster
-       --name demo-cluster --region eu-west-1 \
+   $ eksctl create cluster \
+       --name demo-cluster --region $CLOUD_REGION \
        --managed
    ```
 
@@ -66,7 +85,10 @@ You will need AWS credentials and docker tool installed locally.
 
  - Create container repository in AWS Elastic Container Registry (ECR). AWS ECR is a cloud service providing a container registry. The below command creates a new repository in the registry and this repository will be subsequently used to store the Falcon Node sensor image.
    ```
-   $ aws ecr create-repository --region eu-west-1 --repository-name falcon-node-sensor
+   $ aws ecr create-repository --region $CLOUD_REGION --repository-name falcon-node-sensor
+   ```
+   Example Output:
+   ```
    {
        "repository": {
            "repositoryArn": "arn:aws:ecr:eu-west-1:123456789123:repository/falcon-node-sensor",
@@ -90,7 +112,7 @@ You will need AWS credentials and docker tool installed locally.
    $ FALCON_NODE_IMAGE_URI=123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-node-sensor
    ```
 
-### Step 3: Build falcon-node-sensor container image
+### Step 4: Build falcon-node-sensor container image
 
  - Provide OAuth2 Client ID and Client Secret for authentication with CrowdStrike Falcon platform. Establishing and retrieving OAuth2 API credentials can be performed at [falcon-console](https://falcon.crowdstrike.com/support/api-clients-and-keys). These credentials will only be used to download sensor, we recommend you create key pair that has permissions only for
    ```
@@ -109,7 +131,7 @@ You will need AWS credentials and docker tool installed locally.
    ```
    To see various build options see [upstream project](https://github.com/CrowdStrike/Dockerfiles).
 
-### Step 4: Push falcon-node-sensor image to the kube registry
+### Step 5: Push falcon-node-sensor image to the kube registry
 
  - Push the image to the kube registry:
    ```
@@ -128,7 +150,7 @@ You will need AWS credentials and docker tool installed locally.
    latest: digest: sha256:132eea2728db09c49fecfae78778f11225f6e9818c71c4f5b2321a0dae4d0c95 size: 1572
    ```
 
-### Step 5: Deploy the DaemonSet using the helm chart
+### Step 6: Deploy the DaemonSet using the helm chart
 
  - Provide CrowdStrike Falcon Customer ID as environment variable. This CID will be used be helm chart to register your cluster nodes to the CrowdStrike Falcon platform.
    ```
