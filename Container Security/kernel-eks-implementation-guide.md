@@ -223,7 +223,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
    ```
  - Step 2: Delete the falcon image from AWS ECR registry
    ```
-   $ aws ecr batch-delete-image --region eu-west-1 \
+   $ aws ecr batch-delete-image --region $CLOUD_REGION \
        --repository-name falcon-node-sensor \
        --image-ids imageTag=latest
    ```
@@ -241,7 +241,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
    ```
  - Step 4: Delete the AWS ECR repository
    ```
-   $ aws ecr delete-repository --region eu-west-1 --repository-name falcon-node-sensor
+   $ aws ecr delete-repository --region $CLOUD_REGION --repository-name falcon-node-sensor
    ```
    Example output:
    ```
@@ -258,7 +258,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
    ```
  - Step 5: Delete the AWS EKS Fargate Cluster, replacing `eu-west-1` with the AWS region your cluster is running on.
    ```
-   $ eksctl delete cluster --region eu-west-1 demo-cluster
+   $ eksctl delete cluster --region $CLOUD_REGION demo-cluster
    ```
 
 ## Additional Resources
