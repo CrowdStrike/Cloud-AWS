@@ -1,4 +1,4 @@
-# Install CrowdStrike Falcon Senosr for Windows
+# Install CrowdStrike Falcon Sensor for Windows
 PowerShell based bootstrap for installing the CrowdStrike Falcon sensor on a Windows host.
 
 ## Requirements
