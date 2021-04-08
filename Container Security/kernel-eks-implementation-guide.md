@@ -61,7 +61,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
     }
     ````
 
-### Step 2: Create EKS Cluster (Move to step 4 for existing EKS cluster)
+### Step 2: Create EKS Cluster (Move to step 4 for existing EKS cluster and ECR container registry)
  - Set the cloud region (example below uses us-west-1)
    ```$ CLOUD_REGION=us-west-1```
  - Create new EKS cluster. It may take couple minutes before cluster is fully up and functioning.
@@ -108,12 +108,16 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
    ```
 
  - Note the `registryURI` of the newly created repository to the environment variable for further use. Falcon Container Sensor will be available under this URI.
+
+### Step 4: Build falcon-node-sensor container image
+ - Add the ECR `registryURI` in an environment variable.
    ```
    $ FALCON_NODE_IMAGE_URI=123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-node-sensor
    ```
-
-### Step 4: Build falcon-node-sensor container image
-
+ - Note for existing ECR registries the `registryURI` can be found with the following command.
+  ```
+  aws ecr describe-repositories
+  ```
  - Provide OAuth2 Client ID and Client Secret for authentication with CrowdStrike Falcon platform. Establishing and retrieving OAuth2 API credentials can be performed at [falcon-console](https://falcon.crowdstrike.com/support/api-clients-and-keys). These credentials will only be used to download sensor, we recommend you create key pair that has permissions only for
    ```
    $ FALCON_CLIENT_ID=1234567890ABCDEFG1234567890ABCDEF
