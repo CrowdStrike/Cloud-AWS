@@ -293,7 +293,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
        }
    }
    ```
- - Step 6: Delete the AWS EKS Fargate Cluster, replacing `eu-west-1` with the AWS region your cluster is running on.
+ - Step 6: Delete the AWS EKS Fargate Cluster.
    ```
    $ eksctl delete cluster --region $CLOUD_REGION demo-cluster
    ```
