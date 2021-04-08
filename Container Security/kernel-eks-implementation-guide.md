@@ -300,7 +300,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
 
 ## Additional Resources
  - To learn more about CrowdStrike: [CrowdStrike website](http://crowdstrike.com/)
- - To get started with AWS Fargate using Amazon EKS: [User Guide](https://docs.aws.amazon.com/eks/latest/userguide/fargate-getting-started.html)
+ - To get started with AWS using Amazon EKS: [User Guide](https://docs.aws.amazon.com/eks/latest/userguide/getting-started.html)
  - To get started with Amazon Elastic Container (ECR) Registry [Developer Guide](https://aws.amazon.com/ecr/getting-started/)
  - To learn more about Kubernetes: [Community Homepage](https://kubernetes.io/)
  - To get started with `kubectl` command-line utility: [Overview of kubectl](https://kubernetes.io/docs/reference/kubectl/overview/)
