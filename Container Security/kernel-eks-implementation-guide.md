@@ -272,7 +272,11 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
        "failures": []
    }
    ```
- - Step 4: Delete the AWS ECR repository
+ - Step 4: Delete the falcon-system namespace
+   ```
+   kuebctl delete ns falcon-system
+   ```
+ - Step 5: Delete the AWS ECR repository
    ```
    $ aws ecr delete-repository --region $CLOUD_REGION --repository-name falcon-node-sensor
    ```
@@ -289,7 +293,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
        }
    }
    ```
- - Step 5: Delete the AWS EKS Fargate Cluster, replacing `eu-west-1` with the AWS region your cluster is running on.
+ - Step 6: Delete the AWS EKS Fargate Cluster, replacing `eu-west-1` with the AWS region your cluster is running on.
    ```
    $ eksctl delete cluster --region $CLOUD_REGION demo-cluster
    ```
