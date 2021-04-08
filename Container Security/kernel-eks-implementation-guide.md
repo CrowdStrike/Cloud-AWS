@@ -218,7 +218,8 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-12
    ```
    $ IFS=$'\n'
      for i in $(kubectl get pods -n falcon-system | awk 'FNR > 1' | awk '{print $1}')
-     do echo "$i - $(kubectl exec $i -n falcon-system -c falcon-node-sensor -- falconctl -g --aid)"
+     do 
+              echo "$i - $(kubectl exec $i -n falcon-system -c falcon-node-sensor -- falconctl -g --aid)"
      done
    ```
    Example output:
