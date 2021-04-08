@@ -92,7 +92,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
    ```
    $ aws ecr create-repository --region $CLOUD_REGION --repository-name falcon-node-sensor
    ```
-   Example Output:
+   Example output:
    ```
    {
        "repository": {
@@ -147,6 +147,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
    ```
    $ docker tag falcon-node-sensor:latest $FALCON_NODE_IMAGE_URI:latest
    ```
+   Example output:
    ```
    $ docker push $FALCON_NODE_IMAGE_URI:latest
    Using default tag: latest
