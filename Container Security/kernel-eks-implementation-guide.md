@@ -9,16 +9,34 @@ Time needed to follow this guide: 45 minutes.
 
 ## Pre-requisites
 
-You will need AWS credentials and docker tool installed locally.
+- Existing AWS Account and VPC
+- You will need a workstation with a linux platform
+- You will need AWS credentials and [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html) configured
+- Docker installed locally on the workstation
+- API Credentials from Falcon with Sensor Download Permissions
+  * For this step and practice of least privilege, you would want to create a dedicated API secret and key.
+- Verify connectivity with AWS CLI
+  * ``aws ec2 describe-instances`` should return without error
 
 ## Deployment
 
 ### Step 1: Enter the tooling container
 
  - Install [docker](https://www.docker.com/products/docker-desktop) container runtime
+ - Verify docker daemon is running on your workstation
+ - Configure environment variables for FALCON
+
+From the terminal run the following to set the environment variables.
+
+ ```
+$ FALCON_CLIENT_ID=1234567890ABCDEFG1234567890ABCDEF
+$ FALCON_CLIENT_SECRET=1234567890ABCDEFG1234567890ABCDEF
+$ CID=1234567890ABCDEFG1234567890ABCDEF-12
+
+ ```
  - Enter the [tooling container](https://github.com/CrowdStrike/cloud-tools-image)
    ```
-   docker run --privileged=true \
+   sudo docker run --privileged=true \
        -e FALCON_CLIENT_ID="$FALCON_CLIENT_ID" \
        -e FALCON_CLIENT_SECRET="$FALCON_CLIENT_SECRET" \
        -e CID="$CID" \
@@ -26,6 +44,8 @@ You will need AWS credentials and docker tool installed locally.
        -v ~/.aws:/root/.aws -it --rm \
        quay.io/crowdstrike/cloud-tools-image
    ```
+   You will be placed inside of the running container. 
+   
    The above command creates a new container runtime that contains tools needed by this guide. All the
    following commands should be run inside this container. If you have previously used AWS CLI tool,
    you may already have AWS Credentials stored on your system in `~/.aws` directory. If that is the case,
@@ -34,7 +54,7 @@ You will need AWS credentials and docker tool installed locally.
    AWS credentials with the container. You can review your credentials with `aws sts get-caller-identity`
    command.
 
-    Example output
+    Example output:
     ```
     {
         "UserId": "AIDAXRCSSEFWMXXXXXXXX",
@@ -43,18 +63,22 @@ You will need AWS credentials and docker tool installed locally.
     }
     ````
 
-### Step 2: Create EKS Cluster
-
+### Step 2: Create EKS Cluster (Move to step 4 for existing EKS cluster and ECR container registry)
+ - Set the cloud region (example below uses us-west-1)
+   ```$ CLOUD_REGION=us-west-1```
  - Create new EKS cluster. It may take couple minutes before cluster is fully up and functioning.
    ```
-   $ eksctl create cluster
-       --name demo-cluster --region eu-west-1 \
+   $ eksctl create cluster \
+       --name demo-cluster --region $CLOUD_REGION \
        --managed
    ```
 
- - (optional) Verify that your local kubectl utility has been configured to connect to the cluster.
+ - Verify that your local kubectl utility has been configured to connect to the cluster.
    ```
    $ kubectl cluster-info
+   ```
+   Example output:
+   ```
    Kubernetes control plane is running at https://EEAB38XXXXXXXXXXXXXXXXXXXXXXXXXX.sk1.eu-west-1.eks.amazonaws.com
    CoreDNS is running at https://EEAB38XXXXXXXXXXXXXXXXXXXXXXXXXX.sk1.eu-west-1.eks.amazonaws.com/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
 
@@ -66,7 +90,10 @@ You will need AWS credentials and docker tool installed locally.
 
  - Create container repository in AWS Elastic Container Registry (ECR). AWS ECR is a cloud service providing a container registry. The below command creates a new repository in the registry and this repository will be subsequently used to store the Falcon Node sensor image.
    ```
-   $ aws ecr create-repository --region eu-west-1 --repository-name falcon-node-sensor
+   $ aws ecr create-repository --region $CLOUD_REGION --repository-name falcon-node-sensor
+   ```
+   Example output:
+   ```
    {
        "repository": {
            "repositoryArn": "arn:aws:ecr:eu-west-1:123456789123:repository/falcon-node-sensor",
@@ -85,22 +112,27 @@ You will need AWS credentials and docker tool installed locally.
    }
    ```
 
- - Note the `registryURI` of the newly created repository to the environment variable for further use. Falcon Container Sensor will be available under this URI.
+ - Note the `repositoryUri` of the newly created repository to the environment variable for further use. Falcon Container Sensor will be available under this URI.
+
+### Step 4: Build falcon-node-sensor container image
+ - Add the ECR `repositoryUri` in an environment variable.
    ```
    $ FALCON_NODE_IMAGE_URI=123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-node-sensor
    ```
-
-### Step 3: Build falcon-node-sensor container image
-
- - Provide OAuth2 Client ID and Client Secret for authentication with CrowdStrike Falcon platform. Establishing and retrieving OAuth2 API credentials can be performed at [falcon-console](https://falcon.crowdstrike.com/support/api-clients-and-keys). These credentials will only be used to download sensor, we recommend you create key pair that has permissions only for
+ - Note for existing ECR registries the `registryURI` can be found with the following command.
+  ```
+  aws ecr describe-repositories
+  ```
+ - We will be reusing the variables from previous commands inside the interactive container session. Provide OAuth2 Client ID and Client Secret for authentication with CrowdStrike Falcon platform. Establishing and retrieving OAuth2 API credentials can be performed at [falcon-console](https://falcon.crowdstrike.com/support/api-clients-and-keys). These credentials will only be used to download sensor, we recommend you create key pair that has permissions only for Sensor Download.
    ```
    $ FALCON_CLIENT_ID=1234567890ABCDEFG1234567890ABCDEF
    $ FALCON_CLIENT_SECRET=1234567890ABCDEFG1234567890ABCDEF
    ```
 
  - (optional) Provide name of Falcon Cloud you want to used
+ - Note that this information can be found in the URL of the Falcon Platform. The default value used by the falcon-node-sensor-build script is us-1. The example    below uses us-2.
    ```
-   $ FALCON_CLOUD=us-1
+   $ FALCON_CLOUD=us-2
    ```
 
  - Build falcon-node-sensor container for your particular OS that is running on your cluster nodes. By default EKS clusters use Amazon Linux 2
@@ -109,12 +141,13 @@ You will need AWS credentials and docker tool installed locally.
    ```
    To see various build options see [upstream project](https://github.com/CrowdStrike/Dockerfiles).
 
-### Step 4: Push falcon-node-sensor image to the kube registry
+### Step 5: Push falcon-node-sensor image to the kube registry
 
  - Push the image to the kube registry:
    ```
    $ docker tag falcon-node-sensor:latest $FALCON_NODE_IMAGE_URI:latest
    ```
+   Example output:
    ```
    $ docker push $FALCON_NODE_IMAGE_URI:latest
    Using default tag: latest
@@ -128,12 +161,12 @@ You will need AWS credentials and docker tool installed locally.
    latest: digest: sha256:132eea2728db09c49fecfae78778f11225f6e9818c71c4f5b2321a0dae4d0c95 size: 1572
    ```
 
-### Step 5: Deploy the DaemonSet using the helm chart
+### Step 6: Deploy the DaemonSet using the helm chart
 
  - Provide CrowdStrike Falcon Customer ID as environment variable. This CID will be used be helm chart to register your cluster nodes to the CrowdStrike Falcon platform.
-   ```
-   $ CID=1234567890ABCDEFG1234567890ABCDEF-12
-   ```
+```
+$ CID=1234567890ABCDEFG1234567890ABCDEF-12
+```
 
  - Add the CrowdStrike Falcon Helm repository
    ```
@@ -146,6 +179,9 @@ You will need AWS credentials and docker tool installed locally.
         -n falcon-system --create-namespace \
         --set falcon.cid="$CID" \
         --set node.image.repository=$FALCON_NODE_IMAGE_URI
+   ```
+   Example output:
+   ```
    Release "falcon-helm" does not exist. Installing it now.
    NAME: falcon-helm
    LAST DEPLOYED: Fri Mar  5 17:07:54 2021
@@ -172,15 +208,37 @@ You will need AWS credentials and docker tool installed locally.
  - (optional) Verify that falcon-node-sensor pod running. You should see one pod per each node on your cluster.
    ```
    $ kubectl get pods -n falcon-system
+   ```
+   Example output:
+   ```
    NAME                              READY   STATUS    RESTARTS   AGE
    falcon-helm-falcon-sensor-bs98m   2/2     Running   0          21s
    ```
  - (optional) Verify that given pod has registered with CrowdStrike Falcon and received unique identifier.
    ```
-   $ kubectl exec -n falcon-system falcon-helm-falcon-sensor-bs98m -c falcon-node-sensor -- falconctl -g --aid
-   aid="a582XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+   $ for i in $(kubectl get pods -n falcon-system | awk 'FNR > 1' | awk '{print $1}')
+     do 
+              echo "$i - $(kubectl exec $i -n falcon-system -c falcon-node-sensor -- falconctl -g --aid)"
+     done
+   ```
+   Example output:
+   ```
+     falcon-helm-falcon-sensor-XXXX - aid="a582XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+   ```
+ - (optional) Check the Reduced Functionality Mode state of the Falcon Sensor.
+ - Note that the value returned should be false if running on supported kernel and platform versions.
+   ```
+   $ for i in $(kubectl get pods -n falcon-system | awk 'FNR > 1' | awk '{print $1}')
+     do 
+           echo "$i - $(kubectl exec $i -n falcon-system -c falcon-node-sensor -- falconctl -g --rfm-state)"
+     done
+    ```
+    Example output:
+    ```
+     falcon-helm-falcon-sensor-XXXX - rfm-state=false."
    ```
  - (optional) Verify that Falcon Sensor for Linux has insert itself to the kernel
+ - Note that this must be done on Kubernetes worker nodes so access to these nodes is required for this step.
     ```
     $ lsmod | grep falcon
     falcon_lsm_serviceable     724992  1
@@ -198,9 +256,12 @@ You will need AWS credentials and docker tool installed locally.
    ```
  - Step 2: Delete the falcon image from AWS ECR registry
    ```
-   $ aws ecr batch-delete-image --region eu-west-1 \
+   $ aws ecr batch-delete-image --region $CLOUD_REGION \
        --repository-name falcon-node-sensor \
        --image-ids imageTag=latest
+   ```
+   Example output:
+   ```
    {
        "imageIds": [
            {
@@ -211,9 +272,16 @@ You will need AWS credentials and docker tool installed locally.
        "failures": []
    }
    ```
- - Step 4: Delete the AWS ECR repository
+ - Step 4: Delete the falcon-system namespace
    ```
-   $ aws ecr delete-repository --region eu-west-1 --repository-name falcon-node-sensor
+   kuebctl delete ns falcon-system
+   ```
+ - Step 5: Delete the AWS ECR repository
+   ```
+   $ aws ecr delete-repository --region $CLOUD_REGION --repository-name falcon-node-sensor
+   ```
+   Example output:
+   ```
    {
        "repository": {
            "repositoryArn": "arn:aws:ecr:eu-west-1:123456789123:repository/falcon-sensor",
@@ -225,14 +293,14 @@ You will need AWS credentials and docker tool installed locally.
        }
    }
    ```
- - Step 5: Delete the AWS EKS Fargate Cluster, replacing `eu-west-1` with the AWS region your cluster is running on.
+ - Step 6: Delete the AWS EKS Cluster.
    ```
-   $ eksctl delete cluster --region eu-west-1 demo-cluster
+   $ eksctl delete cluster --region $CLOUD_REGION demo-cluster
    ```
 
 ## Additional Resources
  - To learn more about CrowdStrike: [CrowdStrike website](http://crowdstrike.com/)
- - To get started with AWS Fargate using Amazon EKS: [User Guide](https://docs.aws.amazon.com/eks/latest/userguide/fargate-getting-started.html)
+ - To get started with AWS using Amazon EKS: [User Guide](https://docs.aws.amazon.com/eks/latest/userguide/getting-started.html)
  - To get started with Amazon Elastic Container (ECR) Registry [Developer Guide](https://aws.amazon.com/ecr/getting-started/)
  - To learn more about Kubernetes: [Community Homepage](https://kubernetes.io/)
  - To get started with `kubectl` command-line utility: [Overview of kubectl](https://kubernetes.io/docs/reference/kubectl/overview/)
