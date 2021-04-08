@@ -112,10 +112,10 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
    }
    ```
 
- - Note the `registryURI` of the newly created repository to the environment variable for further use. Falcon Container Sensor will be available under this URI.
+ - Note the `repositoryUri` of the newly created repository to the environment variable for further use. Falcon Container Sensor will be available under this URI.
 
 ### Step 4: Build falcon-node-sensor container image
- - Add the ECR `registryURI` in an environment variable.
+ - Add the ECR `repositoryUri` in an environment variable.
    ```
    $ FALCON_NODE_IMAGE_URI=123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-node-sensor
    ```
