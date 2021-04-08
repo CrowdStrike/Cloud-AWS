@@ -197,15 +197,35 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
  - (optional) Verify that falcon-node-sensor pod running. You should see one pod per each node on your cluster.
    ```
    $ kubectl get pods -n falcon-system
+   ```
+   Example output:
+   ```
    NAME                              READY   STATUS    RESTARTS   AGE
    falcon-helm-falcon-sensor-bs98m   2/2     Running   0          21s
    ```
  - (optional) Verify that given pod has registered with CrowdStrike Falcon and received unique identifier.
    ```
-   $ kubectl exec -n falcon-system falcon-helm-falcon-sensor-bs98m -c falcon-node-sensor -- falconctl -g --aid
-   aid="a582XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+   $ IFS=$'\n'
+     for i in $(k get pods -n falcon-system | awk 'FNR > 1' | awk '{print $1}')
+     do echo "$i - $(kubectl exec $i -n falcon-system -c falcon-node-sensor -- falconctl -g --aid)"
+     done
    ```
- - (optional) Verify that Falcon Sensor for Linux has insert itself to the kernel
+   Example output:
+   ```
+     falcon-helm-falcon-sensor-XXXX - aid="a582XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+   ```
+ - (optional) Check the Reduced Functionality Mode (RFM) state of the Falcon Sensor.
+   ```
+   $ IFS=$'\n'
+     for i in $(k get pods -n falcon-system | awk 'FNR > 1' | awk '{print $1}')
+     do echo "$i - $(kubectl exec $i -n falcon-system -c falcon-node-sensor -- falconctl -g --rfm-state)"
+     done
+    ```
+    Example output:
+    ```
+     falcon-helm-falcon-sensor-XXXX - rfm-state=false."
+   ```
+ - (optional) Verify that Falcon Sensor for Linux has insert itself to the kernel (this must be done on k8s workers)
     ```
     $ lsmod | grep falcon
     falcon_lsm_serviceable     724992  1
