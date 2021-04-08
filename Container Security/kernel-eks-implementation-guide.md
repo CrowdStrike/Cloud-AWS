@@ -225,8 +225,8 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
    ```
      falcon-helm-falcon-sensor-XXXX - aid="a582XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
    ```
- - (optional) Check the Reduced Functionality Mode (RFM) state of the Falcon Sensor.
- - Note that the value returned should be false if runnning on supported kernel and platform versions.
+ - (optional) Check the Reduced Functionality Mode state of the Falcon Sensor.
+ - Note that the value returned should be false if running on supported kernel and platform versions.
    ```
    $ IFS=$'\n'
      for i in $(kubectl get pods -n falcon-system | awk 'FNR > 1' | awk '{print $1}')
@@ -238,7 +238,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
      falcon-helm-falcon-sensor-XXXX - rfm-state=false."
    ```
  - (optional) Verify that Falcon Sensor for Linux has insert itself to the kernel
- - Note that this must be done on kubernetes worker nodes so access to these nodes is required for this step.
+ - Note that this must be done on Kubernetes worker nodes so access to these nodes is required for this step.
     ```
     $ lsmod | grep falcon
     falcon_lsm_serviceable     724992  1
