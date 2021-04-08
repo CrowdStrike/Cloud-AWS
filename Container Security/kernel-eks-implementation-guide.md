@@ -31,7 +31,7 @@ From the terminal run the following to set the environment variables.
  ```
 $ FALCON_CLIENT_ID=1234567890ABCDEFG1234567890ABCDEF
 $ FALCON_CLIENT_SECRET=1234567890ABCDEFG1234567890ABCDEF
-$ CID=1234567890ABCDEFG1234567890ABCDEF-HH
+$ CID=1234567890ABCDEFG1234567890ABCDEF-12
 
  ```
  - Enter the [tooling container](https://github.com/CrowdStrike/cloud-tools-image)
