@@ -21,9 +21,9 @@ endpoints and shared with the test VPC.
 
 
 4) Verify that the cloudformation template has been created successfully.
-![](docs/images/cft-status-sm.png)
-   
 ![](docs/images/cft-output-sm.png)
+   
+   
 
 5) Connect to the instance and verify that the private hosted domain has been shared with the Test VPC.
 ![](docs/images/dnstest-sm.png)
