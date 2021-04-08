@@ -73,9 +73,12 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
        --managed
    ```
 
- - (optional) Verify that your local kubectl utility has been configured to connect to the cluster.
+ - Verify that your local kubectl utility has been configured to connect to the cluster.
    ```
    $ kubectl cluster-info
+   ```
+   Example output:
+   ```
    Kubernetes control plane is running at https://EEAB38XXXXXXXXXXXXXXXXXXXXXXXXXX.sk1.eu-west-1.eks.amazonaws.com
    CoreDNS is running at https://EEAB38XXXXXXXXXXXXXXXXXXXXXXXXXX.sk1.eu-west-1.eks.amazonaws.com/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
 
