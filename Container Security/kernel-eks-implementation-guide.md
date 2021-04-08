@@ -123,7 +123,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
   ```
   aws ecr describe-repositories
   ```
- - Provide OAuth2 Client ID and Client Secret for authentication with CrowdStrike Falcon platform. Establishing and retrieving OAuth2 API credentials can be performed at [falcon-console](https://falcon.crowdstrike.com/support/api-clients-and-keys). These credentials will only be used to download sensor, we recommend you create key pair that has permissions only for
+ - We will be reusing the variables from previous commands inside the interactive container sesison. Provide OAuth2 Client ID and Client Secret for authentication with CrowdStrike Falcon platform. Establishing and retrieving OAuth2 API credentials can be performed at [falcon-console](https://falcon.crowdstrike.com/support/api-clients-and-keys). These credentials will only be used to download sensor, we recommend you create key pair that has permissions only for Sensor Download.
    ```
    $ FALCON_CLIENT_ID=1234567890ABCDEFG1234567890ABCDEF
    $ FALCON_CLIENT_SECRET=1234567890ABCDEFG1234567890ABCDEF
