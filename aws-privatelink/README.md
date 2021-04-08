@@ -15,7 +15,7 @@ endpoints and shared with the test VPC.
 
    
 2) Copy the files from the s3bucket folder to the newly created S3 bucket.
-![](docs/images/s3bucket-sm.png)
+   ![](docs/images/s3bucket-sm.png)
    
 3) Load the cloudformation template (create-vpc-endpoint-r53-tgw-attachment.yaml).
 
