@@ -24,7 +24,7 @@ Time needed to follow this guide: 45 minutes.
 
  - Install [docker](https://www.docker.com/products/docker-desktop) container runtime
  - Verify docker daemon is running on your workstation
- - Configure environtment variables for FALCON
+ - Configure environment variables for FALCON
 
 From the terminal run the following to set the environment variables.
 
