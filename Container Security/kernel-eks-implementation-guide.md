@@ -293,7 +293,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
        }
    }
    ```
- - Step 6: Delete the AWS EKS Fargate Cluster.
+ - Step 6: Delete the AWS EKS Cluster.
    ```
    $ eksctl delete cluster --region $CLOUD_REGION demo-cluster
    ```
