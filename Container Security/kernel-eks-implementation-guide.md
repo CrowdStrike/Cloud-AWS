@@ -232,7 +232,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
      falcon-helm-falcon-sensor-XXXX - rfm-state=false."
    ```
  - (optional) Verify that Falcon Sensor for Linux has insert itself to the kernel
- - Note that this must be done on k8s worker nodes so access to these nodes is required for this step.
+ - Note that this must be done on kubernetes worker nodes so access to these nodes is required for this step.
     ```
     $ lsmod | grep falcon
     falcon_lsm_serviceable     724992  1
