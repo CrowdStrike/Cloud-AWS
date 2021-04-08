@@ -62,7 +62,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
     ````
 
 ### Step 2: Create EKS Cluster (Move to step 4 for existing EKS cluster)
- - Set the cloud region
+ - Set the cloud region (example below uses us-west-1)
    ```$ CLOUD_REGION=us-west-1```
  - Create new EKS cluster. It may take couple minutes before cluster is fully up and functioning.
    ```
@@ -120,9 +120,10 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
    $ FALCON_CLIENT_SECRET=1234567890ABCDEFG1234567890ABCDEF
    ```
 
- - (optional) Provide name of Falcon Cloud you want to used
+ - (optonal) Provide name of Falcon Cloud you want to used
+ - Note that this information can be found in the URL of the Falcon Platform. The default value used by the falcon-node-sensor-build script is us-1. The example    below uses us-2.
    ```
-   $ FALCON_CLOUD=us-1
+   $ FALCON_CLOUD=us-2
    ```
 
  - Build falcon-node-sensor container for your particular OS that is running on your cluster nodes. By default EKS clusters use Amazon Linux 2
@@ -215,6 +216,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
      falcon-helm-falcon-sensor-XXXX - aid="a582XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
    ```
  - (optional) Check the Reduced Functionality Mode (RFM) state of the Falcon Sensor.
+ - Note that the value returned should be false if runnning on supported kernel and platform versions.
    ```
    $ IFS=$'\n'
      for i in $(k get pods -n falcon-system | awk 'FNR > 1' | awk '{print $1}')
@@ -225,7 +227,8 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
     ```
      falcon-helm-falcon-sensor-XXXX - rfm-state=false."
    ```
- - (optional) Verify that Falcon Sensor for Linux has insert itself to the kernel (this must be done on k8s workers)
+ - (optional) Verify that Falcon Sensor for Linux has insert itself to the kernel
+ - Note that this must be done on k8s worker nodes so access to these nodes is required for this step.
     ```
     $ lsmod | grep falcon
     falcon_lsm_serviceable     724992  1
