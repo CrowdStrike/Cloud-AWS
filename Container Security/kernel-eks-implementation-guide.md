@@ -217,7 +217,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
  - (optional) Verify that given pod has registered with CrowdStrike Falcon and received unique identifier.
    ```
    $ IFS=$'\n'
-     for i in $(k get pods -n falcon-system | awk 'FNR > 1' | awk '{print $1}')
+     for i in $(kubectl get pods -n falcon-system | awk 'FNR > 1' | awk '{print $1}')
      do echo "$i - $(kubectl exec $i -n falcon-system -c falcon-node-sensor -- falconctl -g --aid)"
      done
    ```
@@ -229,7 +229,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-HH
  - Note that the value returned should be false if runnning on supported kernel and platform versions.
    ```
    $ IFS=$'\n'
-     for i in $(k get pods -n falcon-system | awk 'FNR > 1' | awk '{print $1}')
+     for i in $(kubectl get pods -n falcon-system | awk 'FNR > 1' | awk '{print $1}')
      do echo "$i - $(kubectl exec $i -n falcon-system -c falcon-node-sensor -- falconctl -g --rfm-state)"
      done
     ```
