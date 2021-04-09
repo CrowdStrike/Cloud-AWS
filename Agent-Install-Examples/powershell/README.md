@@ -100,7 +100,7 @@ within the same region as the region you specify as REGION.
 + `INSTANCE_TYPE` - The AWS Instance Type to use for the instance.
 + `INSTANCE_NAME` - The name to use for the name tag on the instance.
 + `REGION` - The AWS region where the instance and security group are deployed.
-```
+```bash
 aws cloudformation create-stack --template-body file://WindowsInstanceExample.yml \
 --stack-name STACK_NAME \
 --parameters ParameterKey=FalconClientID,ParameterValue=CLIENT_ID_PARAMETER_NAME \
