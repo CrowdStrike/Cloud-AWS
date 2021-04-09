@@ -145,7 +145,7 @@ sensor and install it upon first boot.
 template that creates a single security group and a single Windows Server instance.
     - Uses the most recent AMI available for Windows Server 2019 Full. 
     - The instance and security group will be deployed to the VPC you specify.
-    - The instance and security group will be deployed to the default subnet for the VPC. **??**
+    - The instance and security group will be deployed to the subnet you specify.
     - You must have Terraform installed in order to make use of this template.
     - Your installation of Terraform must be configured with appropriate AWS API credentials.
 
