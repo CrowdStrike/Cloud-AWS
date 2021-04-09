@@ -123,9 +123,9 @@ begin {
                 throw $_
             } finally {
                 $this.WaitRetry($Response)
-                # if ($Response) {
-                #     $Response.Dispose()
-                # }
+                if ($Response) {
+                    $Response.Dispose()
+                }
             }
             return $Output
         }
