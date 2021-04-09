@@ -1,4 +1,4 @@
-# Automating the Installation of the CrowdStrike Falcon Sensor for Windows
+# Automating CrowdStrike Falcon Sensor for Windows Installation
 This example demonstrates leveraging Microsoft PowerShell to bootstrap the CrowdStrike 
 Falcon sensor onto a Windows host during first boot. This solution leverages AWS Systems 
 Manager Parameter Store to store API credentials for use in calling the CrowdStrike 
