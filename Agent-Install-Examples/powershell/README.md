@@ -23,7 +23,7 @@ used to communicate with the CrowdStrike Falcon API.
 
 Two parameters must be created for this demonstration to function. They may be named whatever
 you wish and will be referenced when you import the template into CloudFormation, execute 
-`create-stack` using the AWS CLI or when you update your Terraform template file and execute 
+`create-stack` using the AWS CLI, or when you update your Terraform template file and execute 
 `terraform apply`. You will create one parameter to store the API client ID and one parameter 
 to store the API client secret. 
 
@@ -42,8 +42,9 @@ sensor and install it upon first boot.
 + [WindowsInstanceExample.yml](cloudformation/WindowsInstanceExample.yml) - Example CloudFormation 
 template that creates a single security group and a single Windows Server instance.
     - Uses the most recent AMI available for Windows Server 2019 Full. 
-    - The instance and security group will be deployed to your default VPC for the region.
-    - The instance and security group will be deployed to the default subnet for the VPC.
+    - The instance and security group will be deployed to your default VPC for the region the 
+    Availability Zone resides within.
+    - The instance and security group will be deployed to the default subnet for the Availability Zone.
     - This template can be uploaded directly to your AWS console or executed via the AWS CLI.
 
 ### Standing up the demonstration using the AWS Console
