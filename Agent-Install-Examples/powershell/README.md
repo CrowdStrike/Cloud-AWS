@@ -71,7 +71,7 @@ the names of the SSM parameters that are storing these values.
 
 ![Specifying the stack details](images/specify-stack-details.png)
 
-On this next page you can stack-specific options you may want to implement. The most common
+On this next page you can select stack-specific options you may want to implement. The most common
 example would be to specify additional custom tags that would be propagated to the instance
 upon creation. Once you have specified all of your options, scroll to the bottom of the page
 and click the __Next__ button.
@@ -79,7 +79,7 @@ and click the __Next__ button.
 ![Configuring stack options](images/configure-stack-options.png)
 
 The next page will confirm all of your choices. Carefully review the options you've selected
-and when you are satisfied, click the __Create Stack__ button.
+and when you are satisfied, click the __Create stack__ button.
 
 > If you have not created your SSM parameters containing your API credentials
 you will need to do so before proceeding to the next step.
@@ -104,13 +104,13 @@ your environment.
 parameter must exist within the same region you specify as REGION.
 + `CLIENT_SECRET_PARAMETER_NAME` - The name of the SSM parameter to use for your Falcon Client Secret.
 This parameter must exist within the same region you specify as REGION.
-+ `TRUSTED_IP` - The IP address to provided RDP (TCP 3389) access to upon creation.
++ `TRUSTED_IP` - The IP address to provide RDP (TCP 3389) access to upon creation.
 + `AVAILABILITY_ZONE` - The availability zone to deploy the example instance to. This availability 
 zone must reside within the same region you specify as REGION.
 + `KEY_PAIR_NAME` - The name of the key pair to use for the instance. This key pair must exist
 within the same region as the region you specify as REGION.
 + `INSTANCE_TYPE` - The AWS Instance Type to use for the instance.
-+ `INSTANCE_NAME` - The name to use for the name tag on the instance.
++ `INSTANCE_NAME` - The value to use for the name tag on the instance.
 + `REGION` - The AWS region where the instance and security group are deployed.
 
 > If you have not created your SSM parameters containing your API credentials
@@ -133,7 +133,7 @@ If successful, you will receive a response containing the request ID for this st
 request. The stack will take approximately 3 to 5 minutes to stand up the demonstration.
 
 ```bash
-arn:aws:cloudformation:us-east-2:{ACCT_ID}:stack/WindowsSensorExample2/72ee79f2-96ef-12ab-8554-02b5a70b77dc
+arn:aws:cloudformation:us-east-2:{ACCOUNT_ID}:stack/WindowsSensorExample2/72ee79f2-96ef-12ab-8554-02b5a70b77dc
 ```
 
 ## Terraform
