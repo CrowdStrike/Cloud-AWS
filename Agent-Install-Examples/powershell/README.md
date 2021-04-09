@@ -39,9 +39,11 @@ be leveraged to deploy instances that automatically download the correct version
 sensor and install it upon first boot.
 
 + [WindowsInstanceExample.yml](cloudformation/WindowsInstanceExample.yml) - Example CloudFormation 
-template that creates a single security group and a single Windows Server instance using the most 
-recent AMI available for Windows Server 2019 Full. This template can be uploaded directly to your
-AWS console or executed via the AWS CLI.
+template that creates a single security group and a single Windows Server instance.
+    - Uses the most recent AMI available for Windows Server 2019 Full. 
+    - The instance and security group will be deployed to your default VPC for the region.
+    - The instance and security group will be deployed to the default subnet for the VPC.
+    - This template can be uploaded directly to your AWS console or executed via the AWS CLI.
 
 ### Standing up the demonstration using the AWS Console
 This template can be uploaded directly into CloudFormation within the AWS console and executed.
@@ -77,6 +79,9 @@ and click the __Next__ button.
 The next page will confirm all of your choices. Carefully review the options you've selected
 and when you are satisfied, click the __Create Stack__ button.
 
+> If you have not created your SSM parameters containing your API credentials
+you will need to do so before proceeding to the next step.
+
 ![Create stack button](images/create-stack-button.png)
 
 You will be brought back to the Stacks status dashboard and will see the stack initiating creation.
@@ -105,6 +110,10 @@ within the same region as the region you specify as REGION.
 + `INSTANCE_TYPE` - The AWS Instance Type to use for the instance.
 + `INSTANCE_NAME` - The name to use for the name tag on the instance.
 + `REGION` - The AWS region where the instance and security group are deployed.
+
+> If you have not created your SSM parameters containing your API credentials
+you will need to do so before executing this command.
+
 ```bash
 aws cloudformation create-stack --template-body file://WindowsInstanceExample.yml \
 --stack-name STACK_NAME \
@@ -126,7 +135,276 @@ arn:aws:cloudformation:us-east-2:{ACCT_ID}:stack/WindowsSensorExample2/72ee79f2-
 ```
 
 ## Terraform
+An example Terraform template has been developed to demonstrate how this solution can
+be leveraged to deploy instances that automatically download the correct version of the
+sensor and install it upon first boot.
 
++ [WindowsInstanceExample.tf](terraform/WindowsInstanceExample.tf) - Example Terraform 
+template that creates a single security group and a single Windows Server instance.
+    - Uses the most recent AMI available for Windows Server 2019 Full. 
+    - The instance and security group will be deployed to the VPC you specify.
+    - The instance and security group will be deployed to the default subnet for the VPC. **??**
+    - You must have Terraform installed in order to make use of this template.
+    - Your installation of Terraform must be configured with appropriate AWS API credentials.
+
+### Standing up the demonstration
+Open the Terraform template in any editor and update the following values to reflect your environment:
++ `region` - The AWS region where the demonstration will be deployed.
++ `instance_name` - The name of the deployed instance.
++ `security_group_name` - The name of the deployed security group.
++ `instance_type` - The type of instance. (_Example: t2.micro_)
++ `key_name` - The name of the key pair to use for the instance. This key pair must reside
+within the specified `region`.
++ `subnet_id` - The ID of the subnet to deploy the demonstration to. This subnet must
+reside within the VPC specified by `vpc_id`.
++ `vpc_id` - The ID of the VPC to deploy the demonstration to. This VPC must reside
+within the region specified by `region`.
++ `trusted_ip` - The IP address in CIDR format of the IP(s) to allow RDP access to the demonstration.
++ `client_id_ssm_name` - The name of the SSM parameter storing your Falcon API client ID.
++ `client_secret_ssm_name` - The name of the SSM parameter storing your Falcon API client secret.
+
+> Do __not__ enter your CrowdStrike Falcon API credentials into this file.
+
+Open a terminal shell and navigate to the folder where the Terraform template `WindowsInstanceExample.tf`
+resides and execute the following command:
+```shell
+terraform init
+```
+If your Terraform installation is working and you are in the right directory, you should see 
+something similar to the following:
+```shell
+Initializing the backend...
+
+Initializing provider plugins...
+- Finding latest version of hashicorp/aws...
+- Installing hashicorp/aws v3.36.0...
+- Installed hashicorp/aws v3.36.0 (signed by HashiCorp)
+
+The following providers do not have any version constraints in configuration,
+so the latest version was installed.
+
+To prevent automatic upgrades to new major versions that may contain breaking
+changes, we recommend adding version constraints in a required_providers block
+in your configuration, with the constraint strings suggested below.
+
+* hashicorp/aws: version = "~> 3.36.0"
+
+Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+```
+
+Confirm the template and your settings by executing the command:
+
+```shell
+terraform plan
+```
+
+If there are no errors in the template, you will see a display similar to the following:
+
+```shell
+Refreshing Terraform state in-memory prior to plan...
+The refreshed state will be used to calculate this plan, but will not be
+persisted to local or remote state storage.
+
+data.aws_ssm_parameter.falcon_client_id: Refreshing state...
+data.aws_ssm_parameter.falcon_client_secret: Refreshing state...
+data.aws_ami.windows: Refreshing state...
+
+------------------------------------------------------------------------
+
+An execution plan has been generated and is shown below.
+Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_instance.windows_example_instance will be created
+  + resource "aws_instance" "windows_example_instance" {
+      + ami                          = "ami-0db6a09e9ade44bb3"
+      + arn                          = (known after apply)
+      + associate_public_ip_address  = (known after apply)
+      + availability_zone            = (known after apply)
+      + cpu_core_count               = (known after apply)
+      + cpu_threads_per_core         = (known after apply)
+      + get_password_data            = false
+      + host_id                      = (known after apply)
+      + id                           = (known after apply)
+      + instance_state               = (known after apply)
+      + instance_type                = "t2.micro"
+      + ipv6_address_count           = (known after apply)
+      + ipv6_addresses               = (known after apply)
+      + key_name                     = "REDACTED"
+      + outpost_arn                  = (known after apply)
+      + password_data                = (known after apply)
+      + placement_group              = (known after apply)
+      + primary_network_interface_id = (known after apply)
+      + private_dns                  = (known after apply)
+      + private_ip                   = (known after apply)
+      + public_dns                   = (known after apply)
+      + public_ip                    = (known after apply)
+      + secondary_private_ips        = (known after apply)
+      + security_groups              = (known after apply)
+      + source_dest_check            = true
+      + subnet_id                    = "subnet-REDACTED"
+      + tags                         = {
+          + "Name"             = "WindowsInstanceExample"
+        }
+      + tenancy                      = (known after apply)
+      + user_data                    = "3ac9124967385fb10fdf03f32f4fe6a387eda509"
+      + vpc_security_group_ids       = (known after apply)
+
+      + ebs_block_device {
+          + delete_on_termination = (known after apply)
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + snapshot_id           = (known after apply)
+          + tags                  = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = (known after apply)
+          + volume_type           = (known after apply)
+        }
+
+      + enclave_options {
+          + enabled = (known after apply)
+        }
+
+      + ephemeral_block_device {
+          + device_name  = (known after apply)
+          + no_device    = (known after apply)
+          + virtual_name = (known after apply)
+        }
+
+      + metadata_options {
+          + http_endpoint               = (known after apply)
+          + http_put_response_hop_limit = (known after apply)
+          + http_tokens                 = (known after apply)
+        }
+
+      + network_interface {
+          + delete_on_termination = (known after apply)
+          + device_index          = (known after apply)
+          + network_interface_id  = (known after apply)
+        }
+
+      + root_block_device {
+          + delete_on_termination = (known after apply)
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags                  = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = (known after apply)
+          + volume_type           = (known after apply)
+        }
+    }
+
+  # aws_security_group.windows_example_security_group will be created
+  + resource "aws_security_group" "windows_example_security_group" {
+      + arn                    = (known after apply)
+      + description            = "Allowed RDP traffic from trusted IP"
+      + egress                 = [
+          + {
+              + cidr_blocks      = [
+                  + "0.0.0.0/0",
+                ]
+              + description      = ""
+              + from_port        = 0
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "-1"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 0
+            },
+        ]
+      + id                     = (known after apply)
+      + ingress                = [
+          + {
+              + cidr_blocks      = [
+                  + "REDACTED/32",
+                ]
+              + description      = ""
+              + from_port        = 3389
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "tcp"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 3389
+            },
+        ]
+      + name                   = "WindowsExampleSecurityGroup"
+      + name_prefix            = (known after apply)
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + vpc_id                 = "vpc-REDACTED"
+    }
+
+Plan: 2 to add, 0 to change, 0 to destroy.
+
+------------------------------------------------------------------------
+
+Note: You didn't specify an "-out" parameter to save this plan, so Terraform
+can't guarantee that exactly these actions will be performed if
+"terraform apply" is subsequently run.
+```
+
+At this point, you are ready to stand up the demonstration environment. 
+
+> If you have not created your SSM parameters containing your API credentials
+you will need to do so before proceeding to the next step.
+
+Execute the command:
+
+```shell
+terraform apply
+```
+
+If you wish to skip the review of your plan, execute the command as follows.
+
+```shell
+terraform apply -auto-approve
+```
+
+Terraform will then stand up the environment as specified.
+
+```shell
+data.aws_ssm_parameter.falcon_client_secret: Refreshing state...
+data.aws_ssm_parameter.falcon_client_id: Refreshing state...
+data.aws_ami.windows: Refreshing state...
+aws_security_group.windows_example_security_group: Creating...
+aws_security_group.windows_example_security_group: Still creating... [10s elapsed]
+aws_security_group.windows_example_security_group: Still creating... [20s elapsed]
+aws_security_group.windows_example_security_group: Still creating... [30s elapsed]
+aws_security_group.windows_example_security_group: Creation complete after 35s [id=sg-0171cREDACTED]
+aws_instance.windows_example_instance: Creating...
+aws_instance.windows_example_instance: Still creating... [10s elapsed]
+aws_instance.windows_example_instance: Still creating... [20s elapsed]
+aws_instance.windows_example_instance: Still creating... [30s elapsed]
+aws_instance.windows_example_instance: Still creating... [40s elapsed]
+aws_instance.windows_example_instance: Still creating... [50s elapsed]
+aws_instance.windows_example_instance: Still creating... [1m0s elapsed]
+aws_instance.windows_example_instance: Creation complete after 1m0s [id=i-0a218bREDACTED]
+
+Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+windows_example_instance_external_ip = Demonstration RDP address: AA.BB.CC.XX
+Retrieve the Administrator password from the AWS console.
+```
 
 ## Bootstrap timing
 Typically, you should be able to retrieve the Windows Administrator password for the demonstration
