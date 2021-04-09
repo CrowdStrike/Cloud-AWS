@@ -8,13 +8,14 @@ Falcon sensor onto a Windows host during first boot. This solution leverages AWS
 Manager Parameter Store to store API credentials for use in calling the CrowdStrike 
 Falcon API to download the appropriate sensor version.
 
-> This demonstration provides two methods for testing, [CloudFormation](#cloudformation)
-and [Terraform](#terraform).
+> This demonstration provides three methods for testing, [CloudFormation](#cloudformation)
+and [Terraform](#terraform), and [Manual Execution]().
 
 + [Requirements](#requirements)
 + [Creating the required SSM parameters](#creating-the-required-ssm-parameters)
 + [CloudFormation](#cloudformation)
 + [Terraform](#terraform)
++ [Manual Execution](#manual-execution)
 + [Bootstrap timing](#bootstrap-timing)
 
 ## Requirements
@@ -412,6 +413,28 @@ Outputs:
 windows_example_instance_external_ip = Demonstration RDP address: AA.BB.CC.XX
 Retrieve the Administrator password from the AWS console.
 ```
+
+The instance should be available within approximately 5 minutes.
+
+## Manual execution
+If you wish to bootstrap a Windows instance you are building directly from the AWS console, you
+can pass the following powershell in the User data text box in the _Advanced Details_ section of
+the __Step 3: Configure Instance Details__ page.
+
+> You will _not_ be able to lookup your CrowdStrike Falcon API client ID or secret via SSM using
+this method, and must enter the values in this dialog.
+
+```powershell
+<powershell>
+$client = new-object System.Net.WebClient
+$client.DownloadFile("https://raw.githubusercontent.com/CrowdStrike/Cloud-AWS/master/Agent-Install-Examples/powershell/sensor_install.ps1","C:\Windows\Temp\sensor.ps1")
+C:\Windows\Temp\sensor.ps1 FALCON_CLIENT_ID_HERE FALCON_CLIENT_SECRET_HERE
+Remove-Item C:\Windows\Temp\sensor.ps1
+Remove-Item C:\Windows\Temp\UserScript.ps1
+</powershell>
+```
+
+> Your script __must__ include the `<powershell>` and `</powershell>` tags or it will not execute properly.
 
 ## Bootstrap timing
 Typically, you should be able to retrieve the Windows Administrator password for the demonstration
