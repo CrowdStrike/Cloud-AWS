@@ -22,9 +22,10 @@ This demonstration leverages AWS SSM Parameter Store to store the API client ID 
 used to communicate with the CrowdStrike Falcon API.
 
 Two parameters must be created for this demonstration to function. They may be named whatever
-you wish and will be referenced when you import the template into CloudFormation or call
-`create-stack` using the AWS CLI. You will create one parameter to store the API client ID and
-one parameter to store the API client secret. 
+you wish and will be referenced when you import the template into CloudFormation, execute 
+`create-stack` using the AWS CLI or when you update your Terraform template file and execute 
+`terraform apply`. You will create one parameter to store the API client ID and one parameter 
+to store the API client secret. 
 
 This image provides an example of creating a SSM parameter within the AWS console.
 
