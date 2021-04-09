@@ -108,7 +108,7 @@ begin {
                     }
                 }
                 # Make request and output result
-                $Response = Invoke-WebRequest @Param
+                $Response = Invoke-WebRequest @Param -UseBasicParsing
                 if ($Response.Content -and ($Param.Headers.Accept -eq 'application/json')) {
                     ConvertFrom-Json -InputObject $Response.Content
                 } elseif ($Response.Content) {
@@ -123,9 +123,9 @@ begin {
                 throw $_
             } finally {
                 $this.WaitRetry($Response)
-                if ($Response) {
-                    $Response.Dispose()
-                }
+                # if ($Response) {
+                #     $Response.Dispose()
+                # }
             }
             return $Output
         }
