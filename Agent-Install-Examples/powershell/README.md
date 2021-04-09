@@ -9,7 +9,7 @@ Manager Parameter Store to store API credentials for use in calling the CrowdStr
 Falcon API to download the appropriate sensor version.
 
 > This demonstration provides three methods for testing, [CloudFormation](#cloudformation)
-and [Terraform](#terraform), and [Manual Execution]().
+and [Terraform](#terraform), and [Manual Execution](#manual-execution).
 
 + [Requirements](#requirements)
 + [Creating the required SSM parameters](#creating-the-required-ssm-parameters)
