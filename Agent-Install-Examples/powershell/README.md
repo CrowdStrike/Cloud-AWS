@@ -418,7 +418,7 @@ The instance should be available within approximately 5 minutes.
 
 ## Manual execution
 If you wish to bootstrap a Windows instance you are building directly from the AWS console, you
-can pass the following powershell in the User data text box in the _Advanced Details_ section of
+can pass the following PowerShell in the User data text box in the _Advanced Details_ section of
 the __Step 3: Configure Instance Details__ page.
 
 > You will _not_ be able to lookup your CrowdStrike Falcon API client ID or secret via SSM using
