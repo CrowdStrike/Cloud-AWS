@@ -113,7 +113,12 @@ ParameterKey=InstanceExampleName,ParameterValue=INSTANCE_NAME \
 --region REGION
 ```
 
+If successful, you will receive a response containing the request ID for this stack creation
+request. The stack will take approximately 3 to 5 minutes to stand up the demonstration.
 
+```bash
+arn:aws:cloudformation:us-east-2:{ACCT_ID}:stack/WindowsSensorExample2/72ee79f2-96ef-12ab-8554-02b5a70b77dc
+```
 
 ## Terraform
 
