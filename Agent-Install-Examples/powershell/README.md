@@ -8,7 +8,7 @@ Falcon sensor onto a Windows host during first boot. This solution leverages AWS
 Manager Parameter Store to store API credentials for use in calling the CrowdStrike 
 Falcon API to download the appropriate sensor version.
 
-> This demonstration provides three methods for testing, [CloudFormation](#cloudformation),
+> This demonstration provides three methods for testing; [CloudFormation](#cloudformation),
 [Terraform](#terraform), and [Manual Execution](#manual-execution).
 
 + [Requirements](#requirements)
