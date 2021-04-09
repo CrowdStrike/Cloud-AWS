@@ -48,12 +48,14 @@ This template can be uploaded directly into CloudFormation within the AWS consol
 
 Login to the AWS Console and navigate to CloudFormation. If it is not already displayed, select
 __Stacks__ from the left hand navigation. On the upper right of the page you should see a __Create Stack__
-drop down menu. Click this drop down menu and select _With new resources (standard)_
+drop down menu. Click this drop down menu and select _With new resources (standard)_.
+
 ![Getting started](images/create-stack-dropdown.png)
 
 On the next page select _Template is ready_, _Upload a template file_, and click the __Choose file__
 button. Using the file dialog provided, navigate to the `WindowsInstanceExample.yml` file and click __Upload__.
 When the file dialog closes, click the __Next__ button.
+
 ![Uploading the template](images/create-stack-template-upload.png)
 
 Enter the necessary parameters as demonstrated in the image below. 
@@ -69,6 +71,7 @@ On this next page you can stack-specific options you may want to implement. The 
 example would be to specify additional custom tags that would be propagated to the instance
 upon creation. Once you have specified all of your options, scroll to the bottom of the page
 and click the __Next__ button.
+
 ![Configuring stack options](images/configure-stack-options.png)
 
 The next page will confirm all of your choices. Carefully review the options you've selected
@@ -77,9 +80,11 @@ and when you are satisfied, click the __Create Stack__ button.
 ![Create stack button](images/create-stack-button.png)
 
 You will be brought back to the Stacks status dashboard and will see the stack initiating creation.
+
 ![Creation in progress](images/create-in-progress.png)
 
 Within a few minutes, the stack will complete its work and the instance will be available.
+
 ![Creation complete](images/create-complete.png)
 
 
