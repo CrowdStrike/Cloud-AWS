@@ -151,7 +151,7 @@ template that creates a single security group and a single Windows Server instan
 
 ### Standing up the demonstration
 Open the Terraform template in any editor and update the following values to reflect your environment:
-+ `region` - The AWS region where the demonstration will be deployed.
++ `region` - The AWS region where the demonstration will be deployed. (_Example: us-east-2_)
 + `instance_name` - The name of the deployed instance.
 + `security_group_name` - The name of the deployed security group.
 + `instance_type` - The type of instance. (_Example: t2.micro_)
@@ -161,7 +161,8 @@ within the specified `region`.
 reside within the VPC specified by `vpc_id`.
 + `vpc_id` - The ID of the VPC to deploy the demonstration to. This VPC must reside
 within the region specified by `region`.
-+ `trusted_ip` - The IP address in CIDR format of the IP(s) to allow RDP access to the demonstration.
++ `trusted_ip` - The IP address in CIDR format of the IP(s) to allow RDP access to the demonstration. 
+(_Example: 1.2.3.4/32_)
 + `client_id_ssm_name` - The name of the SSM parameter storing your Falcon API client ID.
 + `client_secret_ssm_name` - The name of the SSM parameter storing your Falcon API client secret.
 
