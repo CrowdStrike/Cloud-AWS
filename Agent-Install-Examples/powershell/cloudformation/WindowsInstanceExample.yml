@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template to demonstrate sensor bootstrapping utilizing SSM parameters
+
+Parameters:
+  FalconClientID:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: Name of the SSM Parameter containing the Falcon API Console Client ID
+  FalconClientSecret:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: Name of the SSM Parameter containing the Falcon API Console Client Secret
+  TrustedIPAddress:
+    Type: String
+    Description: The IP Address that is allowed RDP Ingress access to the Instance
+    Default: '1.2.3.4/32'
+  InstanceExampleAMIID:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Description: ID for the AMI to use to create the Instance
+    Default: '/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base'
+  InstanceExampleAvailabilityZone:
+    Type: String
+    Description: Availability zone the instance will be created within
+    Default: ''
+  InstanceExampleKeyPairName:
+    Type: String
+    Description: Name of the Key Pair to use for the instance
+    Default: ''
+  InstanceExampleInstanceType:
+    Type: String
+    Description: Name of the AWS Instance Type to use for the instance
+    Default: ''
+  InstanceExampleName:
+    Type: String
+    Description: The value of the Name tag used on the instance
+    Default: 'WindowsSensorBootstrapExample'
+
+Resources:
+  InstanceExampleSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable RDP access via port 3389 for our trusted IP
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '3389'
+        ToPort: '3389'
+        CidrIp: !Ref 'TrustedIPAddress'
+          
+  InstanceExample:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: !Ref 'InstanceExampleKeyPairName'
+      SecurityGroups: 
+        - Ref: InstanceExampleSecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          <powershell>
+          $client = new-object System.Net.WebClient
+          $client.DownloadFile("https://raw.githubusercontent.com/CrowdStrike/Cloud-AWS/master/Agent-Install-Examples/powershell/sensor_install.ps1","C:\Windows\Temp\sensor.ps1")
+          C:\Windows\Temp\sensor.ps1 ${FalconClientID} ${FalconClientSecret}
+          Remove-Item C:\Windows\Temp\sensor.ps1
+          Remove-Item C:\Windows\Temp\UserScript.ps1
+          </powershell>
+      InstanceType: !Ref 'InstanceExampleInstanceType'
+      AvailabilityZone: !Ref 'InstanceExampleAvailabilityZone'
+      ImageId: !Ref 'InstanceExampleAMIID'
+      Tags:
+        - Key: Name
+          Value: !Ref 'InstanceExampleName'
