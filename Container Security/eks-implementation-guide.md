@@ -323,7 +323,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
    $ kubectl exec $(kubectl get pods | grep detection | awk '{print $1}') -c falcon-container -- falconctl -g --aid
    ```
-   Example output
+   Example output:
    ```
    aid="d49dc4fd4b6347e3981fb67a2bf8e6c8".
    ```
