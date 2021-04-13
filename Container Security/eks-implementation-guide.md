@@ -254,7 +254,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
    $ watch 'kubectl get pods -n falcon-system'
    ```
-   Example output
+   Example output:
    ```
    NAME                        READY   STATUS    RESTARTS   AGE
    injector-6499dbd4b5-v5gqr   1/1     Running   0          2d3h
