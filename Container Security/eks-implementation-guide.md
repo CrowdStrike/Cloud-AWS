@@ -197,7 +197,7 @@ Various command-line utilities are required for this demo. The utilities can eit
    ```
    $ docker load -i falcon-sensor-6.21.0-403.container.x86_64.tar.bz2
    ```
-   Example output
+   Example output:
    ```
    30cbe59c0010: Loading layer  39.07MB/39.07MB
    Loaded image: falcon-sensor-6.21.0-403.container.x86_64.tar.bz2
