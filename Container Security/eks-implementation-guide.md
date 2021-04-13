@@ -314,7 +314,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
    $ watch 'kubectl get pods'
    ```
-   Example output
+   Example output:
    ```
    NAME                            READY   STATUS    RESTARTS   AGE
    detection-single-767cd557b-267zg   2/2     Running   0          2m26s
