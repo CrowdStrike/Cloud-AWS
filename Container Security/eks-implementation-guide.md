@@ -241,7 +241,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
        -cid $CID -image $FALCON_IMAGE_URI \
        | kubectl apply -f -
    ```
-   Example output
+   Example output:
    ```
    namespace/falcon-system created
    configmap/injector-config created
