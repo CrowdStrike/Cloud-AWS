@@ -1,3 +1,5 @@
+ABCDEF
+ABCDEFG
 ACL
 ACS
 AIDAXRCSSEFWMXXXXXXXX
@@ -25,6 +27,7 @@ BootStrap
 Boto
 CCID
 CFT
+CIDR
 CLI
 CROWDSTRIKE
 CRWD
@@ -239,6 +242,7 @@ noexec
 notificaitons
 oauth
 os
+powershell
 pre
 precursed
 premiumsupport
@@ -281,6 +285,7 @@ uncomment
 unmanaged
 url
 urllib
+Userdata
 userguide
 usr
 vCPU
@@ -288,6 +293,7 @@ vpc
 vpce
 walkthrough
 webserver
+WindowsInstanceExample
 www
 xe
 xxxxxxx
