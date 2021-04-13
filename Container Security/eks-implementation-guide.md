@@ -371,7 +371,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
    $ aws ecr delete-repository --region $CLOUD_REGION --repository-name falcon-sensor
    ```
-   Example output
+   Example output:
    ```
    {
        "repository": {
