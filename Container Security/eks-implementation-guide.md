@@ -353,7 +353,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
  - Step 3: Delete the falcon image from AWS ECR registry
    ```
-   $ aws ecr batch-delete-image --region eu-west-1 \
+   $ aws ecr batch-delete-image --region $CLOUD_REGION \
        --repository-name falcon-sensor \
        --image-ids imageTag=latest
    ```
@@ -371,7 +371,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
  - Step 4: Delete the AWS ECR repository
    ```
-   $ aws ecr delete-repository --region eu-west-1 --repository-name falcon-sensor
+   $ aws ecr delete-repository --region $CLOUD_REGION --repository-name falcon-sensor
    ```
    Example output
    ```
@@ -388,7 +388,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
  - Step 5: Delete the AWS EKS Fargate Cluster
    ```
-   $ eksctl delete cluster --region eu-west-1 eks-fargate-cluster
+   $ eksctl delete cluster --region $CLOUD_REGION eks-fargate-cluster
    ```
    Example output
    ```
