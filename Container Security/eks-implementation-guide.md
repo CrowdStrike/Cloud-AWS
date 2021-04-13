@@ -295,11 +295,17 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
  - Instruct Kubernetes cluster to start a detection application
    ```
    $ kubectl apply -f ~/demo-yamls/detection-single.yaml
+   ```
+   Example output
+   ```
    deployment.apps/detection-single created
    ```
  - (optional) See the logs of the admission installer to ensure it is responding to the detection app start-up
    ```
-   $ kubectl logs -n falcon-system injector-6499dbd4b5-v5gqr
+   $ kubectl logs -n falcon-system $(kubectl get pods -n falcon-system | awk 'FNR > 1' | awk '{print $1}')
+   ```
+   Example output
+   ```
    injector server starting ...
    2021/02/03 16:05:51 Handling webhook request with id 0d20df1d-8737-4bf0-bea6-fd03b48b2516 in namespace default ...
    2021/02/03 16:05:51 Webhook request with id 0d20df1d-8737-4bf0-bea6-fd03b48b2516 in namespace default handled successfully!
@@ -307,12 +313,18 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
  - (optional) Watch the deployment progress of the detection app
    ```
    $ watch 'kubectl get pods'
+   ```
+   Example output
+   ```
    NAME                            READY   STATUS    RESTARTS   AGE
    detection-single-767cd557b-267zg   2/2     Running   0          2m26s
    ```
  - (optional) Ensure that the newly created pod was allocated an Agent ID (AID) from CrowdStrike Falcon platform
    ```
-   $ kubectl exec detection-single-767cd557b-267zg -c falcon-container -- falconctl -g --aid
+   $ kubectl exec $(kubectl get pods | grep detection | awk '{print $1}') -c falcon-container -- falconctl -g --aid
+   ```
+   Example output
+   ```
    aid="d49dc4fd4b6347e3981fb67a2bf8e6c8".
    ```
 
@@ -329,6 +341,9 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    $ docker run --rm --entrypoint installer $FALCON_IMAGE_URI \
        -cid $CID -image $FALCON_IMAGE_URI \
        | kubectl delete -f -
+   ```
+   Example output
+   ```
    namespace "falcon-system" deleted
    configmap "injector-config" deleted
    secret "injector-tls" deleted
@@ -341,6 +356,9 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    $ aws ecr batch-delete-image --region eu-west-1 \
        --repository-name falcon-sensor \
        --image-ids imageTag=latest
+   ```
+   Example output
+   ```
    {
        "imageIds": [
            {
@@ -354,6 +372,9 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
  - Step 4: Delete the AWS ECR repository
    ```
    $ aws ecr delete-repository --region eu-west-1 --repository-name falcon-sensor
+   ```
+   Example output
+   ```
    {
        "repository": {
            "repositoryArn": "arn:aws:ecr:eu-west-1:123456789123:repository/falcon-sensor",
@@ -368,6 +389,9 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
  - Step 5: Delete the AWS EKS Fargate Cluster
    ```
    $ eksctl delete cluster --region eu-west-1 eks-fargate-cluster
+   ```
+   Example output
+   ```
    [ℹ]  eksctl version 0.37.0
    [ℹ]  using region eu-west-1
    [ℹ]  deleting EKS cluster "eks-fargate-cluster"
