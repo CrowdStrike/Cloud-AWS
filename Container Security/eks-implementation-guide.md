@@ -171,16 +171,14 @@ Various command-line utilities are required for this demo. The utilities can eit
 ### Step 3: Push the falcon sensor image to the Repository
 
  - Set the FALCON_IMAGE_URI variable to your managed ECR based on the ECR `repositoryUri`
- 
+   ```
+   $ FALCON_IMAGE_URI=123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-sensor:latest
+   ```
  - Note for existing ECR registries the `repositoryUri` can be found with the following command.
    ```
    aws ecr describe-repositories
    ```
-   Example
-    ```
-   $ FALCON_IMAGE_URI=123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-sensor:latest
-   ```
-   - Note that the URI suffix `:latest` is a container image tag. Container repositories usually contain multiple image versions, and tags are used to distinguish between versions. A container image tag must be added to the end of the `repositoryUri`.
+ - Note that the URI suffix `:latest` is a container image tag. Container repositories usually contain multiple image versions, and tags are used to distinguish between versions. A container image tag must be added to the end of the `repositoryUri`.
 
  - Obtain the falcon-sensor container tarball.
  - Note that the prompts will require the input of the API key and secret that were obtained in the pre-requisites
