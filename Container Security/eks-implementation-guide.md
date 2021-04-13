@@ -170,7 +170,7 @@ Various command-line utilities are required for this demo. The utilities can eit
 
 ### Step 3: Push the falcon sensor image to the Repository
 
- - Set the FALCON_IMAGE_URI variable to your managed ECR based on the ECR's `repositoryUri`
+ - Set the FALCON_IMAGE_URI variable to your managed ECR based on the ECR `repositoryUri`
  
  - Note for existing ECR registries the `repositoryUri` can be found with the following command.
    ```
