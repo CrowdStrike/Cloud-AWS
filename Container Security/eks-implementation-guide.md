@@ -388,7 +388,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
    $ eksctl delete cluster --region $CLOUD_REGION eks-fargate-cluster
    ```
-   Example output
+   Example output:
    ```
    [ℹ]  eksctl version 0.37.0
    [ℹ]  using region eu-west-1
