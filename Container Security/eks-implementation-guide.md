@@ -22,14 +22,21 @@ The Falcon Container sensor for Linux extends runtime security to container work
 
 ## Pre-requisites
 
+- Existing AWS Account and VPC
+- You will need a workstation with a linux platform
+- Docker installed and running locally on the workstation
+- API Credentials from Falcon with Sensor Download Permissions
+  * For this step and practice of least privilege, you would want to create a dedicated API secret and key.
+  
 Various command-line utilities are required for this demo. The utilities can either be installed locally or through ready-made tooling container. We recommend the use of the container.
 
 ### Option 1: Use tooling container (recommended)
 
  - Install [docker](https://www.docker.com/products/docker-desktop) container runtime
+ - Verify docker daemon is running on your workstation
  - Enter the [tooling container](https://github.com/CrowdStrike/cloud-tools-image)
    ```
-   docker run --privileged=true \
+   sudo docker run --privileged=true \
        -v /var/run/docker.sock:/var/run/docker.sock \
        -v ~/.aws:/root/.aws -it --rm \
        quay.io/crowdstrike/cloud-tools-image
@@ -61,12 +68,17 @@ Various command-line utilities are required for this demo. The utilities can eit
 
 ## Deployment Configuration Steps
 
-### Step 1: Create EKS Fargate Cluster
-
+### Step 1: Create EKS Fargate Cluster (For an existing cluster continue to step 2)
+ - Set the cloud region (example below uses us-west-1)
+   ```$ CLOUD_REGION=us-west-1```
  - Create new EKS Fargate cluster. It may take couple minutes before cluster is fully up and functioning.
    ```
    $ eksctl create cluster \
-       --name eks-fargate-cluster --region eu-west-1 --fargate
+       --name eks-fargate-cluster --region $CLOUD_REGION \
+       --fargate
+   ```
+   Example output
+   ```
    [ℹ]  eksctl version 0.37.0
    [ℹ]  using region eu-west-1
    [ℹ]  setting availability zones to [eu-west-1b eu-west-1c eu-west-1a]
@@ -103,17 +115,23 @@ Various command-line utilities are required for this demo. The utilities can eit
 
    ```
    $ eksctl create fargateprofile \
-       --region eu-west-1 \
+       --region $CLOUD_REGION \
        --cluster eks-fargate-cluster \
        --name fp-falcon-sytem \
        --namespace falcon-system
+   ```
+   Example output
+   ```
    [ℹ]  creating Fargate profile "fp-falcon-sytem" on EKS cluster "eks-fargate-cluster"
    [ℹ]  created Fargate profile "fp-falcon-sytem" on EKS cluster "eks-fargate-cluster"
    ```
 
- - (optional) Verify that your local kubectl utility has been configured to connect to the cluster.
+ - Verify that your local kubectl utility has been configured to connect to the cluster.
    ```
    $ kubectl cluster-info
+   ```
+   Example output
+   ```
    Kubernetes control plane is running at https://EEAB38XXXXXXXXXXXXXXXXXXXXXXXXXX.sk1.eu-west-1.eks.amazonaws.com
    CoreDNS is running at https://EEAB38XXXXXXXXXXXXXXXXXXXXXXXXXX.sk1.eu-west-1.eks.amazonaws.com/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
 
@@ -121,11 +139,14 @@ Various command-line utilities are required for this demo. The utilities can eit
    ```
    kubectl is command line tool that lets you control Kubernetes clusters. For configuration, kubectl looks for a file named config in the `$HOME/.kube` directory. This config was created previously by `eksctl create cluster` command and contains login information for your newly created cluster.
 
-### Step 2: Create Container Repository
+### Step 2: Create Container Repository (For an existing ECR continue to step 3)
 
  - Create container repository in AWS ECR. AWS ECR (Elastic Container Registry) is a cloud service providing a container registry. The bellow command creates a new repository in the registry and this repository will be subsequently used to store the Falcon Container sensor image.
    ```
-   $ aws ecr create-repository --region eu-west-1 --repository-name falcon-sensor
+   $ aws ecr create-repository --region $CLOUD_REGION --repository-name falcon-sensor
+   ```
+   Example output
+   ```
    {
        "repository": {
            "repositoryArn": "arn:aws:ecr:eu-west-1:123456789123:repository/falcon-sensor",
@@ -144,36 +165,64 @@ Various command-line utilities are required for this demo. The utilities can eit
    }
    ```
 
- - Note the URI of the newly created repository to the environment variable for further use. Falcon Container Sensor will be available under this URI.
-   ```
-   $ FALCON_IMAGE_URI=123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-sensor:latest
-   ```
-   The URI suffix `:latest` is a container image tag. Repository usually contains multiple image version, and tags are used to distinguish between versions.
+ - Note the `repositoryUri` of the newly created repository to the environment variable for further use. Falcon Container Sensor will be available under this URI.
+
 
 ### Step 3: Push the falcon sensor image to the Repository
 
+ - Set the FALCON_IMAGE_URI variable to your managed ECR based on the ECR's `repositoryUri`
+ 
+ - Note for existing ECR registries the `repositoryUri` can be found with the following command.
+   ```
+   aws ecr describe-repositories
+   ```
+   Example
+    ```
+   $ FALCON_IMAGE_URI=123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-sensor:latest
+   ```
+   - Note that the URI suffix `:latest` is a container image tag. Repository usually contains multiple image version, and tags are used to distinguish between versions. This must be added to the end of the `repositoryUri`.
+
  - Obtain the falcon-sensor container tarball.
+ - Note that the prompts will require the input of the API key and secret that were obtained in the pre-requisites
    ```
    $ falcon_sensor_download --os-name=Container
+   ```
+   Example prompts
+   ```
    Please provide your Falcon Client ID: ABC
    Please provide your Falcon Client Secret: XYZ
-   Downloaded Falcon Usermode Container Sensor to falcon-sensor-6.18.0-106.container.x86_64.tar.bz2
+   Downloaded Falcon Usermode Container Sensor to falcon-sensor-6.21.0-403.container.x86_64.tar.bz2
    ```
  - Import the tarball to your local docker. If you are following this guide inside the tooling
    container, you can run this command outside of the container as the docker socket is shared
    between your host system and the said tooling container.
    ```
-   $ docker load -i falcon-sensor-6.18.0-106.container.x86_64.tar.bz2
+   $ docker load -i falcon-sensor-6.21.0-403.container.x86_64.tar.bz2
+   ```
+   Example output
+   ```
    30cbe59c0010: Loading layer  39.07MB/39.07MB
-   Loaded image: falcon-sensor:6.18.0-106.container.x86_64.Release.Beta
+   Loaded image: falcon-sensor-6.21.0-403.container.x86_64.tar.bz2
    ```
- - Tag the image
+ - List the loaded docker image
    ```
-   $ docker tag falcon-sensor:6.18.0-106.container.x86_64.Release.Beta $FALCON_IMAGE_URI
+   docker images | grep falcon-sensor
+   ```
+   Example output
+   ```
+   falcon-sensor    6.21.0-403.container.x86_64.Release.US2   xxxxxxx        2 weeks ago         78.8MB
+   ```
+ - Note the image name and the image tag in the first and second columns respectively
+ - Using the local image name and tag, re-tag the image for your managed ECR using the variable previously set
+   ```
+   $ docker tag falcon-sensor:6.21.0-403.container.x86_64.Release.US2 $FALCON_IMAGE_URI
    ```
  - Push the image to AWS ECR
    ```
    $ docker push $FALCON_IMAGE_URI
+   ```
+   Example output
+   ```
    The push refers to repository [123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-sensor]
    30cbe59c0010: Pushed
    latest: digest: sha256:e14904d6fd47a8395304cd33a0d650c2b924f1241f0b3561ece8a515c87036df size: 529
@@ -193,6 +242,9 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    $ docker run --rm --entrypoint installer $FALCON_IMAGE_URI \
        -cid $CID -image $FALCON_IMAGE_URI \
        | kubectl apply -f -
+   ```
+   Example output
+   ```
    namespace/falcon-system created
    configmap/injector-config created
    secret/injector-tls created
@@ -203,6 +255,9 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
  - (optional) Watch the progress of a deployment
    ```
    $ watch 'kubectl get pods -n falcon-system'
+   ```
+   Example output
+   ```
    NAME                        READY   STATUS    RESTARTS   AGE
    injector-6499dbd4b5-v5gqr   1/1     Running   0          2d3h
    ```
