@@ -302,7 +302,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
    $ kubectl logs -n falcon-system $(kubectl get pods -n falcon-system | awk 'FNR > 1' | awk '{print $1}')
    ```
-   Example output
+   Example output:
    ```
    injector server starting ...
    2021/02/03 16:05:51 Handling webhook request with id 0d20df1d-8737-4bf0-bea6-fd03b48b2516 in namespace default ...
