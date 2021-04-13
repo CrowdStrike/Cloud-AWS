@@ -145,7 +145,7 @@ Various command-line utilities are required for this demo. The utilities can eit
    ```
    $ aws ecr create-repository --region $CLOUD_REGION --repository-name falcon-sensor
    ```
-   Example output
+   Example output:
    ```
    {
        "repository": {
