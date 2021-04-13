@@ -206,7 +206,7 @@ Various command-line utilities are required for this demo. The utilities can eit
    ```
    docker images | grep falcon-sensor
    ```
-   Example output
+   Example output:
    ```
    falcon-sensor    6.21.0-403.container.x86_64.Release.US2   xxxxxxx        2 weeks ago         78.8MB
    ```
