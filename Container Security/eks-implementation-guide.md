@@ -130,7 +130,7 @@ Various command-line utilities are required for this demo. The utilities can eit
    ```
    $ kubectl cluster-info
    ```
-   Example output
+   Example output:
    ```
    Kubernetes control plane is running at https://EEAB38XXXXXXXXXXXXXXXXXXXXXXXXXX.sk1.eu-west-1.eks.amazonaws.com
    CoreDNS is running at https://EEAB38XXXXXXXXXXXXXXXXXXXXXXXXXX.sk1.eu-west-1.eks.amazonaws.com/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
