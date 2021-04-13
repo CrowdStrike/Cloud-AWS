@@ -219,7 +219,7 @@ Various command-line utilities are required for this demo. The utilities can eit
    ```
    $ docker push $FALCON_IMAGE_URI
    ```
-   Example output
+   Example output:
    ```
    The push refers to repository [123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-sensor]
    30cbe59c0010: Pushed
