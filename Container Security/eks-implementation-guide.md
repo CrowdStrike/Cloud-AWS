@@ -22,7 +22,7 @@ The Falcon Container sensor for Linux extends runtime security to container work
 
 ## Pre-requisites
 
-- Existing AWS Account and VPC
+- Existing AWS Account
 - You will need a workstation with a linux platform
 - Docker installed and running locally on the workstation
 - API Credentials from Falcon with Sensor Download Permissions
