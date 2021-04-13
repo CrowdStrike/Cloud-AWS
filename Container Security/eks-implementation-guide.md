@@ -187,7 +187,7 @@ Various command-line utilities are required for this demo. The utilities can eit
    ```
    $ falcon_sensor_download --os-name=Container
    ```
-   Example prompts
+   Example prompts:
    ```
    Please provide your Falcon Client ID: ABC
    Please provide your Falcon Client Secret: XYZ
