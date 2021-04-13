@@ -355,7 +355,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
        --repository-name falcon-sensor \
        --image-ids imageTag=latest
    ```
-   Example output
+   Example output:
    ```
    {
        "imageIds": [
