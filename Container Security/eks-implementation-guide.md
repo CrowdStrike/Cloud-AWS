@@ -27,6 +27,7 @@ The Falcon Container sensor for Linux extends runtime security to container work
   * These steps have been tested on Linux and should also work with OSX
 - Docker installed and running locally on the workstation
 - API Credentials from Falcon with Sensor Download Permissions
+  * These credentials can be created in the Falcon platform under Support->API Clients and Keys.
   * For this step and practice of least privilege, you would want to create a dedicated API secret and key.
   
 Various command-line utilities are required for this demo. These command line tools are listed in Option 2. The utilities can either be installed locally or through ready-made tooling container. We recommend the use of the container for consistency.
