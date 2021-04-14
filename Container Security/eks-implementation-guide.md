@@ -23,12 +23,13 @@ The Falcon Container sensor for Linux extends runtime security to container work
 ## Pre-requisites
 
 - Existing AWS Account
-- You will need a workstation with a linux platform
+- You will need a workstation to complete the installation steps below
+  * These steps have been tested on Linux and should also work with OSX
 - Docker installed and running locally on the workstation
 - API Credentials from Falcon with Sensor Download Permissions
   * For this step and practice of least privilege, you would want to create a dedicated API secret and key.
   
-Various command-line utilities are required for this demo. The utilities can either be installed locally or through ready-made tooling container. We recommend the use of the container.
+Various command-line utilities are required for this demo. These command line tools are listed in Option 2. The utilities can either be installed locally or through ready-made tooling container. We recommend the use of the container for consistency.
 
 ### Option 1: Use tooling container (recommended)
 
