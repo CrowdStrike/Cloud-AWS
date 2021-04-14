@@ -112,6 +112,7 @@ MatchAttributes
 Microk
 OAuth
 Optimise
+OSX
 POSIX
 PackageName
 PackageVersion
