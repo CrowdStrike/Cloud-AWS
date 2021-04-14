@@ -295,7 +295,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
    $ kubectl apply -f ~/demo-yamls/detection-single.yaml
    ```
-   Example output
+   Example output:
    ```
    deployment.apps/detection-single created
    ```
