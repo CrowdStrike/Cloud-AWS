@@ -15,17 +15,17 @@ endpoints and shared with the test VPC.
 
    
 2) Copy the files from the s3bucket folder to the newly created S3 bucket.
-![](./docs/images/s3bucket.png)
+   ![](docs/images/s3bucket-sm.png)
    
 3) Load the cloudformation template (create-vpc-endpoint-r53-tgw-attachment.yaml).
 
 
 4) Verify that the cloudformation template has been created successfully.
-![](./docs/images/cft-status.png)
+![](docs/images/cft-output-sm.png)
    
-![](./docs/images/cft-output.png)
+   
 
 5) Connect to the instance and verify that the private hosted domain has been shared with the Test VPC.
-![](./docs/images/dnstest.png)
+![](docs/images/dnstest-sm.png)
 
 6) Download and install the CrowdStrike sensor.
