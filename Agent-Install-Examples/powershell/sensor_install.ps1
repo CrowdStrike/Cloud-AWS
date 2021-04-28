@@ -123,9 +123,10 @@ begin {
                 throw $_
             } finally {
                 $this.WaitRetry($Response)
-                if ($Response) {
-                    $Response.Dispose()
-                }
+                # JSH - Dispose method is not available when UseBasicParsing is enabled
+                # if ($Response) {
+                #     $Response.Dispose()
+                # }
             }
             return $Output
         }
