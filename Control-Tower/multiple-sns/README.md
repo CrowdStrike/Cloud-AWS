@@ -10,7 +10,7 @@ Other vendors including Splunk sometimes require that S3 PUT notifications are s
 AWS does not allow multiple event notifications for the same event.
 In this case we can use a lambda function to forward the S3 notifications to multiple SNS topics
 
-This is easily archived by adding a lambda function to the log archive account and send the s3 notificaitons fist to lambda and then have the lambda function forward to multiple SNS topics.
+This is easily archived by adding a lambda function to the log archive account and send the s3 notifications first to lambda and then have the lambda function forward to multiple SNS topics.
 
 
 
