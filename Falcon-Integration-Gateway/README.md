@@ -46,9 +46,11 @@ The solution can be run stand-alone, but is not recommended for production deplo
 ## Configuring the application
 The FIG service application allows for customer configuration via parameters that can be provided in multiple ways. These parameters control several aspects of the service application's behavior. This includes; the credentials utilized to access the CrowdStrike Falcon API, the application ID utilized to connect to the CrowdStrike Falcon API, the severity threshold used to filter out unwanted detections, the SQS queue to target for alerts being published, and the AWS Region to report to.
 
+
+
 ### Parameters
 There are six required parameters that must be defined in order for the Falcon Integration Gateway to successfully operate.
-+ `base_url` - The API Endpoint for your CrowdStrike Account. This is shown during API Key Creation. `https://api.crowdstrike.com`
++ `base_url` - The API Endpoint for your CrowdStrike Account. This is shown during API Key Creation.
 + `falcon_client_id` - The API client ID for the API key used to access your Falcon environment.
 + `falcon_client_secret` - The API client secret for the API key used to access your Falcon environment.
 + `app_id` - A unique string value that describes the name of the application you are connecting to Falcon. Most string values are supported.
@@ -73,6 +75,7 @@ Application parameter values can also be specified within a _config.json_ file. 
 > For deployments running multiple instances of FIG on the same instance, you _must_ use a config.json file.
 ```json
 {
+    "base_url":"https://api.crowdstrike.com",
     "falcon_client_id":"FALCON_CLIENT_ID_GOES_HERE",
     "falcon_client_secret":"FALCON_CLIENT_SECRET_GOES_HERE",
     "app_id":"FIG_APP_ID",
