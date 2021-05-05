@@ -48,6 +48,7 @@ The FIG service application allows for customer configuration via parameters tha
 
 ### Parameters
 There are six required parameters that must be defined in order for the Falcon Integration Gateway to successfully operate.
++ `base_url` - The API Endpoint for your CrowdStrike Account. This is shown during API Key Creation. `https://api.crowdstrike.com`
 + `falcon_client_id` - The API client ID for the API key used to access your Falcon environment.
 + `falcon_client_secret` - The API client secret for the API key used to access your Falcon environment.
 + `app_id` - A unique string value that describes the name of the application you are connecting to Falcon. Most string values are supported.
