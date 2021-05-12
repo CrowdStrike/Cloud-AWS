@@ -1,42 +1,19 @@
-# Cloud-AWS
-A collection of projects supporting AWS Integration
+![](https://raw.githubusercontent.com/CrowdStrike/falconpy/main/docs/asset/cs-logo.png)
 
-## AWS Network Firewall Integration
-[About the Demo](https://github.com/CrowdStrike/Cloud-AWS/blob/master/Network-Firewall/documentation/overview.md)
 
-[Setting up the Demo](https://github.com/CrowdStrike/Cloud-AWS/blob/master/Network-Firewall/documentation/deployment.md)
+## AWS Service Integrations
+| Integration Name | Description |
+|:-|:-|
+| [AWS Control Tower with CrowdStrike Discover for Cloud and Containers](Control-Tower/README.md) | Configure AWS Control Tower to register new AWS accounts with CrowdStrike Discover for Cloud and Containers. |
+| [AWS Control Tower with CrowdStrike Horizon](Control-Tower-For-Horizon/README.md) | Configure AWS Control Tower to register new AWS accounts with CrowdStrike Horizon. |
+| [AWS Network Firewall with CrowdStrike Threat Intelligence](Network-Firewall/README.md) | Build capabilities such as automated blocking of malicious domains (via AWS Network Firewall) based on CrowdStrike detection alerts, or perform threat hunting derived from CrowdStrike domain-based Indicators of Activity (IOAs). |
+| [AWS Private Link with CrowdStrike Sensor Proxy](aws-privatelink/README.md) | Utilize AWS PrivateLink to provide provide private connectivity to the CrowdStrike cloud. |
+| [AWS Security Hub with CrowdStrike Event Streams API](Falcon-Integration-Gateway/README.md) | The Falcon Integration Gateway publishes detections identified by CrowdStrike Falcon for instances residing within Amazon Web Services (AWS) to AWS Security Hub. |
 
-[Running the Demo](https://github.com/CrowdStrike/Cloud-AWS/blob/master/Network-Firewall/documentation/testing.md)
-
-## Agent Install Examples
-[AWS Terraform BootStrap S3](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Agent-Install-Examples/Terraform-bootstrap-s3)
-
-[AWS Autoscale](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Agent-Install-Examples/Cloudformation/autoscale)
-
-## Control Tower
-Cloud Formation Templates and lambda functions to integrate Falcon Discover with AWS Control Tower
-
-[Implementation Guide](https://github.com/CrowdStrike/Cloud-AWS/blob/master/Control-Tower/documentation/implementation-guide.md)
-
-[Files](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Control-Tower)
-
-[Multiple Providers Require SNS notifications](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Control-Tower/multiple-sns)
-
-## AWS Security Hub Integration/ Falcon Integration Gateway
-[CrowdStrike FIG](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Falcon-Integration-Gateway)
-
-## Discover for Cloud
-
-This folder contains a number of templates for setting up AWS accounts with Discover.  The scripts all assume that you are using CloudTrail to write to an S3 bucket in a shared log Archive account. 
-
-### Terraform
-
-[Terraform templates for additional accounts creating new CloudTrail log](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Discover-for-Cloud-Templates/AWS/terraform-templates/log-archive-account)
-
-[Terraform templates for additional accounts using and existing CloudTrail log](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Discover-for-Cloud-Templates/AWS/terraform-templates/additional-account-existing-trail)
-
-The python script "register_account.py" is included as an example of a script that should be run at the end of the terraform apply to register the AWS account with Crowdstrike.  The script may be run as part of a pipeline or as a local-exec process.
-
-### CloudFormation
-
-[See the README.md file here](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Discover-for-Cloud-Templates/AWS/cloudformation-templates)
+## CrowdStrike Sensor Automation
+| Integration Name | Description |
+|:-|:-|
+| [AWS Autoscale Groups for Auto Register/Deregister](Agent-Install-Examples/Cloudformation/autoscale/README.md) | Utilize AWS Autoscale Groups to install the CrowdStrike Falcon Sensor during virtual machine initialization, and AWS Autoscale Lifecycle hooks to deregister the instance with CrowdStrike upon virtual machine termination. |
+| [AWS Systems Manager Parameter Store with PowerShell Sensor Installation Script](Agent-Install-Examples/powershell) | Sample automation which leverages AWS Systems Manager Parameter Store to store CrowdStrike API credentials. These credentials are passed into a Microsoft PowerShell script to bootstrap the CrowdStrike Falcon Sensor for Windows during a Windows virtual machine's first boot process. |
+| [AWS Systems Manager with Linux BASH Sensor Installation Script](Agent-Install-Examples/bash) | POSIX script that will install CrowdStrike sensor. The script is current tailored to the use within AWS Systems Manager, but can be used outside the Systems Manager. |
+| [AWS Terraform Template for Sensor Installation](Agent-Install-Examples/Terraform-bootstrap-s3) | Sample AWS Terraform template that builds a test VPC, creates an Ubuntu-based web server, and automatically installs the CrowdStrike Falcon sensor into the virtual machine. |
