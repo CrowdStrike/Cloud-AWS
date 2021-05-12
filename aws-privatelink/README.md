@@ -23,19 +23,19 @@ For visualization purposes, here is a reference diagram showing the AWS architec
 
 ## Configuration
 1. Create an S3 bucket in the region where you wish to deploy the demo.
-
+<br/><br/>
 2. Copy the files from [https://github.com/CrowdStrike/Cloud-AWS/tree/master/aws-privatelink/s3bucket](https://github.com/CrowdStrike/Cloud-AWS/tree/master/aws-privatelink/s3bucket)  to the newly created S3 bucket. 
 <br/><br/>
 ![](docs/images/s3bucket-sm.png)
-   
-3) Load the cloudformation template by running the CloudFormation template at [https://github.com/CrowdStrike/Cloud-AWS/blob/master/aws-privatelink/cloudformation/create-vpc-endpoint-r53-tgw-attachment.yaml](https://github.com/CrowdStrike/Cloud-AWS/blob/master/aws-privatelink/cloudformation/create-vpc-endpoint-r53-tgw-attachment.yaml).
-
-4) Verify that the CloudFormation template has been created successfully.
+<br/><br/>
+3. Load the cloudformation template by running the CloudFormation template at [https://github.com/CrowdStrike/Cloud-AWS/blob/master/aws-privatelink/cloudformation/create-vpc-endpoint-r53-tgw-attachment.yaml](https://github.com/CrowdStrike/Cloud-AWS/blob/master/aws-privatelink/cloudformation/create-vpc-endpoint-r53-tgw-attachment.yaml).
+<br/><br/>
+4. Verify that the CloudFormation template has been created successfully.
 <br/><br/>
 ![](docs/images/cft-output-sm.png)
-
-5) Connect to the linux virtual machine instance and verify that the private hosted domain has been shared with the Test VPC.
+<br/><br/>
+5. Connect to the linux virtual machine instance and verify that the private hosted domain has been shared with the Test VPC.
 <br/><br/>
 ![](docs/images/dnstest-sm.png)
-
-6) Download and install the CrowdStrike sensor.
+<br/><br/>
+6. Download and install the CrowdStrike sensor.
