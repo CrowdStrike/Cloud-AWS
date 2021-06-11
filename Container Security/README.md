@@ -12,7 +12,6 @@ Note: In Kubernetes clusters where kernel module loading is supported by the wor
    - [Implementation Guide - Using Helm Charts in EKS](kernel-eks-implementation-guide.md)
  - Falcon Container Sensor - setting up cluster to deploy user space agent to each pod
    - [Implementation Guide for AWS EKS / Fargate](eks-implementation-guide.md)
-   - [Implementation Guide for GKE](gke-implementation-guide.md) (Technology Preview)
 
 ## Additional Resources
  - CrowdStrike Container Security: [Product Page](https://www.crowdstrike.com/products/cloud-security/falcon-cloud-workload-protection/container-security/)
