@@ -159,7 +159,7 @@ Diagram showing the steps in the setup process.
 
 ![flows](media/sytems-manager-flows.png)
 
-When a Systems manager administrator wishes to install the CrowdStrike sensor on an EC2 distance they will use a
+When a Systems manager administrator wishes to install the CrowdStrike sensor on an EC2 instance they will use a
 automation document to perform the task. During the agent install process the following tasks are performed.
 
 1) Administrator invokes the automation script via the Systems Manager API, aws cli or Console.
