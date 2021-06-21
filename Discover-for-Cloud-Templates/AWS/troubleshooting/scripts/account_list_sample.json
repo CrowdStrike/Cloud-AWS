@@ -1,0 +1,18 @@
+{
+    "resources": [
+      {
+          "cloudtrail_bucket_owner_id": "BUCKET_OWNER_ACCOUNT_ID_HERE",
+          "cloudtrail_bucket_region": "AWS_REGION_HERE",
+          "external_id": "EXTERNAL_ID_HERE",
+          "iam_role_arn": "arn:aws:iam::ACCOUNT_ID_HERE:role/FalconDiscover",
+          "id": "ACCOUNT_ID_HERE"
+      },
+      {
+          "cloudtrail_bucket_owner_id": "BUCKET_OWNER_ACCOUNT_ID_HERE",
+          "cloudtrail_bucket_region": "AWS_REGION_HERE",
+          "external_id": "EXTERNAL_ID_HERE",
+          "iam_role_arn": "arn:aws:iam::ACCOUNT_ID_HERE:role/FalconDiscover",
+          "id": "ACCOUNT_ID_HERE"
+      }
+    ]
+}
