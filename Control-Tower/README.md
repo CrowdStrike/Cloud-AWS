@@ -1,14 +1,13 @@
-# CrowdStrike with AWS Control Tower 
+# CrowdStrike with AWS Control Tower
 
-Setup AWS Control Tower to register new accounts with CrowdStrike 
+Setup AWS Control Tower to register new accounts with CrowdStrike
 
-## Documentation 
+## Documentation
 
-For setting up Control Tower for Discover 
+For setting up Control Tower for Discover
 
-Please see the [Implementation Guide](https://github.com/CrowdStrike/Cloud-AWS/blob/master/Control-Tower/documentation/implementation-guide.md)
+Please see the [Implementation Guide](../Control-Tower/documentation/implementation-guide.md)
 
 For setting up Control Tower for Horizon
 
-Please see the [Implementation Guide](https://github.com/CrowdStrike/Cloud-AWS/blob/horizon/Control-Tower-For-Horizon/documentation/implementation-guide.md)
-
+Please see the [Implementation Guide](../Control-Tower-For-Horizon/documentation/implementation-guide.md)
