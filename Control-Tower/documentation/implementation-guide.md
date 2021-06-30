@@ -55,7 +55,7 @@ CrowdStrike will analyze the logs in the log file, if an event of interest is fo
     * *ec2:DescribeSecurityGroups*
     * *iam:ListAccountAliases*
 
-    The custom Lambra resource will register the account with CrowdStrike Discover for Cloud using an API call. The role ```arn`` together with the details of the log archive S3 bucket are passed in an HTTP POST to CrowdStrike.
+    The custom Lambda resource will register the account with CrowdStrike Discover for Cloud using an API call. The role ``arn`` together with the details of the log archive S3 bucket are passed in an HTTP POST to CrowdStrike.
 
 # Pre-requisites
 Customers will require the following:
@@ -114,7 +114,7 @@ To get started with AWS Control Tower, review the User Guide:
 Setup consists of the following high-level tasks:
 
 * Load the CloudFormation template in the ``log-archive`` account.
-* Load the CloudFormation template in the master account.
+* Load the CloudFormation template in the ``master`` account.
 
 1) Generate CrowdStrike Falcon API Keys.
 
@@ -130,7 +130,7 @@ Setup consists of the following high-level tasks:
 
     * *Control-Tower/log-archive-acct*: CloudFormation template for the ControlTower ``log-archive`` account
 
-    * *Control-Tower/master-acct*: CloudFormation template for the Control Tower master account
+    * *Control-Tower/master-acct*: CloudFormation template for the Control Tower ``master`` account
 
 3) Load the CloudFormation template in the ``log-archive`` account.
 
@@ -144,7 +144,7 @@ Setup consists of the following high-level tasks:
 
     ![AWS Roles for Falcon Discover)](images/cs-cloudconnect-aws-cloudtrails.png)
 
-4) Load the CloudFormation template in the master account.
+4) Load the CloudFormation template in the ``master`` account.
 
     Go to the master account and apply the CloudFormation template "*ct_crowdstrike_master_accountv2.yaml*" from the ``master-acct`` folder.
 
@@ -166,7 +166,7 @@ Setup consists of the following high-level tasks:
 
     * **RoleName**: This name may be modified as required.
     
-    * **RoleCreationDelayTimer**: Time delay before registering the account.  Provides time fot hte newly createed role to be replicated to all regions before we register the account in the CrowdStrike API
+    * **RoleCreationDelayTimer**: Time delay before registering the account.  Provides time for the newly created role to be replicated to all regions before we register the account in the CrowdStrike API
     
     The CloudFormation template will create the following resources in the account:
     
@@ -175,7 +175,7 @@ Setup consists of the following high-level tasks:
 
     ![CrowdStrike Master StackSet)](images/crowdstrike-master-stackset.png)
 
-    * CloudWatch rile to trigger a lambda function.
+    * CloudWatch rule to trigger a Lambda function.
 
     ![CrowdStrike Lambda Function)](images/cloudwatch-lambda.png)
 
@@ -195,7 +195,7 @@ Setup consists of the following high-level tasks:
 
     ![Check the status of the account)](images/check-account-status.png)
 
-    Go to CloudFormation -> StackSets and verify the stack instance exists:
+    Go to ``CloudFormation --> StackSets`` and verify the stack instance exists:
 
     ![CloudFormation -> StackSets to verify the stack instance)](images/verify-stacksets.png)
 
@@ -203,14 +203,14 @@ Setup consists of the following high-level tasks:
 
     The StackSet will configure two resources:
 
-        * IAM Role named ``FalconDiscover``
-        * Lambda function to register the account with Falcon Discover service
+      * IAM Role named ``FalconDiscover``
+      * Lambda function to register the account with Falcon Discover service
 
     Verify that the IAM role has been configured in the new account:
 
     ![Verify IAM role)](images/verify-iam-role.png)
 
-    Go to CloudWatch logs and verify that the lambda function created has run and successfully and registered the account:
+    Go to CloudWatch logs and verify that the Lambda function created has run and successfully and registered the account:
 
     ![Verify Lambda function)](images/verify-lambda-function.png)
 
