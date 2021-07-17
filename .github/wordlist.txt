@@ -50,6 +50,7 @@ cft
 CFT
 cid
 CIDR
+checkfig
 classtype
 cli
 CLI
@@ -187,6 +188,7 @@ linux
 ListAccountAliases
 LTS
 MatchAttributes
+makeself
 md
 MERCHANTABILITY
 microk
@@ -194,6 +196,7 @@ Microk
 mins
 misconfigurations
 msg
+MSSP
 namespace
 namespaces
 nav
@@ -233,6 +236,7 @@ runtime
 sc
 scalable
 SDK
+sechub
 sfe
 sha
 sid
@@ -272,7 +276,10 @@ tf
 tfvars
 tgw
 tooltip
+txt
 ubuntu
+uber
+userdata
 UDP
 ul
 uncomment
