@@ -10,7 +10,7 @@ The [makeself](https://makeself.io/) project was leveraged to build this install
 + `api_complete.py` - Falcon Complete API SDK uber class
 + `credvault.py` - SSM credential handling
 + `fig.service` - Systemd service definition (**_Removed as part of installation_**)
-+ `install.sh` - Executed post decompression, installation script that installs pre-reqs and cleans up. (**_Removed as part of installation_**)
++ `install.sh` - Executed post decompression, installation script that installs pre-requisites and cleans up. (**_Removed as part of installation_**)
 
 ## Execution
 This installer must be executed as the root user (usually via _sudo_, userdata scripts already execute as root).
