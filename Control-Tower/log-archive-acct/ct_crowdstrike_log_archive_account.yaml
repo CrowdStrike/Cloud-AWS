@@ -125,6 +125,7 @@ Resources:
                 - ''
                 - - 'arn:aws:s3:::'
                   - !Ref LogArchiveBucketName
+                  - '/*'
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSLambdaExecute
 
