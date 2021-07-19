@@ -42,12 +42,12 @@ def handleRecord(decoded_line):
         send = True
 
     if send:
-        send_result = sendToSecurityHub(generateManifest(decoded_line, cur_region), cur_region)
+        send_result = sendToSecurityHub(generateManifest(decoded_line, cur_region, region), cur_region)
 
     return send_result
 
 
-def generateManifest(detection_event, region):
+def generateManifest(detection_event, region, det_region):
     manifest = {}
     try:
         manifest["SchemaVersion"] = "2018-10-08"
@@ -65,7 +65,7 @@ def generateManifest(detection_event, region):
         if "instance_id" in detection_event:
             manifest["Id"] = detection_event["instance_id"] + detection_event["detection_id"]
             manifest["Title"] = "Falcon Alert. Instance: %s" % detection_event["instance_id"]
-            manifest["Resources"] = [{"Type": "AwsEc2Instance", "Id": detection_event["instance_id"], "Region": region}]
+            manifest["Resources"] = [{"Type": "AwsEc2Instance", "Id": detection_event["instance_id"], "Region": det_region}]
         else:
             manifest["Id"] = f"UnknownInstanceID:{detection_event['detection_id']}"
             manifest["Title"] = "Falcon Alert."
