@@ -274,7 +274,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-12
    ```
  - Step 4: Delete the falcon-system namespace
    ```
-   kuebctl delete ns falcon-system
+   kubectl delete ns falcon-system
    ```
  - Step 5: Delete the AWS ECR repository
    ```
