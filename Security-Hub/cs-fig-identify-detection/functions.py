@@ -26,7 +26,7 @@ def handleRecord(decoded_line):
                         for tag in instance.tags:
                             if "name" in tag["Key"].lower():
                                 decoded_line["instance_name"] = tag["Value"]
-                    except (IndexError, KeyError):
+                    except (AttributeError, IndexError, KeyError):
                         decoded_line["instance_name"] = "Unnamed instance"
 
                 send = True
