@@ -124,16 +124,24 @@ except KeyError:
     # Any failure assume we're doing commercial
     baseURL = "https://api.crowdstrike.com"
 
+try:
+    verify_ssl_connections = config["ssl_verify"]
+    if verify_ssl_connections == "":
+        verify_ssl_connections = True
+except KeyError:
+    verify_ssl_connections = True
+    config["ssl_verify"] = verify_ssl_connections
+
 # Connect to the API
 falcon = FalconSDK.APIHarness(creds={'client_id': config["falcon_client_id"],
                                      'client_secret': config["falcon_client_secret"]
-                                     }, base_url=baseURL)
+                                     }, base_url=baseURL, ssl_verify=verify_ssl_connections)
 # Authenticate to the API
 falcon.authenticate()
 # Cry about our bad keys
 if not falcon.authenticated:
-    status.statusWrite("Failed to connect to the API")
-    raise SystemExit("Failed to connect to the API")    
+    status.statusWrite(f"Failed to connect to the API on {baseURL}. Check base_url and ssl_verify configuration settings.")
+    raise SystemExit(f"Failed to connect to the API on {baseURL}.  Check base_url and ssl_verify configuration settings.")
 else:
     # Retrieve our current CID (MSSP functionality) or add it to config?
     # This method requires Sensor Install API, our fallback option uses the Hosts API but a device must exist
