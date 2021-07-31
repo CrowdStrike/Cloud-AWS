@@ -82,7 +82,7 @@ class Stream():
         return True
 
     def open(self):
-        self.spigot = requests.get(self.dataFeed, headers=self.headers, stream=True)
+        self.spigot = requests.get(self.dataFeed, headers=self.headers, stream=True, verify=self.api_config["ssl_verify"])
 
         return self.spigot
 

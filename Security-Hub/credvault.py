@@ -80,6 +80,11 @@ class CredVault():
             self.confirm_provider = self._getParameter("FIG_CONFIRM_PROVIDER")
         except Exception:
             pass
-
+        # Should we enable SSL Verification for Request calls? - Defaults to True
+        self.enable_ssl_verify = True
+        try:
+            self.enable_ssl_verify = self._getParameter("FIG_SSL_VERIFY")
+        except Exception:
+            pass
         del self.logger
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True)

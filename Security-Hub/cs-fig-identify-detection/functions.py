@@ -1,7 +1,6 @@
-import boto3
-# import json
 import traceback
 import os
+import boto3
 from botocore.exceptions import ClientError  # , EndpointConnectionError
 
 
@@ -23,9 +22,13 @@ def handleRecord(decoded_line):
                     decoded_line["image_id"] = instance.image_id
                     decoded_line["eni_id"] = iface.id
                     # Try and grab the instance name tag
-                    for tag in instance.tags:
-                        if "name" in tag["Key"].lower():
-                            decoded_line["instance_name"] = tag["Value"]
+                    try:
+                        for tag in instance.tags:
+                            if "name" in tag["Key"].lower():
+                                decoded_line["instance_name"] = tag["Value"]
+                    except (IndexError, KeyError) as err:
+                        decoded_line["instance_name"] = "Unnamed instance"
+
                 send = True
 
             except ClientError:
@@ -39,6 +42,8 @@ def handleRecord(decoded_line):
             send_result = {"Error": e_msg}
 
     else:
+        # We are not confirming instances, so we will cannot identify it's region. Use our reporting region instead.
+        region = cur_region  
         send = True
 
     if send:
@@ -49,9 +54,13 @@ def handleRecord(decoded_line):
 
 def generateManifest(detection_event, region, det_region):
     manifest = {}
+    if "gov" in region:
+        ARN = "arn:aws-us-gov:securityhub:{}:358431324613:product/crowdstrike/crowdstrike-falcon".format(region)
+    else:
+        ARN = "arn:aws:securityhub:{}:517716713836:product/crowdstrike/crowdstrike-falcon".format(region)
     try:
         manifest["SchemaVersion"] = "2018-10-08"
-        manifest["ProductArn"] = "arn:aws:securityhub:{}:517716713836:product/crowdstrike/crowdstrike-falcon".format(region)
+        manifest["ProductArn"] = f"{ARN}"
         accountID = boto3.client("sts").get_caller_identity().get('Account')
         manifest["AwsAccountId"] = accountID
         manifest["GeneratorId"] = detection_event["generator_id"]
