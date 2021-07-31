@@ -94,7 +94,8 @@ Application parameter values can also be specified within a _config.json_ file. 
     "severity_threshold":3,
     "sqs_queue_name":"SQS_QUEUE_NAME_SAME_REGION_AS_BELOW",
     "region":"REGION_GOES_HERE",
-    "confirm_provider": true
+    "confirm_provider": true,
+    "ssl_verify": true
 }
 ```
 
