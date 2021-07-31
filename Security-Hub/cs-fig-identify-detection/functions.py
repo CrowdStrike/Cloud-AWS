@@ -26,7 +26,7 @@ def handleRecord(decoded_line):
                         for tag in instance.tags:
                             if "name" in tag["Key"].lower():
                                 decoded_line["instance_name"] = tag["Value"]
-                    except (IndexError, KeyError) as err:
+                    except (IndexError, KeyError):
                         decoded_line["instance_name"] = "Unnamed instance"
 
                 send = True
@@ -42,8 +42,8 @@ def handleRecord(decoded_line):
             send_result = {"Error": e_msg}
 
     else:
-        # We are not confirming instances, so we will cannot identify it's region. Use our reporting region instead.
-        region = cur_region  
+        # We are not confirming instances, so we cannot identify it's region. Use our reporting region instead.
+        region = cur_region
         send = True
 
     if send:
