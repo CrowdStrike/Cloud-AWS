@@ -37,3 +37,19 @@ resource "aws_ssm_parameter" "sechub_sqs_queue_name" {
 	value = var.sqs_queue_name
 	overwrite = true
 }
+
+resource "aws_ssm_parameter" "sechub_ssl_verify" {
+	name = "FIG_SSL_VERIFY"
+	description = "Enable / Disable SSL verification boolean"
+	type = "String"
+	value = var.ssl_verify
+	overwrite = true
+}
+
+resource "aws_ssm_parameter" "sechub_base_url" {
+	name = "FIG_API_BASE_URL"
+	description = "CrowdStrike Base URL"
+	type = "String"
+	value = var.base_url
+	overwrite = true
+}
