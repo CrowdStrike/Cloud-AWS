@@ -81,9 +81,9 @@ class CredVault():
         except Exception:
             pass
         # Should we enable SSL Verification for Request calls? - Defaults to True
-        self.enable_ssl_verify = True
+        self.ssl_verify = True
         try:
-            self.enable_ssl_verify = self._getParameter("FIG_SSL_VERIFY")
+            self.ssl_verify = self._getParameter("FIG_SSL_VERIFY")
         except Exception:
             pass
         del self.logger
