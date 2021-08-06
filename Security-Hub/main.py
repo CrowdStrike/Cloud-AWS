@@ -37,14 +37,17 @@ import os
 import sys
 import platform
 import time
-import boto3
 import threading
 import stream as event_stream
 import credvault
 import logger
 import atexit
 from falconpy import api_complete as FalconSDK
-from botocore.exceptions import ClientError, EndpointConnectionError
+try:
+    import boto3
+    from botocore.exceptions import ClientError, EndpointConnectionError
+except ImportError:
+    raise SystemExit("The AWS boto3 library is required to run Falcon Data Replicator.\nPlease execute 'pip3 install boto3'")
 
 
 def shutdown():
