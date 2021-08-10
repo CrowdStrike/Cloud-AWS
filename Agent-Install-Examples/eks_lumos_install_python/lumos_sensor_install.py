@@ -26,7 +26,7 @@ base_url = "https://api.us-2.crowdstrike.com"
 # Set the repo name to be used for ECR
 os_name = "Container"
 falcon_repo = 'falcon-container-sensor'
-download_path = "."
+download_path = "/tmp"
 output_file = "/tmp/" + falcon_repo + ".yaml"
 
 
@@ -75,7 +75,7 @@ def download_latest_sensor(os_name: str, download_path: str):
         exit()
 
     # Download falcon-container-sensor
-    if os.path.exists("./" + file_name) == False:
+    if os.path.exists(download_path  + "/" + file_name) == False:
         falcon.DownloadSensorInstallerById(
             parameters={
                 "id": latest_sha,
