@@ -181,6 +181,7 @@ kube
 kubectl
 KubeDNS
 Kubernetes
+kubernetes
 licensors
 lifecycle
 Lifecycle
