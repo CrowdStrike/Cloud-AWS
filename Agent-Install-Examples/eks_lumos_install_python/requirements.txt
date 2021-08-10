@@ -1,0 +1,5 @@
+docker
+crowdstrike-falconpy
+pyyaml
+boto3
+kubernetes
