@@ -27,7 +27,7 @@ base_url = "https://api.us-2.crowdstrike.com"
 os_name = "Container"
 falcon_repo = 'falcon-container-sensor'
 download_path = "."
-output_file = "./" + falcon_repo + ".yaml"
+output_file = "/tmp/" + falcon_repo + ".yaml"
 
 
 # Load objects for boto3.ECR and Docker
