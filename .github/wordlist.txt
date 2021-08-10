@@ -188,6 +188,7 @@ linux
 ListAccountAliases
 ListBucket
 LTS
+MacOS
 MatchAttributes
 makeself
 md
@@ -224,6 +225,7 @@ PrivateLink
 privatelink
 ps
 py
+pyyaml
 rdp
 RDP
 reachability
