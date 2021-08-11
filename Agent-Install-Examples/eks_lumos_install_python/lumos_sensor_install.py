@@ -27,15 +27,26 @@ base_url = "https://api.us-2.crowdstrike.com"
 os_name = "Container"
 falcon_repo = 'falcon-container-sensor'
 download_path = "/tmp"
-output_file =  download_path + "/" + falcon_repo + ".yaml"
+output_file = download_path + "/" + falcon_repo + ".yaml"
 
 
-# Load objects for boto3.ECR and Docker
-docker_client = docker.from_env()
+# Verify docker is running
+try:
+    docker_client = docker.from_env()
+    docker_client.containers.list()
+except docker.errors.DockerException:
+    log.error("DockerError: Please ensure Docker is running")
+    exit()
+
+# Load objects for boto3.ECR
 ecr_client = client = boto3.client('ecr')
 
 # Get credentials for falconpy SDK
 config_file = os.path.expanduser("~/config.json")
+if os.path.exists(config_file) == False:
+    log.error("ConfigFileError: Please verify ~/config.json exists")
+    exit()
+
 with open(config_file, 'r') as file_config:
     config = json.loads(file_config.read())
 
@@ -43,6 +54,7 @@ try:
     falcon_cid = config["falcon_cid"]
 except KeyError:
     log.error("Set the falcon_cid key-value in the config.json")
+    exit()
 
 # Instantiate object for ServiceClass
 falcon = Sensor_Download(creds={
@@ -75,7 +87,7 @@ def download_latest_sensor(os_name: str, download_path: str):
         exit()
 
     # Download falcon-container-sensor
-    if os.path.exists(download_path  + "/" + file_name) == False:
+    if os.path.exists(download_path + "/" + file_name) == False:
         falcon.DownloadSensorInstallerById(
             parameters={
                 "id": latest_sha,
