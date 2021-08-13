@@ -23,9 +23,9 @@ NOTE: The`base_url` will be provided when creating the API keys.
 
 ```
 {
-        "falcon_client_id": "8972331hiusgdaugd987987231213",
-        "falcon_client_secret": "cdHJKASDsdad7t8sdsajhkasdasd",
-        "falcon_cid": "JHDSHJDHFS9879EHKSJDAHKJHFA-JH",
+        "falcon_client_id": "abcdefghijklmnopqrstuvwxyz1234",
+        "falcon_client_secret": "abcdefghijklmnopqrstuvwxyz1234",
+        "falcon_cid": "1234567890ABCDEF1234567890ABCDEF-12",
         "base_url": "https://api.us-2.crowdstrike.com"
 }
 ```
