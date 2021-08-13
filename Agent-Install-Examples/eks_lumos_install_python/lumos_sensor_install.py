@@ -56,9 +56,9 @@ except KeyError:
     exit()
 
 try:
-    base_url = config["api_base_url"]
+    base_url = config["base_url"]
 except KeyError:
-    log.error("Set the api_base_url key-value in the config.json")
+    log.error("Set the base_url key-value in the config.json")
     exit()
 
 # Instantiate object for ServiceClass
@@ -187,18 +187,18 @@ def main():
                                        )
 
     # Create ECR if necessary and return Uri
-    ecr_repo_uri = create_ecr(falcon_repo=falcon_repo)
+    repo_uri = create_ecr(falcon_repo=falcon_repo)
 
     # Import sensor from arhive into local repo
     import_result = import_container_sensor(download_path=download_path,
                                             file_name=file_name,
-                                            repo_uri=ecr_repo_uri)
+                                            repo_uri=repo_uri)
 
     tag = import_result[1]
-    image_name = ecr_repo_uri + ":" + tag
+    image_name = repo_uri + ":" + tag
 
     # Push sensor image to ECR and log response
-    push_response = push_image_ecr(ecr_repo_uri=ecr_repo_uri,
+    push_response = push_image_ecr(ecr_repo_uri=repo_uri,
                                    tag=tag)
     log.info(push_response)
 
