@@ -19,11 +19,14 @@ NOTE: The API `base_url` info can be found when creating the API credentials in 
 
 Example of the `config.json` file
 
+NOTE: The`api_base_url` will be provided when creating the API keys.
+
 ```
 {
         "falcon_client_id": "8972331hiusgdaugd987987231213",
         "falcon_client_secret": "cdHJKASDsdad7t8sdsajhkasdasd",
-        "falcon_cid": "JHDSHJDHFS9879EHKSJDAHKJHFA-JH"
+        "falcon_cid": "JHDSHJDHFS9879EHKSJDAHKJHFA-JH",
+        "api_base_url": "https://api.us-2.crowdstrike.com"
 }
 ```
 

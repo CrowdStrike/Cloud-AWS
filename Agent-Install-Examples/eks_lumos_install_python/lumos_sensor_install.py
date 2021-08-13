@@ -20,7 +20,6 @@ logging.getLogger().setLevel(logging.INFO)
 
 # Set the base_url variable to match the Falcon platform API
 # Change this variable to meet your needs
-base_url = "https://api.us-2.crowdstrike.com"
 
 
 # Set the repo name to be used for ECR
@@ -54,6 +53,12 @@ try:
     falcon_cid = config["falcon_cid"]
 except KeyError:
     log.error("Set the falcon_cid key-value in the config.json")
+    exit()
+
+try:
+    base_url = config["api_base_url"]
+except KeyError:
+    log.error("Set the api_base_url key-value in the config.json")
     exit()
 
 # Instantiate object for ServiceClass
