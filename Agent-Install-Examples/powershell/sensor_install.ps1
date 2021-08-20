@@ -1,10 +1,10 @@
 #Requires -Version 5.1
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $true, Position = 1)]
     [ValidatePattern('\w{32}')]
     [string] $ClientId,
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $true, Position = 1)]
     [ValidatePattern('\w{40}')]
     [string] $ClientSecret
 )
@@ -176,7 +176,7 @@ process {
     try {
         # Verify presence of TLS 1.2 for API communication
         $TlsCheck = if ([Net.ServicePointManager]::SecurityProtocol -notmatch 'Tls12') {
-            [Net.ServicePointManager]::SecurityProtocol += [Net.SecurityProtocolType]::Tls12
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
             'Added [Net.SecurityProtocolType]::Tls12'
         } else {
             'Tls12 present in [Net.ServicePointManager]::SecurityProtocol'
