@@ -4,7 +4,7 @@ param(
     [Parameter(Mandatory = $true, Position = 1)]
     [ValidatePattern('\w{32}')]
     [string] $ClientId,
-    [Parameter(Mandatory = $true, Position = 1)]
+    [Parameter(Mandatory = $true, Position = 2)]
     [ValidatePattern('\w{40}')]
     [string] $ClientSecret
 )
