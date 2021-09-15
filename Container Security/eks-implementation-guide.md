@@ -174,58 +174,16 @@ Various command-line utilities are required for this demo. These command line to
 
  - Set the FALCON_IMAGE_URI variable to your managed ECR based on the ECR `repositoryUri`
    ```
-   $ FALCON_IMAGE_URI=123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-sensor:latest
+   $ FALCON_IMAGE_URI=123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-sensor
    ```
  - Note for existing ECR registries the `repositoryUri` can be found with the following command.
    ```
-   aws ecr describe-repositories
+   $ aws ecr describe-repositories
    ```
- - Note that the URI suffix `:latest` is a container image tag. Container repositories usually contain multiple image versions, and tags are used to distinguish between versions. A container image tag must be added to the end of the `repositoryUri`.
 
- - Obtain the falcon-sensor container tarball.
- - Note that the prompts will require the input of the API key and secret that were obtained in the pre-requisites
+ - Push Falcon Container image to your newly created repository
    ```
-   $ falcon_sensor_download --os-name=Container
-   ```
-   Example prompts:
-   ```
-   Please provide your Falcon Client ID: ABC
-   Please provide your Falcon Client Secret: XYZ
-   Downloaded Falcon Usermode Container Sensor to falcon-sensor-6.21.0-403.container.x86_64.tar.bz2
-   ```
- - Import the tarball to your local docker. If you are following this guide inside the tooling
-   container, you can run this command outside of the container as the docker socket is shared
-   between your host system and the said tooling container.
-   ```
-   $ docker load -i falcon-sensor-6.21.0-403.container.x86_64.tar.bz2
-   ```
-   Example output:
-   ```
-   30cbe59c0010: Loading layer  39.07MB/39.07MB
-   Loaded image: falcon-sensor-6.21.0-403.container.x86_64.tar.bz2
-   ```
- - List the loaded docker image
-   ```
-   docker images | grep falcon-sensor
-   ```
-   Example output:
-   ```
-   falcon-sensor    6.21.0-403.container.x86_64.Release.US2   xxxxxxx        2 weeks ago         78.8MB
-   ```
- - Note the image name and the image tag in the first and second columns respectively
- - Using the local image name and tag, re-tag the image for your managed ECR using the variable previously set
-   ```
-   $ docker tag falcon-sensor:6.21.0-403.container.x86_64.Release.US2 $FALCON_IMAGE_URI
-   ```
- - Push the image to AWS ECR
-   ```
-   $ docker push $FALCON_IMAGE_URI
-   ```
-   Example output:
-   ```
-   The push refers to repository [123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-sensor]
-   30cbe59c0010: Pushed
-   latest: digest: sha256:e14904d6fd47a8395304cd33a0d650c2b924f1241f0b3561ece8a515c87036df size: 529
+   $ falcon-container-sensor-push $FALCON_IMAGE_URI
    ```
 
 ### Step 4: Install The Admission Controller
@@ -239,8 +197,8 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
 
  - Install the admission controller
    ```
-   $ docker run --rm --entrypoint installer $FALCON_IMAGE_URI \
-       -cid $CID -image $FALCON_IMAGE_URI \
+   $ docker run --rm --entrypoint installer $FALCON_IMAGE_URI:latest \
+       -cid $CID -image $FALCON_IMAGE_URI:latest \
        | kubectl apply -f -
    ```
    Example output:
@@ -264,7 +222,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
 
  - (optional) Run the installer with `--help` command-line argument to output available configuration options for the deployment.
    ```
-   $ docker run --rm --entrypoint installer $FALCON_IMAGE_URI --help
+   $ docker run --rm --entrypoint installer $FALCON_IMAGE_URI:latest --help
    usage:
      -cid string
        	Customer id to use
@@ -338,8 +296,8 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
 
  - Step 2: Uninstall the admission Controller
    ```
-   $ docker run --rm --entrypoint installer $FALCON_IMAGE_URI \
-       -cid $CID -image $FALCON_IMAGE_URI \
+   $ docker run --rm --entrypoint installer $FALCON_IMAGE_URI:latest \
+       -cid $CID -image $FALCON_IMAGE_URI:latest \
        | kubectl delete -f -
    ```
    Example output:
