@@ -102,49 +102,9 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: "Internet Group"
-      GroupDescription: "SSH and web traffic in, all traffic out."
+      GroupDescription: "SSH in, all traffic out."
       VpcId: !Ref VPC
       SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: '10933'
-          ToPort: '10933'
-          CidrIp:  20.188.245.156/32
-        - IpProtocol: tcp
-          FromPort: '10933'
-          ToPort: '10933'
-          CidrIp:  52.147.25.42/32 
-        - IpProtocol: tcp
-          FromPort: '10933'
-          ToPort: '10933'
-          CidrIp:  52.147.31.180/32 
-        - IpProtocol: tcp
-          FromPort: '10933'
-          ToPort: '10933'
-          CidrIp:  20.188.244.132/32 
-        - IpProtocol: tcp
-          FromPort: '10933'
-          ToPort: '10933'
-          CidrIp:  52.147.25.94/32 
-        - IpProtocol: tcp
-          FromPort: '10933'
-          ToPort: '10933'
-          CidrIp:  52.147.25.173/32 
-        - IpProtocol: tcp
-          FromPort: '10933'
-          ToPort: '10933'
-          CidrIp:  20.188.245.171/32 
-        - IpProtocol: tcp
-          FromPort: '10933'
-          ToPort: '10933'
-          CidrIp:  20.188.245.7/32
-        - IpProtocol: tcp
-          FromPort: '10933'
-          ToPort: '10933'
-          CidrIp:  20.188.244.147/32
-        - IpProtocol: tcp
-          FromPort: '10933'
-          ToPort: '10933'
-          CidrIp:  20.188.244.240/32
         - IpProtocol: tcp
           FromPort: '22'
           ToPort: '22'
