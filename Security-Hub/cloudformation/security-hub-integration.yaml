@@ -1,0 +1,396 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  InstanceTypeParameter:
+    Type: String
+    Default: t2.micro
+    Description: Enter instance size. Default is t3a.medium.
+  TrustedIp:
+    Type: String
+    Description: The IP address of the workstation that can SSH into the instance.
+  Key:
+    Type: String
+    Description: The key used to access the instance.
+  SecHubInstaller:
+    Type: String
+    Description: Name of the Security Hub installer.
+    Default: sechub-2.0.latest-install.run
+  FalconClientId:
+    Description: Falcon OAuth2 Client ID.
+    Type: String
+    NoEcho: true
+    Default: "API_CLIENT_ID_GOES_HERE"
+  FalconSecret:
+    Description: Falcon Oath2 API secret.
+    Type: String
+    NoEcho: true
+    Default: "API_CLIENT_SECRET_GOES_HERE"
+  S3Bucket:
+    Type: String
+    Description: S3 staging bucket
+    Default: "sechubint-testing"
+  LatestLinuxAMI:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: Linux VPC
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+  SubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-west-2a
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/24
+      MapPublicIpOnLaunch: true
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+  InternetRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGateway
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref RouteTable
+  SubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref SubnetA
+  InstanceBootstrapInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref 'InstanceIAMRole'
+  InstanceIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - SecHubRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+            Condition: { }
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSQSFullAccess
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: "Internet Group"
+      GroupDescription: "SSH and web traffic in, all traffic out."
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '10933'
+          ToPort: '10933'
+          CidrIp:  20.188.245.156/32
+        - IpProtocol: tcp
+          FromPort: '10933'
+          ToPort: '10933'
+          CidrIp:  52.147.25.42/32 
+        - IpProtocol: tcp
+          FromPort: '10933'
+          ToPort: '10933'
+          CidrIp:  52.147.31.180/32 
+        - IpProtocol: tcp
+          FromPort: '10933'
+          ToPort: '10933'
+          CidrIp:  20.188.244.132/32 
+        - IpProtocol: tcp
+          FromPort: '10933'
+          ToPort: '10933'
+          CidrIp:  52.147.25.94/32 
+        - IpProtocol: tcp
+          FromPort: '10933'
+          ToPort: '10933'
+          CidrIp:  52.147.25.173/32 
+        - IpProtocol: tcp
+          FromPort: '10933'
+          ToPort: '10933'
+          CidrIp:  20.188.245.171/32 
+        - IpProtocol: tcp
+          FromPort: '10933'
+          ToPort: '10933'
+          CidrIp:  20.188.245.7/32
+        - IpProtocol: tcp
+          FromPort: '10933'
+          ToPort: '10933'
+          CidrIp:  20.188.244.147/32
+        - IpProtocol: tcp
+          FromPort: '10933'
+          ToPort: '10933'
+          CidrIp:  20.188.244.240/32
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp:  !Sub ${TrustedIp}/32
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+  ElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref Linux
+
+  # The Security Hub Integration instance - sends detections to SQS for processing
+  Linux:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      SubnetId: !Ref SubnetA
+      ImageId: !Ref LatestLinuxAMI
+      InstanceType:
+        Ref: InstanceTypeParameter
+      KeyName: !Ref Key
+      SecurityGroupIds:
+        - Ref: InstanceSecurityGroup
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 250
+      IamInstanceProfile: !Ref InstanceBootstrapInstanceProfile
+      UserData:
+        Fn::Base64: !Sub |
+          #! /bin/bash
+          # version 3.0
+          # Should consider also bootstrapping the CrowdStrike sensor at this point
+          # depending on current deployment patterns for the environment in question
+          cd /var/tmp
+          hostname -b ${AWS::StackName}-fig
+          echo ${AWS::StackName}-fig > /etc/hostname
+          cat /etc/hosts | sed 's/  localhost/localhost ${AWS::StackName}-fig/g'
+          wget -O ${SecHubInstaller} https://raw.githubusercontent.com/CrowdStrike/Cloud-AWS/master/Security-Hub/install/${SecHubInstaller}
+          chmod 755 ${SecHubInstaller}
+          ./${SecHubInstaller} --target /usr/share/fig
+      Tags:
+        -
+          Key: Name
+          Value: Security Hub Integration Server
+
+  # SQS queues to hold detections from the instance
+  SecHubIntQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 120
+      QueueName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - crwd-sechub-int
+      RedrivePolicy:
+        deadLetterTargetArn:
+          Fn::GetAtt:
+            - "SecHubIntDeadLetterQueue"
+            - "Arn"
+        maxReceiveCount: 5
+  SecHubIntDeadLetterQueue:
+    Type: AWS::SQS::Queue
+
+  # Primary detections handling lambda
+  CRWDSecHubIntegration:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: !Ref S3Bucket
+        S3Key: sechub-identify-detections_lambda.zip
+      Environment:
+        Variables:
+          DEBUG: True
+      Layers:
+        - !Ref lambdaLayer
+      Handler: main.lambda_handler
+      MemorySize: 128
+      Role: !GetAtt SecHubIntLambdaRole.Arn
+      Runtime: python3.7
+      Timeout: 60
+  SecHubIntLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - SecHubInt-LambdaRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+            Condition: { }
+      Path: /
+      Policies:
+        - PolicyName: Get_Values
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: VisualEditor0
+                Effect: Allow
+                Action:
+                  - ssm:GetParametersByPath
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                Resource: '*'
+              - Sid: VisualEditor1
+                Effect: Allow
+                Action:
+                  - securityhub:*
+                Resource: '*'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLambdaExecute
+        - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+        - arn:aws:iam::aws:policy/AmazonSQSFullAccess
+
+  # FalconPy SDK lambda layer - Includes requests and urllib3
+  lambdaLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.7
+      Content:
+        S3Bucket: !Ref S3Bucket
+        S3Key: layer.zip
+      Description: Layer for requests package
+      LayerName: requests-package
+
+  # Trigger from SQS to call our lambda handler
+  SecHubIntQueueTrigger:
+    Type: AWS::Lambda::EventSourceMapping
+    DependsOn:
+      - LogGroup
+    Properties:
+      BatchSize: 1
+      Enabled: true
+      EventSourceArn: !GetAtt SecHubIntQueue.Arn
+      FunctionName: !Ref 'CRWDSecHubIntegration'
+
+  # SSM Parameters
+  AppFalconClientId:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: Falcon_ClientID
+      Type: String
+      Value: !Ref 'FalconClientId'
+      Description: Falcon Client ID for FIG connection
+  SSMFigClientId:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: FIG_FALCON_CLIENT_ID
+      Type: String
+      Value: !Ref 'FalconClientId'
+      Description: Falcon Client ID for FIG connection
+
+  AppFalconClientSecret:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: Falcon_Secret
+      Type: String
+      Value: !Ref 'FalconSecret'
+      Description: Falcon Client secret for FIG connection
+
+  SSMFigClientSecret:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: FIG_FALCON_CLIENT_SECRET
+      Type: String
+      Value: !Ref 'FalconSecret'
+      Description: Falcon Client secret for FIG connection
+  SSMAppId:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: FIG_APP_ID
+      Type: String
+      Value: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - 'Sec_Hub_Int'
+      Description: App ID.
+  SSMFigSeverityThreshold:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: FIG_SEVERITY_THRESHOLD
+      Type: String
+      Value: "3"
+  SSMFigSQSQueueName:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: FIG_SQS_QUEUE_NAME
+      Type: String
+      Value:
+        Fn::GetAtt:
+          - 'SecHubIntQueue'
+          - 'QueueName'
+
+  # Enable SecurityHub
+  RegionSecurityHub:
+    Type: 'AWS::SecurityHub::Hub'
+
+  # VPC Flow logging
+  FlowLogRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 'vpc-flow-logs.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: 'flowlogs-policy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                  - 'logs:DescribeLogGroups'
+                  - 'logs:DescribeLogStreams'
+                Resource: !GetAtt 'LogGroup.Arn'
+  LogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      LogGroupName: !Join ['', [!Ref 'AWS::StackName', 'vpc-flow-log']]
+      RetentionInDays: 5
+  FlowLog:
+    Type: 'AWS::EC2::FlowLog'
+    Properties:
+      DeliverLogsPermissionArn: !GetAtt 'FlowLogRole.Arn'
+      LogGroupName: !Join ['', [!Ref 'AWS::StackName', 'vpc-flow-log']]
+      ResourceId: !Ref VPC
+      ResourceType: 'VPC'
+      TrafficType: 'ALL'
+
+Outputs:
+  PublicIp:
+    Value:
+      Fn::GetAtt:
+        - Linux
+        - PublicIp
+    Description: Server's PublicIp Address
