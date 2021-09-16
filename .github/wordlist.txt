@@ -313,3 +313,8 @@ xxxxxxx
 XXXXXXXXXXXXXXXXXXXXXXXXXX
 yaml
 yml
+FalconClientID
+FalconClientSecret
+InstanceTypeParameter
+SecHubInstaller
+TrustedIp
