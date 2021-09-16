@@ -4,6 +4,7 @@
 # CloudFormation deployment example
 This example CFT demonstrates deployment of the following:
 + A single VPC with a single subnet and an internet gateway. VPC Flow logging is enabled.
+This VPC resides in __us-west-2__ (this can be changed).
 + A __t2.micro__ AWS Linux 2 instance that pre-installs the Security Hub integration application as a bootstrap.
     - This instance is assigned an elastic IP. This is not a requirement and only included for demo purposes.
 + A SQS queue, dead-letter queue and Lambda trigger for handling detections identified as findings.
