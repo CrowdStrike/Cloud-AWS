@@ -14,7 +14,7 @@ This VPC resides in __us-west-2__ (this can be changed).
 > Please note: You will need to manual subscribe to CrowdStrike findings in the region after deploying this template.
 
 ## Prerequisites
-+ Valid CrowdStrike Falcon API credentials allowing access _READ_ to Event Streams, Hosts, and Detections.
++ Valid CrowdStrike Falcon API credentials allowing access _READ_ to Event Streams, Hosts, and Detections. (Sensor Download can also be used to lookup CIDs, but it is not required.)
 + A _pre-existing_ S3 bucket, created to hold two archives used to create the lambda handler.
     - [sechub-identify-detections_lambda.zip](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Security-Hub/install) (Download the latest)
     - `layer.zip` - A Lambda layer containing the CrowdStrike FalconPy SDK. You can generate one using the latest SDK with the utility provided [here](https://github.com/CrowdStrike/falconpy/blob/main/util/create-lambda-layer.sh).
