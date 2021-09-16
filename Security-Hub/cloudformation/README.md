@@ -10,7 +10,7 @@ This example CFT demonstrates deployment of the following:
 + A Lambda handler that consumes detections posted to the SQS queue and submits findings to AWS Security Hub based.
 + Security Hub is activated for the region deployed.
 
-> Please note: You will need to manual subscribe to CrowdStrike findings in the region after deploying this tempalte.
+> Please note: You will need to manual subscribe to CrowdStrike findings in the region after deploying this template.
 
 ## Prerequisites
 + Valid CrowdStrike Falcon API credentials allowing access _READ_ to Event Streams, Hosts, and Detections.
