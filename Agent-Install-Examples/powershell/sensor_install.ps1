@@ -1,294 +1,265 @@
-#Requires -Version 5.1
+#Requires -Version 2.0
+<#
+.SYNOPSIS
+Download and install the CrowdStrike Falcon Sensor for Windows
+.DESCRIPTION
+Uses the CrowdStrike Falcon APIs to check the sensor version assigned to a Windows Sensor Update policy,
+downloads that version, then installs it on the local machine. By default, once complete, the script
+deletes itself and the downloaded installer package. The individual steps and any related error messages
+are logged to 'Windows\Temp\InstallFalcon.log' unless otherwise specified.
+
+Script options can be passed as parameters or defined in the param() block. Default values are listed in
+the parameter descriptions.
+
+The script must be run as an administrator on the local machine in order for the Falcon Sensor installation
+to complete.
+.PARAMETER BaseAddress
+CrowdStrike Falcon OAuth2 API Hostname [Required]
+.PARAMETER ClientId
+CrowdStrike Falcon OAuth2 API Client Id [Required]
+.PARAMETER ClientSecret
+CrowdStrike Falcon OAuth2 API Client Secret [Required]
+.PARAMETER MemberCid
+Member CID, used only in multi-CID ("Falcon Flight Control") configurations
+.PARAMETER PolicyName
+Policy name to check for assigned sensor version [default: 'platform_default']
+.PARAMETER InstallParams
+Sensor installation parameters, without your CID value [default: '/install /quiet /noreboot']
+.PARAMETER LogPath
+Script log location [default: undefined, which uses 'Windows\Temp\InstallFalcon.log']
+.PARAMETER DeleteInstaller
+Delete sensor installer package when complete [default: $true]
+.PARAMETER DeleteScript
+Delete script when complete [default: $true]
+.EXAMPLE
+PS>.\sensor_install.ps1 -Hostname <string> -ClientId <string> -ClientSecret <string>
+
+Run the script and define 'Hostname', 'ClientId' and 'ClientSecret' during runtime. All other
+parameters will use their default values.
+.EXAMPLE
+PS>.\sensor_install.ps1
+
+Run the script and use all values that were previously defined within the script.
+#>
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory = $true, Position = 1)]
+    [Parameter(Position = 1)]
+    [ValidateSet('https://api.crowdstrike.com', 'https://api.us-2.crowdstrike.com',
+        'https://api.eu-1.crowdstrike.com', 'https://api.laggar.gcw.crowdstrike.com')]
+    [string] $BaseAddress,
+ 
+    [Parameter(Position = 2)]
     [ValidatePattern('\w{32}')]
     [string] $ClientId,
-    [Parameter(Mandatory = $true, Position = 2)]
+
+    [Parameter(Position = 3)]
     [ValidatePattern('\w{40}')]
-    [string] $ClientSecret
+    [string] $ClientSecret,
+
+    [Parameter(Position = 4)]
+    [ValidatePattern('\w{32}')]
+    [string] $MemberCid,
+
+    [Parameter(Position = 5)]
+    [string] $PolicyName = 'platform_default',
+
+    [Parameter(Position = 6)]
+    [string] $InstallParams = '/install /quiet /noreboot',
+
+    [Parameter(Position = 7)]
+    [string] $LogPath,
+
+    [Parameter(Position = 8)]
+    [string] $DeleteInstaller = $true,
+
+    [Parameter(Position = 9)]
+    [string] $DeleteScript = $true
 )
 begin {
-    <# USER CONFIG ###############################################################################################>
-    # OAuth2 Client with 'sensor-update-policies:read' and 'sensor-installers:read' permissions
-    [string] $ApiHost = 'https://api.crowdstrike.com'
-
-    # Member CID, input when installing the sensor in a parent/child CID configuration [default: $null]
-    [string] $MemberCID = $null
-
-    # Policy name to check for sensor version to install [default: $null, which uses 'platform_default']
-    [string] $PolicyName = $null
-
-    # Installer parameters to include beyond "/install /quiet /noreboot CID=" [default: $null]
-    [string] $InstallParams = $null
-
-    # Custom log file path and filename [default: $null, which uses Windows\Temp\InstallFalcon.log]
-    [string] $LogLocation = $null
-
-    # Delete sensor installer after installation attempt [default: $true]
-    [boolean] $DeleteInstaller = $true
-
-    # Delete this script after installation attempt [default: $true]
-    [boolean] $DeleteScript = $true
-    <############################################################################################### USER CONFIG #>
-    class ApiClient {
-        [string] $Hostname
-        [string] $ClientId
-        [string] $ClientSecret
-        [string] $MemberCid
-        [string] $Token
-        [string] $LogLocation
-        [datetime] $Expires
-        ApiClient ([object] $ClientParam) {
-            @('Hostname', 'ClientId', 'ClientSecret', 'MemberCid', 'LogLocation').foreach{
-                if ($ClientParam.$_) {
-                    $this.$_ = $ClientParam.$_
-                }
-            }
-        }
-        [void] Auth() {
-            if (!$this.Token -or ($this.Expires -le (Get-Date).AddSeconds(30))) {
-                # Request access token
-                $Param = @{
-                    Uri    = '/oauth2/token'
-                    Method  = 'post'
-                    Headers = @{
-                        Accept      = 'application/json'
-                        ContentType = 'application/x-www-form-urlencoded'
-                    }
-                    Body = "client_id=$($this.ClientId)&client_secret=$($this.ClientSecret)"
-                }
-                if ($this.MemberCid) {
-                    $Param.Body += "&member_cid=$($this.MemberCid)"
-                }
-                $Request = $this.Invoke($Param)
-                if ($Request.access_token) {
-                    # Cache token and expiration time
-                    $this.Expires = (Get-Date).AddSeconds($Request.expires_in)
-                    $this.Token = "$($Request.token_type) $($Request.access_token)"
-                    $this.Log('ApiClient.Auth', "Token granted; expires $($this.Expires)")
-                } else {
-                    # Clear credentials
-                    @('ClientId', 'ClientSecret', 'Hostname', 'MemberCid').foreach{
-                        if ($this.$_) {
-                            $this.$_ = $null
-                        }
-                    }
-                }
-            }
-        }
-        [string] FullPath([string] $Path) {
-            # Convert relative file path to absolute file path
-            $Output = if (![IO.Path]::IsPathRooted($Path)) {
-                $Absolute = Join-Path -Path (Get-Location).Path -ChildPath $Path
-                $Absolute = Join-Path -Path $Absolute -ChildPath '.'
-                [IO.Path]::GetFullPath($Absolute)
+    $ScriptName = $MyInvocation.MyCommand.Name
+    $ScriptPath = if (!$PSScriptRoot) {
+        Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
+    } else {
+        $PSScriptRoot
+    }
+    $WinSystem = [Environment]::GetFolderPath('System')
+    $WinTemp = $WinSystem -replace 'system32','Temp'
+    if (!$LogPath) {
+        $LogPath = Join-Path -Path $WinTemp -ChildPath 'InstallFalcon.log'
+    }
+    $Falcon = New-Object System.Net.WebClient
+    $Falcon.Encoding = [System.Text.Encoding]::UTF8
+    $Falcon.BaseAddress = $BaseAddress
+    $Patterns = @{
+        access_token  = '"(?<name>access_token)": "(?<access_token>.*)",'
+        build_version = '"(?<name>build)": "(?<version>.+)",'
+        ccid          = '(?<ccid>\w{32}-\w{2})'
+        policy_id     = '"(?<name>id)": "(?<id>\w{32})",'
+    }
+    function Get-InstallerHash ([string] $Path) {
+        $Output = if (Test-Path $Path) {
+            $Algorithm = [System.Security.Cryptography.HashAlgorithm]::Create("SHA256")
+            $Hash = [System.BitConverter]::ToString(
+                $Algorithm.ComputeHash([System.IO.File]::ReadAllBytes($Path)))
+            if ($Hash) {
+                $Hash.Replace('-','')
             } else {
-                $Path
-            }
-            return $Output
-        }
-        [object] Invoke([object] $Param) {
-            if ($Param.Uri -ne '/oauth2/token') {
-                # Verify OAuth2 access token
-                $this.Auth()
-                if ($this.Token) {
-                    # Add authorization token
-                    $Param.Headers.Add('Authorization', $this.Token)
-                }
-            }
-            # Set URI using Hostname and Param.Path
-            $Param.Uri = "$($this.Hostname)$($Param.Uri)"
-            $this.Log('ApiClient.Invoke', "$($Param.Method.ToUpper()) $($Param.Uri)")
-            $Output = try {
-                if ($Param.Body) {
-                    if ($Param.Headers.ContentType -eq 'application/json') {
-                        # Convert body to Json
-                        $Param.Body = ConvertTo-Json $Param.Body
-                    }
-                }
-                # Make request and output result
-                $Response = Invoke-WebRequest @Param -UseBasicParsing
-                if ($Response.Content -and ($Param.Headers.Accept -eq 'application/json')) {
-                    ConvertFrom-Json -InputObject $Response.Content
-                } elseif ($Response.Content) {
-                    $Response.Content
-                } elseif ($Response.StatusCode -and $Response.StatusDescription) {
-                    Write-Error "$($Response.StatusCode): $($Response.StatusDescription)"
-                } else {
-                    $null
-                }
-            } catch {
-                $this.Log('ApiClient.Invoke', "$_")
-                throw $_
-            } finally {
-                $this.WaitRetry($Response)
-                # JSH - Dispose method is not available when UseBasicParsing is enabled
-                # if ($Response) {
-                #     $Response.Dispose()
-                # }
-            }
-            return $Output
-        }
-        [void] Log([string] $Source, [string] $Message) {
-            "$(Get-Date -Format 'yyyy-MM-dd hh:MM:ss') [$Source] $Message" >> $this.LogLocation
-        }
-        [void] WaitRetry([object] $Response) {
-            if ($Response.Headers.Keys -contains 'X-Ratelimit-RetryAfter') {
-                # Sleep until 'X-Ratelimit-RetryAfter'
-                $RetryAfter = $Response.Headers.GetEnumerator().Where({
-                    $_.Key -eq 'X-Ratelimit-RetryAfter' }).Value
-                $WaitTime = $RetryAfter - ([int] (Get-Date -UFormat %s) + 1)
-                $this.Log('ApiClient.WaitRetry', "Rate limited; waiting $WaitTime seconds")
-                Start-Sleep -Seconds $WaitTime
+                $null
             }
         }
+        return $Output
     }
-    if (!$LogLocation) {
-        # Set default log location
-        $LogLocation = Join-Path -Path ([Environment]::GetFolderPath('Windows')) -ChildPath (
-            'Temp\InstallFalcon.log')
+    function Invoke-FalconAuth ([string] $String) {
+        $Falcon.Headers.Add('Accept', 'application/json')
+        $Falcon.Headers.Add('Content-Type', 'application/x-www-form-urlencoded')
+        $Response = $Falcon.UploadString('/oauth2/token', $String)
+        if ($Response -match $Patterns.access_token) {
+            $AccessToken = [regex]::Matches($Response, $Patterns.access_token)[0].Groups['access_token'].Value
+            $Falcon.Headers.Add('Authorization', "bearer $AccessToken")
+        }
+        $Falcon.Headers.Remove('Content-Type')
     }
-    if ($DeleteInstaller -eq $true) {
-        # Capture script name for deletion
-        $InstallerScript = "$($MyInvocation.MyCommand.Name)"
+    function Invoke-FalconDownload ([string] $Path, [string] $Outfile) {
+        $Falcon.Headers.Add('Accept', 'application/octet-stream')
+        $Falcon.DownloadFile($Path, $Outfile)
     }
-    # Disable progress bar to increase Invoke-WebRequest download speed
-    $ProgressPreference = 'SilentlyContinue'
+    function Invoke-FalconGet ([string] $Path) {
+        $Falcon.Headers.Add('Accept', 'application/json')
+        $Request = $Falcon.OpenRead($Path)
+        $Stream = New-Object System.IO.StreamReader $Request
+        $Output = $Stream.ReadToEnd()
+        @($Request, $Stream) | ForEach-Object {
+            if ($null -ne $_) {
+                $_.Dispose()
+            }
+        }
+        return $Output
+    }
+    function Write-FalconLog ([string] $Source, [string] $Message) {
+        $Content = @(Get-Date -Format 'yyyy-MM-dd hh:MM:ss')
+        if ($Source -notmatch '^(StartProcess|Delete[Installer|Script])$' -and
+        $Falcon.ResponseHeaders.Keys -contains 'X-Cs-TraceId') {
+            $Content += ,"[$($Falcon.ResponseHeaders.Get('X-Cs-TraceId'))]"
+        }
+        "$(@($Content + $Source) -join ' '): $Message" >> $LogPath
+    }
 }
 process {
-    if (Get-Service | Where-Object { $_.Name -eq 'CSFalconService' }) {
-        $ErrorMessage = 'CrowdStrike Falcon service detected.'
-        $ApiClient.Log('ERROR', $ErrorMessage)
-        throw $ErrorMessage
+    if (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
+    [Security.Principal.WindowsBuiltInRole]::Administrator) -eq $false) {
+        $Message = 'Unable to proceed without administrative privileges'
+        Write-FalconLog 'CheckAdmin' $Message
+        throw $Message
+    } elseif (Get-Service | Where-Object { $_.Name -eq 'CSFalconService' }) {
+        $Message = "'CSFalconService' running"
+        Write-FalconLog 'CheckService' $Message
+        throw $Message
+    } else {
+        @('ClientId', 'ClientSecret') | ForEach-Object {
+            if (!(Get-Variable $_).Value) {
+                $Message = "Missing '$((Get-Variable $_).Name)'"
+                Write-FalconLog 'CheckClient' $Message
+                throw $Message
+            }
+        }
+        if ([Net.ServicePointManager]::SecurityProtocol -notmatch 'Tls12') {
+            try {
+                [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            } catch {
+                $Message = $_
+                Write-FalconLog 'TlsCheck' $Message
+                throw $Message
+            }
+        }
     }
-    # Initiate ApiClient
-    $ClientParam = @{
-        ClientId = $ClientId
-        ClientSecret = $ClientSecret
-        Hostname = $ApiHost
-        LogLocation = $LogLocation
-    }
+    $ApiClient = "client_id=$ClientId&client_secret=$ClientSecret"
     if ($MemberCid) {
-        $ClientParam['MemberCid'] = $MemberCid
+        $ApiClient += "&member_cid=$MemberCid"
     }
-    $Script:ApiClient = [ApiClient]::New($ClientParam)
-    try {
-        # Verify presence of TLS 1.2 for API communication
-        $TlsCheck = if ([Net.ServicePointManager]::SecurityProtocol -notmatch 'Tls12') {
-            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-            'Added [Net.SecurityProtocolType]::Tls12'
+    Invoke-FalconAuth $ApiClient
+    if ($Falcon.Headers.Keys -contains 'Authorization') {
+        Write-FalconLog 'GetAuth' "ClientId: $($ClientId), BaseAddress: $($Falcon.BaseAddress)"
+    } else {
+        $Message = 'Failed to retrieve authorization token'
+        Write-FalconLog 'GetAuth' $Message
+        throw $Message
+    }
+    $Response = Invoke-FalconGet '/sensors/queries/installers/ccid/v1'
+    if ($Response -match $Patterns.ccid) {
+        $Ccid = [regex]::Matches($Response, $Patterns.ccid)[0].Groups['ccid'].Value
+        Write-FalconLog 'GetCcid' 'Retrieved CCID'
+        $InstallParams += " CID=$Ccid"
+    } else {
+        $Message = 'Failed to retrieve CCID'
+        Write-FalconLog 'GetCcid' $Message
+        throw $Message
+    }
+    $Response = Invoke-FalconGet ("/policy/combined/sensor-update/v2?filter=platform_name:" +
+        "'Windows'%2Bname:'$($PolicyName.ToLower())'")
+    if ($Response -match $Patterns.build_version) {
+        $PolicyId = [regex]::Matches($Response, $Patterns.policy_id)[0].Groups['id'].Value
+        $Version = [regex]::Matches($Response, $Patterns.build_version)[0].Groups['version'].Value
+        $MinorVersion = ($Version).Split('\|')[0]
+        if ($Version) {
+            Write-FalconLog 'GetVersion' "'$PolicyId' has build '$Version' assigned"
         } else {
-            'Tls12 present in [Net.ServicePointManager]::SecurityProtocol'
+            $Message = "Failed to determine build version for '$PolicyId'"
+            Write-FalconLog 'GetVersion' $Message
+            throw $Message
         }
-        $ApiClient.Log('TlsCheck', $TlsCheck)
-    } catch {
-        throw $_
+    } else {
+        $Message = "Failed to match policy name '$($PolicyName.ToLower())'"
+        Write-FalconLog 'GetPolicy' $Message
+        throw $Message
     }
-    try {
-        # Check existing policies for proper sensor version, using 'platform_default' if not specified
-        $PolicyName = if ($PolicyName) {
-            $PolicyName.ToLower()
+    $Response = Invoke-FalconGet "/sensors/combined/installers/v1?filter=platform:'windows'"
+    if ($Response) {
+        $Installer = '{\n.*"name": "(?<filename>\w+\.exe)",(\n.*){1,}"sha256": "(?<hash>\w{64})",(\n.*){1,}' +
+        '"version": "\d{1,}?\.\d{1,}\.' + $MinorVersion + '",(\n.*){1,}\},'
+        if ($Response -match $Installer) {
+            $CloudHash = [regex]::Matches($Response, $Installer)[0].Groups['hash'].Value
+            $CloudFile = [regex]::Matches($Response, $Installer)[0].Groups['filename'].Value
+            Write-FalconLog 'GetInstaller' "Matched installer '$CloudHash' ($CloudFile)"
         } else {
-            'platform_default'
+            $Message = "Unable to match installer from list using build '$MinorVersion'"
+            Write-FalconLog 'GetInstaller' $Message
+            throw $Message
         }
-        $Param = @{
-            Uri     = "/policy/combined/sensor-update/v2?filter=platform_name:'Windows'%2Bname:'$PolicyName'"
-            Method  = 'get'
-            Headers = @{
-                Accept      = 'application/json'
-                ContentType = 'application/json'
-            }
-        }
-        $Policy = $ApiClient.Invoke($Param)
-    } catch {
-        throw $_
+    } else {
+        $Message = 'Failed to retrieve available installer list'
+        Write-FalconLog 'GetInstaller' $Message
+        throw $Message
     }
-    $MinorVersion = ($Policy.resources.settings.build -split '\|')[0]
-    $ApiClient.Log('PolicyList', "Policy '$PolicyName' has build $MinorVersion assigned")
-    try {
-        # Retrieve list of available sensor installer packages
-        $Param = @{
-            Uri     = "/sensors/combined/installers/v1?filter=platform:'windows'"
-            Method  = 'get'
-            Headers = @{
-                Accept      = 'application/json'
-                ContentType = 'application/json'
-            }
+    $LocalHash = if ($CloudHash -and $CloudFile) {
+        $LocalFile = Join-Path -Path $WinTemp -ChildPath $CloudFile
+        Invoke-FalconDownload "/sensors/entities/download-installer/v1?id=$CloudHash" $LocalFile
+        if (Test-Path $LocalFile) {
+            Get-InstallerHash $LocalFile
+            Write-FalconLog 'DownloadFile' "Created '$LocalFile'"
         }
-        $InstallerList = $ApiClient.Invoke($Param)
-        $CloudHash = ($InstallerList.resources | Where-Object { $_.version -match $MinorVersion }).sha256
-        $ApiClient.Log('InstallerList', "Matched build $MinorVersion with hash $CloudHash")
-    } catch {
-        throw $_
     }
-    try {
-        # Retrieve CCID
-        $Param = @{
-            Uri     = '/sensors/queries/installers/ccid/v1'
-            Method  = 'get'
-            Headers = @{
-                Accept      = 'application/json'
-                ContentType = 'application/json'
-            }
-        }
-        $CCID = $ApiClient.Invoke($Param)
-    } catch {
-        throw $_
-    }
-    try {
-        # Set path for installer package
-        $InstallFile = ($InstallerList.resources | Where-Object { $_.version -match $MinorVersion }).name
-        $TempPath = Join-Path -Path ([Environment]::GetFolderPath('Windows')) -ChildPath temp -Resolve
-        $InstallerPath = Join-Path -Path $TempPath -ChildPath $InstallFile
-        # Download installer package
-        $Param = @{
-            Uri     = "/sensors/entities/download-installer/v1?id=$CloudHash"
-            Method  = 'get'
-            Headers = @{
-                Accept      = 'application/octet-stream'
-                ContentType = 'application/json'
-            }
-            Outfile = $InstallerPath
-        }
-        $ApiClient.Invoke($Param)
-    } catch {
-        throw $_
-    }
-    $LocalHash = (Get-FileHash -Path $InstallerPath -Algorithm SHA256).Hash.ToLower()
-    $ApiClient.Log('LocalHash', $LocalHash)
     if ($CloudHash -ne $LocalHash) {
-        $ErrorMessage = 'Failed hash check of local installer package'
-        $ApiClient.Log('ERROR', $ErrorMessage)
-        throw $ErrorMessage
+        $Message = "Hash mismatch on download (Local: $LocalHash, Cloud: $CloudHash)"
+        Write-FalconLog 'CheckHash' $Message
+        throw $Message
     }
-    # Start installer and record process ID
-    $ArgumentList = '/install /quiet /noreboot'
-    if ($InstallParams) {
-        $ArgumentList += " $InstallParams"
-    }
-    $ApiClient.Log('Start-Process', "Executing $InstallerPath with arguments '$ArgumentList'")
-    $ArgumentList += " CID=$($CCID.resources)"
-    $InstallPID = (Start-Process -FilePath $InstallerPath -ArgumentList $ArgumentList -PassThru).id
-    $ApiClient.Log('Start-Process', "Started $InstallerPath [PID: $InstallPid]")
-    @('DeleteInstaller', 'DeleteScript').foreach{
+    $InstallPid = (Start-Process -FilePath $LocalFile -ArgumentList $InstallParams -PassThru).id
+    Write-FalconLog 'StartProcess' "Started '$LocalFile' ($InstallPid)"
+    @('DeleteInstaller', 'DeleteScript') | ForEach-Object {
         if ((Get-Variable $_).Value -eq $true) {
-            # Delete installer and script
             if ($_ -eq 'DeleteInstaller') {
-                # Wait for process to finish
-                $ApiClient.Log('Start-Process', 'Waiting for process to complete...')
-                Wait-Process $InstallPID
+                Wait-Process -Id $InstallPid
             }
             $FilePath = if ($_ -eq 'DeleteInstaller') {
-                $InstallerPath
+                $LocalFile
             } else {
-                Join-Path -Path $PSScriptRoot -ChildPath $InstallerScript
+                Join-Path -Path $ScriptPath -ChildPath $ScriptName
             }
-            try {
-                Remove-Item -Path $FilePath -Force
-                $ApiClient.Log('Remove-Item', "Deleted $FilePath")
-            } catch {
-                $ApiClient.Log('Remove-Item', "Failed to delete $FilePath")
+            Remove-Item -Path $FilePath -Force
+            if (Test-Path $FilePath) {
+                Write-FalconLog $_ "Failed to delete '$FilePath'"
+            } else {
+                Write-FalconLog $_ "Deleted '$FilePath'"
             }
         }
     }
