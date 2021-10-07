@@ -137,7 +137,7 @@ begin {
     }
     function Write-FalconLog ([string] $Source, [string] $Message) {
         $Content = @(Get-Date -Format 'yyyy-MM-dd hh:MM:ss')
-        if ($Source -notmatch '^(StartProcess|Delete[Installer|Script])$' -and
+        if ($Source -notmatch '^(StartProcess|Delete(Installer|Script))$' -and
         $Falcon.ResponseHeaders.Keys -contains 'X-Cs-TraceId') {
             $Content += ,"[$($Falcon.ResponseHeaders.Get('X-Cs-TraceId'))]"
         }
