@@ -178,7 +178,7 @@ Various command-line utilities are required for this demo. These command line to
    ```
  - Note for existing ECR registries the `repositoryUri` can be found with the following command.
    ```
-   $ aws ecr describe-repositories
+   $ aws ecr describe-repositories --region $CLOUD_REGION
    ```
 
  - Push Falcon Container image to your newly created repository
