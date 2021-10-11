@@ -214,7 +214,7 @@ process {
     }
     $Response = Invoke-FalconGet "/sensors/combined/installers/v1?filter=platform:'windows'"
     if ($Response) {
-        $Installer = '{\n.*"name": "(?<filename>\w+\.exe)",(\n.*){1,}"sha256": "(?<hash>\w{64})",(\n.*){1,}' +
+        $Installer = '{\n.*"name": "(?<filename>(\w+\.){1,}?exe)",(\n.*){1,}"sha256": "(?<hash>\w{64})",(\n.*){1,}' +
         '"version": "\d{1,}?\.\d{1,}\.' + $MinorVersion + '",(\n.*){1,}\},'
         if ($Response -match $Installer) {
             $CloudHash = [regex]::Matches($Response, $Installer)[0].Groups['hash'].Value
