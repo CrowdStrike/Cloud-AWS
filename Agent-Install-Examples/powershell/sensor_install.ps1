@@ -12,7 +12,8 @@ Script options can be passed as parameters or defined in the param() block. Defa
 the parameter descriptions.
 
 The script must be run as an administrator on the local machine in order for the Falcon Sensor installation
-to complete.
+to complete, and the OAuth2 API Client being used requires 'sensor-update-policies:read' and
+'sensor-installers:read' permissions.
 .PARAMETER BaseAddress
 CrowdStrike Falcon OAuth2 API Hostname [Required]
 .PARAMETER ClientId
@@ -32,9 +33,9 @@ Delete sensor installer package when complete [default: $true]
 .PARAMETER DeleteScript
 Delete script when complete [default: $true]
 .EXAMPLE
-PS>.\sensor_install.ps1 -Hostname <string> -ClientId <string> -ClientSecret <string>
+PS>.\sensor_install.ps1 -BaseAddress <string> -ClientId <string> -ClientSecret <string>
 
-Run the script and define 'Hostname', 'ClientId' and 'ClientSecret' during runtime. All other
+Run the script and define 'BaseAddress', 'ClientId' and 'ClientSecret' during runtime. All other
 parameters will use their default values.
 .EXAMPLE
 PS>.\sensor_install.ps1
