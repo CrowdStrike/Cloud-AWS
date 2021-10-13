@@ -6,6 +6,9 @@
 #                                                                       #
 # PLEASE NOTE: This solution requires the falconpy SDK. This project    #
 # can be accessed here: https://github.com/CrowdStrike/falconpy         #
+#                                                                       #
+# Modified - 2021.10.13 - Version 2, Added CrowdStrike cloud region     #
+# !!! NOTE: This version requires FalconPy v0.7.2+ !!!                  #
 #########################################################################
 import argparse
 import json
