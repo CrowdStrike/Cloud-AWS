@@ -18,6 +18,7 @@ $ python3 fd_accounts.py -f [falcon_client_id] -s [falcon_client_secret] -c [com
     - Valid commands are register, update, check and delete
 
 ### Optionally required arguments
++ `crowdstrike_cloud` - The CrowdStrike cloud region for your environment. (Available values: `US1`, `US2`, `EU1`, `USGOV1`)
 + `external_id` - The external ID used for IAM Role assumption. When using the update or register command, this value is required.
 + `local_account` - The local account used for the CloudTrail logging bucket. When using the update or register command, this value is required.
 + `cloudtrail_bucket_region` - The AWS region for the bucket used for CloudTrail logging. When using the update or register command, this value is required.
