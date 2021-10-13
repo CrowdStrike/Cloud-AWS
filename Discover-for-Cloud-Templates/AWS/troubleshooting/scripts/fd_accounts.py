@@ -1,21 +1,25 @@
-#########################################################################
-# fd_accounts - 2020.11.14                                              #
-#                                                                       #
-# Leverages the FalconPy uber class to perform check, update, register  #
-# and delete operations within a customer Falcon Discover environment.  #
-#                                                                       #
-# PLEASE NOTE: This solution requires the falconpy SDK. This project    #
-# can be accessed here: https://github.com/CrowdStrike/falconpy         #
-#########################################################################
+"""CrowdStrike Falcon Discover Account registration utility
+
+Leverages the FalconPy uber class to perform check, update, register
+and delete operations within a customer Falcon Discover environment.
+"""
+##############################################################################
+# fd_accounts - Creation date - 2020.11.14                                   #
+#                                                                            #
+# PLEASE NOTE: This solution requires the falconpy SDK, version 0.7.0+       #
+# This project can be accessed here: https://github.com/CrowdStrike/falconpy #
+#                                                                            #
+# Modified 2021.10.13, Version 2 - Add support for all CrowdStrike clouds    #
+##############################################################################
 import argparse
 import json
 # Falcon SDK - All in one uber-class
-from falconpy import api_complete as FalconSDK
+from falconpy.api_complete import APIHarness
 
 
 # ############## FORMAT API PAYLOAD
 def format_api_payload(rate_limit_reqs=0, rate_limit_time=0):
-    # Generates a properly formatted JSON payload for POST and PATCH requests
+    """Generates a properly formatted JSON payload for POST and PATCH requests."""
     data = {
         "resources": [
             {
@@ -34,18 +38,19 @@ def format_api_payload(rate_limit_reqs=0, rate_limit_time=0):
 
 # ############## CHECK ACCOUNTS
 def check_account():
+    """Retrieves all registered accounts and checks their status."""
     # Retrieve the account list
     account_list = falcon.command(action="QueryAWSAccounts",
-                                  parameters={"limit": "{}".format(str(query_limit))}
+                                  parameters={"limit": f"{str(QUERY_LIMIT)}"}
                                   )["body"]["resources"]
     # Log the results of the account query to a file if logging is enabled
     if log_enabled:
-        with open('falcon-discover-accounts.json', 'w+') as f:
-            json.dump(account_list, f)
+        with open('falcon-discover-accounts.json', 'w+') as file_output:
+            json.dump(account_list, file_output)
     # Create a list of our account IDs out of account_list
     id_items = []
-    for z in account_list:
-        id_items.append(z["id"])
+    for acct in account_list:
+        id_items.append(acct["id"])
     # Returns the specified value for a specific account id within account_list
     account_value = lambda i, v: [a[v] for a in account_list if a["id"] == i][0]  # noqa: E731
     q_max = 10    # VerifyAWSAccountAccess has a ID max count of 10
@@ -82,7 +87,7 @@ def check_account():
                         # the access_health branch hasn't been populated yet.
                         # Requery the API for the account_list when this happens.
                         account_list = falcon.command(action="QueryAWSAccounts",
-                                                      parameters={"limit": "{}".format(str(query_limit))}
+                                                      parameters={"limit": f"{str(QUERY_LIMIT)}"}
                                                       )["body"]["resources"]
                         issue = account_value(result["id"], "access_health")["api"]["reason"]
                         print(f'Account {result["id"]} has a problem: {issue}')
@@ -98,49 +103,44 @@ def check_account():
             except:  # noqa: E722
                 # Handle any egregious errors that break our return error payload
                 print("Got response error code {} message {}".format(access_response["status_code"], access_response["body"]))
-                pass
-
-    return
 
 
 # ############## REGISTER ACCOUNT
 def register_account():
-    # Call the API to update the requested account.
+    """Call the API to update the requested account."""
     register_response = falcon.command(action="ProvisionAWSAccounts", parameters={}, body=format_api_payload())
     if register_response["status_code"] == 201:
         print("Successfully registered account.")
     else:
-        print("Registration failed with response: {} {}".format(register_response["status_code"],
-                                                                register_response["body"]["errors"][0]["message"]
-                                                                ))
-
-    return
+        reg_status = register_response["status_code"]
+        reg_message = register_response["body"]["errors"][0]["message"]
+        print(f"Registration failed with response: {reg_status} {reg_message}")
 
 
 # ############## UPDATE ACCOUNT
 def update_account():
-    # Call the API to update the requested account.
+    """Call the API to update the requested account."""
     update_response = falcon.command(action="UpdateAWSAccounts", body=format_api_payload())
     if update_response["status_code"] == 200:
         print("Successfully updated account.")
     else:
-        print("Update failed with response: {} {}".format(update_response["status_code"],
-                                                          update_response["body"]["errors"][0]["message"]))
-
-    return
+        up_status = update_response["status_code"]
+        up_message = update_response["body"]["errors"][0]["message"]
+        print(f"Update failed with response: {up_status} {up_message}")
 
 
 # ############## DELETE ACCOUNT
 def delete_account():
-    # Call the API to delete the requested account, multiple IDs can be deleted by passing in a comma-delimited list
+    """Call the API to delete the requested account,
+    multiple IDs can be deleted by passing in a comma-delimited list
+    """
     delete_response = falcon.command(action="DeleteAWSAccounts", parameters={}, ids=local_account)
     if delete_response["status_code"] == 200:
         print("Successfully deleted account.")
     else:
-        print("Delete failed with response: {} {}".format(delete_response["status_code"],
-                                                          delete_response["body"]["errors"][0]["message"]))
-
-    return
+        del_status = delete_response["status_code"]
+        del_message = delete_response["body"]["errors"][0]["message"]
+        print(f"Delete failed with response: {del_status} {del_message}")
 
 
 # ############## MAIN
@@ -155,6 +155,7 @@ if __name__ == "__main__":
                         required=False)
     parser.add_argument('-o', '--cloudtrail_bucket_owner_id', help='Account where the S3 bucket is hosted',
                         required=False)
+    parser.add_argument("-u", "--crowdstrike_cloud", help="US1, US2, EU, USGOV1", required=False)
     parser.add_argument('-a', '--local_account', help='This AWS Account', required=False)
     parser.add_argument('-e', '--external_id', help='External ID used to assume role in account', required=False)
     parser.add_argument('-i', '--iam_role_arn',
@@ -176,7 +177,7 @@ if __name__ == "__main__":
                     or args.local_account is None
                     or args.external_id is None
                     or args.iam_role_arn is None):
-                parser.error("The {} command requires the -r, -o, -a, -e, -i arguments to also be specified.".format(command))
+                parser.error(f"The {command} command requires the -r, -o, -a, -e, -i arguments to also be specified.")
             else:
                 cloudtrail_bucket_region = args.cloudtrail_bucket_region
                 cloudtrail_bucket_owner_id = args.cloudtrail_bucket_owner_id
@@ -186,27 +187,35 @@ if __name__ == "__main__":
         elif command.lower() in "delete":
             # Delete only requires the local account ID
             if args.local_account is None:
-                parser.error("The {} command requires the -l argument to also be specified.".format(command))
+                parser.error(f"The {command} command requires the -l argument to also be specified.")
             else:
                 local_account = args.local_account
     else:
-        parser.error("The {} command is not recognized.".format(command))
+        parser.error(f"The {command} command is not recognized.")
     # These globals exist for all requests
     falcon_client_id = args.falcon_client_id
     falcon_client_secret = args.falcon_client_secret
-    log_enabled = args.log_enabled
-    if args.query_limit is None:
-        query_limit = 100
+    if not args.crowdstrike_cloud:
+        CLOUD_URL = "US1"
     else:
-        query_limit = args.query_limit
+        CLOUD_URL = args.crowdstrike_cloud
+    log_enabled = args.log_enabled
+    if not args.query_limit:
+        QUERY_LIMIT = 100
+    else:
+        QUERY_LIMIT = args.query_limit
 
     # ############## MAIN ROUTINE
     # Connect to the API using our provided falcon client_id and client_secret
+
     try:
-        falcon = FalconSDK.APIHarness(creds={'client_id': falcon_client_id, 'client_secret': falcon_client_secret})
-    except:  # noqa: E722
+        falcon = APIHarness(client_id=falcon_client_id,
+                            client_secret=falcon_client_secret,
+                            base_url=CLOUD_URL
+                            )
+    except Exception as err:  # noqa: E722
         # We can't communicate with the endpoint
-        print("Unable to communicate with API")
+        print(f'Unable to communicate with API {str(err)}')
     # Authenticate
     if falcon.authenticate():
         try:
@@ -219,9 +228,9 @@ if __name__ == "__main__":
                 register_account()
             if command.lower() == "delete":
                 delete_account()
-        except Exception as e:
+        except Exception as err:
             # Handle any previously unhandled errors
-            print("Command failed with error: {}.".format(str(e)))
+            print(f"Command failed with error: {str(err)}.")
         # Discard our token before we exit
         falcon.deauthenticate()
     else:
