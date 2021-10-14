@@ -72,10 +72,10 @@ Various command-line utilities are required for this demo. These command line to
 
 ### Step 1: Create EKS Fargate Cluster (For an existing cluster continue to step 2)
  - Set the cloud region (example below uses us-west-1)
-   ```$ CLOUD_REGION=us-west-1```
+   ```CLOUD_REGION=us-west-1```
  - Create new EKS Fargate cluster. It may take couple minutes before cluster is fully up and functioning.
    ```
-   $ eksctl create cluster \
+   eksctl create cluster \
        --name eks-fargate-cluster --region $CLOUD_REGION \
        --fargate
    ```
@@ -116,7 +116,7 @@ Various command-line utilities are required for this demo. These command line to
    EKS cluster automatically decides which workloads shall be instantiated on Fargate vs EKS nodes. This decision process is configured by AWS entity called *Fargate Profile*. Fargate profiles assign workloads based on Kubernetes namespaces. By default `kube-system` and `default` namespaces are present on the cluster. Falcon Admission Controller will be deployed in Step 4 to `falcon-system` namespace. The following command configures a cluster to instantiate the Admission Controller on the Fargate.
 
    ```
-   $ eksctl create fargateprofile \
+   eksctl create fargateprofile \
        --region $CLOUD_REGION \
        --cluster eks-fargate-cluster \
        --name fp-falcon-sytem \
@@ -130,7 +130,7 @@ Various command-line utilities are required for this demo. These command line to
 
  - Verify that your local kubectl utility has been configured to connect to the cluster.
    ```
-   $ kubectl cluster-info
+   kubectl cluster-info
    ```
    Example output:
    ```
@@ -145,7 +145,7 @@ Various command-line utilities are required for this demo. These command line to
 
  - Create container repository in AWS ECR. AWS ECR (Elastic Container Registry) is a cloud service providing a container registry. The bellow command creates a new repository in the registry and this repository will be subsequently used to store the Falcon Container sensor image.
    ```
-   $ aws ecr create-repository --region $CLOUD_REGION --repository-name falcon-sensor
+   aws ecr create-repository --region $CLOUD_REGION --repository-name falcon-sensor
    ```
    Example output:
    ```
@@ -174,16 +174,16 @@ Various command-line utilities are required for this demo. These command line to
 
  - Set the FALCON_IMAGE_URI variable to your managed ECR based on the ECR `repositoryUri`
    ```
-   $ FALCON_IMAGE_URI=123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-sensor
+   FALCON_IMAGE_URI=123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-sensor
    ```
  - Note for existing ECR registries the `repositoryUri` can be found with the following command.
    ```
-   $ aws ecr describe-repositories --region $CLOUD_REGION
+   aws ecr describe-repositories --region $CLOUD_REGION
    ```
 
  - Push Falcon Container image to your newly created repository
    ```
-   $ falcon-container-sensor-push $FALCON_IMAGE_URI
+   falcon-container-sensor-push $FALCON_IMAGE_URI
    ```
 
 ### Step 4: Install The Admission Controller
@@ -192,12 +192,12 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
 
  - Provide CrowdStrike Falcon Customer ID as environment variable. This CID will be later used to register newly deployed pods to CrowdStrike Falcon platform.
    ```
-   $ CID=1234567890ABCDEFG1234567890ABCDEF-12
+   CID=1234567890ABCDEFG1234567890ABCDEF-12
    ```
 
  - Install the admission controller
    ```
-   $ docker run --rm --entrypoint installer $FALCON_IMAGE_URI:latest \
+   docker run --rm --entrypoint installer $FALCON_IMAGE_URI:latest \
        -cid $CID -image $FALCON_IMAGE_URI:latest \
        | kubectl apply -f -
    ```
@@ -212,7 +212,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
  - (optional) Watch the progress of a deployment
    ```
-   $ watch 'kubectl get pods -n falcon-system'
+   watch 'kubectl get pods -n falcon-system'
    ```
    Example output:
    ```
@@ -222,7 +222,11 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
 
  - (optional) Run the installer with `--help` command-line argument to output available configuration options for the deployment.
    ```
-   $ docker run --rm --entrypoint installer $FALCON_IMAGE_URI:latest --help
+   docker run --rm --entrypoint installer $FALCON_IMAGE_URI:latest --help
+   ```
+
+   Sample output:
+   ```
    usage:
      -cid string
        	Customer id to use
@@ -252,7 +256,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
 
  - Instruct Kubernetes cluster to start a detection application
    ```
-   $ kubectl apply -f ~/demo-yamls/detection-single.yaml
+   kubectl apply -f ~/demo-yamls/detection-single.yaml
    ```
    Example output:
    ```
@@ -260,7 +264,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
  - (optional) See the logs of the admission installer to ensure it is responding to the detection app start-up
    ```
-   $ kubectl logs -n falcon-system $(kubectl get pods -n falcon-system | awk 'FNR > 1' | awk '{print $1}')
+   kubectl logs -n falcon-system $(kubectl get pods -n falcon-system | awk 'FNR > 1' | awk '{print $1}')
    ```
    Example output:
    ```
@@ -270,7 +274,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
  - (optional) Watch the deployment progress of the detection app
    ```
-   $ watch 'kubectl get pods'
+   watch 'kubectl get pods'
    ```
    Example output:
    ```
@@ -279,7 +283,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
  - (optional) Ensure that the newly created pod was allocated an Agent ID (AID) from CrowdStrike Falcon platform
    ```
-   $ kubectl exec $(kubectl get pods | grep detection | awk '{print $1}') -c falcon-container -- falconctl -g --aid
+   kubectl exec $(kubectl get pods | grep detection | awk '{print $1}') -c falcon-container -- falconctl -g --aid
    ```
    Example output:
    ```
@@ -290,13 +294,13 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
 
  - Step 1: Uninstall the detection app
    ```
-   $ kubectl delete -f ~/demo-yamls/detection-single.yaml
+   kubectl delete -f ~/demo-yamls/detection-single.yaml
    deployment.apps "detection-single" deleted
    ```
 
  - Step 2: Uninstall the admission Controller
    ```
-   $ docker run --rm --entrypoint installer $FALCON_IMAGE_URI:latest \
+   docker run --rm --entrypoint installer $FALCON_IMAGE_URI:latest \
        -cid $CID -image $FALCON_IMAGE_URI:latest \
        | kubectl delete -f -
    ```
@@ -311,7 +315,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
  - Step 3: Delete the falcon image from AWS ECR registry
    ```
-   $ aws ecr batch-delete-image --region $CLOUD_REGION \
+   aws ecr batch-delete-image --region $CLOUD_REGION \
        --repository-name falcon-sensor \
        --image-ids imageTag=latest
    ```
@@ -329,7 +333,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
  - Step 4: Delete the AWS ECR repository
    ```
-   $ aws ecr delete-repository --region $CLOUD_REGION --repository-name falcon-sensor
+   aws ecr delete-repository --region $CLOUD_REGION --repository-name falcon-sensor
    ```
    Example output:
    ```
@@ -346,7 +350,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
  - Step 5: Delete the AWS EKS Fargate Cluster
    ```
-   $ eksctl delete cluster --region $CLOUD_REGION eks-fargate-cluster
+   eksctl delete cluster --region $CLOUD_REGION eks-fargate-cluster
    ```
    Example output:
    ```
