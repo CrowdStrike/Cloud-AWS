@@ -41,6 +41,8 @@ parameters will use their default values.
 PS>.\sensor_install.ps1
 
 Run the script and use all values that were previously defined within the script.
+.NOTES
+Updated 2021-10-22 to include 'sensor_version' property when matching policy to sensor installer package.
 #>
 [CmdletBinding()]
 param(
@@ -93,9 +95,11 @@ begin {
     $Falcon.BaseAddress = $BaseAddress
     $Patterns = @{
         access_token  = '"(?<name>access_token)": "(?<access_token>.*)",'
-        build_version = '"(?<name>build)": "(?<version>.+)",'
+        build         = '"(?<name>build)": "(?<version>.+)",'
         ccid          = '(?<ccid>\w{32}-\w{2})'
+        major_minor   = '"(?<name>sensor_version)": "(?<version>\d{1,}\.\d{1,})\.\d+",'
         policy_id     = '"(?<name>id)": "(?<id>\w{32})",'
+        version       = '"(?<name>sensor_version)": "(?<version>.+)",'
     }
     function Get-InstallerHash ([string] $Path) {
         $Output = if (Test-Path $Path) {
@@ -197,14 +201,24 @@ process {
     }
     $Response = Invoke-FalconGet ("/policy/combined/sensor-update/v2?filter=platform_name:" +
         "'Windows'%2Bname:'$($PolicyName.ToLower())'")
-    if ($Response -match $Patterns.build_version) {
-        $PolicyId = [regex]::Matches($Response, $Patterns.policy_id)[0].Groups['id'].Value
-        $Version = [regex]::Matches($Response, $Patterns.build_version)[0].Groups['version'].Value
-        $MinorVersion = ($Version).Split('\|')[0]
-        if ($Version) {
-            Write-FalconLog 'GetVersion' "'$PolicyId' has build '$Version' assigned"
+    $PolicyId = if ($Response -match $Patterns.policy_id) {
+        [regex]::Matches($Response, $Patterns.policy_id)[0].Groups['id'].Value
+    }
+    if ($Response -match $Patterns.build -or $Response -match $Patterns.version) {
+        $Build = [regex]::Matches($Response, $Patterns.build)[0].Groups['version'].Value
+        $Version = [regex]::Matches($Response, $Patterns.version)[0].Groups['version'].Value
+        $MajorMinor = if ($Version) {
+            [regex]::Matches($Response, $Patterns.major_minor)[0].Groups['version'].Value
+        }
+        $Patch = if ($Build) {
+            ($Build).Split('|')[0]
+        } elseif ($Version) {
+            ($Version).Split('.')[-1]
+        }
+        if ($Patch) {
+            Write-FalconLog 'GetVersion' "Policy '$PolicyId' has build '$Patch' assigned"
         } else {
-            $Message = "Failed to determine build version for '$PolicyId'"
+            $Message = "Failed to determine sensor version for policy '$PolicyId'"
             Write-FalconLog 'GetVersion' $Message
             throw $Message
         }
@@ -215,14 +229,23 @@ process {
     }
     $Response = Invoke-FalconGet "/sensors/combined/installers/v1?filter=platform:'windows'"
     if ($Response) {
-        $Installer = '{\n.*"name": "(?<filename>(\w+\.){1,}?exe)",(\n.*){1,}"sha256": "(?<hash>\w{64})",(\n.*){1,}' +
-        '"version": "\d{1,}?\.\d{1,}\.' + $MinorVersion + '",(\n.*){1,}\},'
-        if ($Response -match $Installer) {
-            $CloudHash = [regex]::Matches($Response, $Installer)[0].Groups['hash'].Value
-            $CloudFile = [regex]::Matches($Response, $Installer)[0].Groups['filename'].Value
+        $BuildMatch = '\d{1,}?\.\d{1,}\.' + $Patch
+        if ($MajorMinor) {
+            $BuildMatch = "($BuildMatch|$([regex]::Escape($MajorMinor))\.\d+)"
+        }
+        $Installer = '"name": "(?<filename>(\w+\.){1,}?exe)",\n\s+"description": "(.*)?Falcon(.*)",(\n.*){1,}"sh' +
+            'a256": "(?<hash>\w{64})",(\n.*){1,}"version": "' + $BuildMatch + '"'
+        $Match = $Response.Split('}') | Where-Object { $_ -match $Installer }
+        if ($Match) {
+            $CloudHash = [regex]::Matches($Match, $Installer)[0].Groups['hash'].Value
+            $CloudFile = [regex]::Matches($Match, $Installer)[0].Groups['filename'].Value
             Write-FalconLog 'GetInstaller' "Matched installer '$CloudHash' ($CloudFile)"
         } else {
-            $Message = "Unable to match installer from list using build '$MinorVersion'"
+            $MatchValue = "'$Patch'"
+            if ($MajorMinor) {
+                $MatchValue += " or '$MajorMinor'"
+            }
+            $Message = "Unable to match installer using $MatchValue"
             Write-FalconLog 'GetInstaller' $Message
             throw $Message
         }
