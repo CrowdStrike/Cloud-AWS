@@ -174,11 +174,7 @@ Various command-line utilities are required for this demo. These command line to
 
  - Set the FALCON_IMAGE_URI variable to your managed ECR based on the ECR `repositoryUri`
    ```
-   FALCON_IMAGE_URI=123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-sensor
-   ```
- - Note for existing ECR registries the `repositoryUri` can be found with the following command.
-   ```
-   aws ecr describe-repositories --region $CLOUD_REGION
+   $ FALCON_IMAGE_URI=$(aws ecr describe-repositories --region $CLOUD_REGION | jq -r '.repositories[] | select(.repositoryName=="falcon-sensor") | .repositoryUri')
    ```
 
  - Push Falcon Container image to your newly created repository
