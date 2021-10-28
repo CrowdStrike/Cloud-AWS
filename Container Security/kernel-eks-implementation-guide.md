@@ -125,14 +125,14 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-12
   ```
  - We will be reusing the variables from previous commands inside the interactive container session. Provide OAuth2 Client ID and Client Secret for authentication with CrowdStrike Falcon platform. Establishing and retrieving OAuth2 API credentials can be performed at [falcon-console](https://falcon.crowdstrike.com/support/api-clients-and-keys). These credentials will only be used to download sensor, we recommend you create key pair that has permissions only for Sensor Download.
    ```
-   $ FALCON_CLIENT_ID=1234567890ABCDEFG1234567890ABCDEF
-   $ FALCON_CLIENT_SECRET=1234567890ABCDEFG1234567890ABCDEF
+   $ export FALCON_CLIENT_ID=1234567890ABCDEFG1234567890ABCDEF
+   $ export FALCON_CLIENT_SECRET=1234567890ABCDEFG1234567890ABCDEF
    ```
 
  - (optional) Provide name of Falcon Cloud you want to used
  - Note that this information can be found in the URL of the Falcon Platform. The default value used by the falcon-node-sensor-build script is us-1. The example    below uses us-2.
    ```
-   $ FALCON_CLOUD=us-2
+   $ export FALCON_CLOUD=us-2
    ```
 
  - Build falcon-node-sensor container for your particular OS that is running on your cluster nodes. By default EKS clusters use Amazon Linux 2
