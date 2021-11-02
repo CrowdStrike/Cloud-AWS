@@ -23,11 +23,11 @@ CrowdStrike Falcon OAuth2 API Client Secret [Required]
 .PARAMETER MemberCid
 Member CID, used only in multi-CID ("Falcon Flight Control") configurations
 .PARAMETER PolicyName
-Policy name to check for assigned sensor version [default: 'platform_default']
+Policy name to check for assigned sensor version ['platform_default' if left undefined]
 .PARAMETER InstallParams
-Sensor installation parameters, without your CID value [default: '/install /quiet /noreboot']
+Sensor installation parameters, without your CID value ['/install /quiet /noreboot' if left undefined]
 .PARAMETER LogPath
-Script log location [default: undefined, which uses 'Windows\Temp\InstallFalcon.log']
+Script log location ['Windows\Temp\InstallFalcon.log' if left undefined]
 .PARAMETER DeleteInstaller
 Delete sensor installer package when complete [default: $true]
 .PARAMETER DeleteScript
@@ -64,10 +64,10 @@ param(
     [string] $MemberCid,
 
     [Parameter(Position = 5)]
-    [string] $PolicyName = 'platform_default',
+    [string] $PolicyName,
 
     [Parameter(Position = 6)]
-    [string] $InstallParams = '/install /quiet /noreboot',
+    [string] $InstallParams,
 
     [Parameter(Position = 7)]
     [string] $LogPath,
@@ -148,6 +148,12 @@ begin {
         }
         "$(@($Content + $Source) -join ' '): $Message" >> $LogPath
     }
+    if (!$PolicyName) {
+        $PolicyName = 'platform_default'
+    }
+    if (!$InstallParams) {
+        $InstallParams = '/install /quiet /noreboot'
+    }
 }
 process {
     if (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
@@ -160,11 +166,9 @@ process {
         Write-FalconLog 'CheckService' $Message
         throw $Message
     } else {
-        @('ClientId', 'ClientSecret') | ForEach-Object {
-            if (!(Get-Variable $_).Value) {
-                $Message = "Missing '$((Get-Variable $_).Name)'"
-                Write-FalconLog 'CheckClient' $Message
-                throw $Message
+        @($BaseAddress, $ClientId, $ClientSecret).foreach{
+            if (!$_) {
+                throw "Missing 'BaseAddress', 'ClientId' or 'ClientSecret'"
             }
         }
         if ([Net.ServicePointManager]::SecurityProtocol -notmatch 'Tls12') {
@@ -175,6 +179,11 @@ process {
                 Write-FalconLog 'TlsCheck' $Message
                 throw $Message
             }
+        }
+        if (!($PSVersionTable.CLRVersion.ToString() -ge 3.5)) {
+            $Message = '.NET Framework 3.5 or newer is required'
+            Write-FalconLog 'NetCheck' $Message
+            throw $Message
         }
     }
     $ApiClient = "client_id=$ClientId&client_secret=$ClientSecret"
