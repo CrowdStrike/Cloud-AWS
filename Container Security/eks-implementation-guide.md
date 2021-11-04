@@ -279,7 +279,7 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
  - (optional) Ensure that the newly created pod was allocated an Agent ID (AID) from CrowdStrike Falcon platform
    ```
-   kubectl exec $(kubectl get pods | grep detection | awk '{print $1}') -c falcon-container -- falconctl -g --aid
+   kubectl exec $(kubectl get pods | grep detection | awk '{print $1}') -c crowdstrike-falcon-container -- falconctl -g --aid
    ```
    Example output:
    ```
