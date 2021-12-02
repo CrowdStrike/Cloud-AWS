@@ -179,7 +179,7 @@ Various command-line utilities are required for this demo. These command line to
 
  - Push Falcon Container image to your newly created repository
    ```
-   falcon-container-sensor-push $FALCON_IMAGE_URI
+   falcon-container-sensor-push "$FALCON_IMAGE_URI"
    ```
 
 ### Step 4: Install The Admission Controller
