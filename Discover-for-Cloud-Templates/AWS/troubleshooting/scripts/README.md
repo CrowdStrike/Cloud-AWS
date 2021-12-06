@@ -34,7 +34,7 @@ $ python3 fd_accounts.py -f [falcon_client_id] -s [falcon_client_secret] -c [com
 
 #### Checking all accounts in your environment (and outputting the results to a file)
 ```bash
-$ python3 fd_accounts.py -f CLIENT_ID -s CLIENT_SECRET -c check -l
+$ python3 fd_accounts.py -f $FALCON_CLIENT_ID -s $FALCON_CLIENT_SECRET -c check -l
 ```
 ##### Result
 ```json
@@ -61,7 +61,7 @@ Account 987654321012 is ok!
 
 #### Deleting an account
 ```bash
-$ python3 falcon_discover_accounts.py -f CLIENT_ID -s CLIENT_SECRET -c delete -a 123456789012
+$ python3 falcon_discover_accounts.py -f $FALCON_CLIENT_ID -s $FALCON_CLIENT_SECRET -c delete -a 123456789012
 ```
 
 ##### Result
@@ -71,7 +71,7 @@ Successfully deleted account.
 
 #### Registering an account
 ```bash
-$ python3 fd_accounts.py -f CLIENT_ID -s CLIENT_SECRET -c register --external_id IwXs93to8iHEkl0 -a 123456789012 -r eu-west-1 -o 123456789012 -i arn:aws:iam::123456789012:role/FalconDiscover
+$ python3 fd_accounts.py -f $FALCON_CLIENT_ID -s $FALCON_CLIENT_SECRET -c register --external_id IwXs93to8iHEkl0 -a 123456789012 -r eu-west-1 -o 123456789012 -i arn:aws:iam::123456789012:role/FalconDiscover
 ```
 
 ##### Result
@@ -81,7 +81,7 @@ Successfully registered account.
 
 #### Updating an account
 ```bash
-$ python3 falcon_discover_accounts.py -f CLIENT_ID -s CLIENT_SECRET -c update --external_id IwXs93to8iHEkl0 -a 123456789012 -r eu-west-1 -o 123456789012 -i arn:aws:iam::123456789012:role/FalconDiscover
+$ python3 falcon_discover_accounts.py -f $FALCON_CLIENT_ID -s $FALCON_CLIENT_SECRET -c update --external_id IwXs93to8iHEkl0 -a 123456789012 -r eu-west-1 -o 123456789012 -i arn:aws:iam::123456789012:role/FalconDiscover
 ```
 
 ##### Result
