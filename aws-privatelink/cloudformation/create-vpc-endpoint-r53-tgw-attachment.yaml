@@ -19,6 +19,13 @@ Parameters:
   EnvironmentName:
     Description: An environment name that will be prefixed to resource names
     Type: String
+  CRWDCloud:
+    Description: CrowdStrike Cloud us-1, us-2 or eu
+    Type: String
+    AllowedValues:
+      - us-1
+      - us-2
+      - eu
 
   CSPrivLinkVpcCIDR:
     Description: Please enter the IP range (CIDR notation) for this CSPrivLinkVPC
@@ -87,10 +94,21 @@ Parameters:
 
 Mappings:
   CSService:
-    uscloud:
-      'ts01b': 'com.amazonaws.vpce.us-west-1.vpce-svc-08744dea97b26db5d'
-      'lfodown01b' : 'com.amazonaws.vpce.us-west-1.vpce-svc-0f9d8ca86ddcb7106'
-
+    us-1:
+      ts01bdns: 'ts01-b.cloudsink.net'
+      ts01bservice: 'com.amazonaws.vpce.us-west-1.vpce-svc-08744dea97b26db5d'
+      lfodown01dns: 'lfodown01-b'
+      lfodown01service : 'com.amazonaws.vpce.us-west-1.vpce-svc-0f9d8ca86ddcb7106'
+    us-2:
+      ts01bdns: 'ts01-gyr-maverick'
+      ts01bservice: 'com.amazonaws.vpce.us-west-2.vpce-svc-08a5bb05d337fd834'
+      lfodown01dns: 'lfodown01-gyr-maverick'
+      lfodown01service: 'com.amazonaws.vpce.us-west-2.vpce-svc-0e11def2d8620ae74'
+    eu:
+      ts01bdns: 'ts01-lanner-lion'
+      ts01bservice: 'com.amazonaws.vpce.eu-central1.vpce-svc-0eb7b6ca4b7271385'
+      lfodown01dns: 'lfodown01-lanner-lion'
+      lfodown01service: 'com.amazonaws.vpce.eu-central1.vpce-svc-0340142b9ab8fc564'
 
 Resources:
   TransitGateway:
@@ -432,7 +450,10 @@ Resources:
     Type: AWS::EC2::VPCEndpoint
     Properties:
       VpcId: !Ref 'CSPrivLinkVPC'
-      ServiceName: !FindInMap [CSService, uscloud, lfodown01b]
+      ServiceName: !FindInMap
+        - CSService
+        - !Ref 'CRWDCloud'
+        - lfodown01service
       VpcEndpointType: 'Interface'
       PrivateDnsEnabled: False
       SubnetIds:
@@ -445,7 +466,10 @@ Resources:
     Type: AWS::EC2::VPCEndpoint
     Properties:
       VpcId: !Ref 'CSPrivLinkVPC'
-      ServiceName: !FindInMap [CSService, uscloud, ts01b]
+      ServiceName: !FindInMap
+        - CSService
+        - !Ref 'CRWDCloud'
+        - ts01bservice
       VpcEndpointType: 'Interface'
       PrivateDnsEnabled: False
       SubnetIds:
@@ -467,7 +491,10 @@ Resources:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref TenantHostedZone
-      Name: 'ts01-b.cloudsink.net'
+      Name: !FindInMap
+        - CSService
+        - !Ref 'CRWDCloud'
+        - ts01bdns
       Type: A
       AliasTarget:
         DNSName: !Select
@@ -490,7 +517,10 @@ Resources:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref TenantHostedZone
-      Name: 'lfodown01-b.cloudsink.net'
+      Name: !FindInMap
+        - CSService
+        - !Ref 'CRWDCloud'
+        - lfodown01dns
       Type: A
       AliasTarget:
         DNSName: !Select
