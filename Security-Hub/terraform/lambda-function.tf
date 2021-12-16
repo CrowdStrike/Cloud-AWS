@@ -112,7 +112,7 @@ resource "aws_lambda_function" "sechub_example_lambda" {
 
   environment {
       variables = {
-          DEBUG = "True"
+          DEBUG = "False"
           CONFIRM_INSTANCES = "True"
       }
   }
