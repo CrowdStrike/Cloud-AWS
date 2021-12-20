@@ -2,7 +2,6 @@ import json
 import os
 import logging
 import sys
-#from botocore.vendored import requests
 import requests
 
 logger = logging.getLogger()

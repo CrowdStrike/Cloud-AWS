@@ -4,7 +4,6 @@ import logging
 import string
 import random
 import sys
-#from botocore.vendored import requests
 import requests
 
 logger = logging.getLogger()

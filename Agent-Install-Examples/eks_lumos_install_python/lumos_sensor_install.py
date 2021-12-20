@@ -42,7 +42,7 @@ ecr_client = client = boto3.client('ecr')
 
 # Get credentials for falconpy SDK
 config_file = os.path.expanduser("~/config.json")
-if os.path.exists(config_file) == False:
+if not os.path.exists(config_file):
     log.error("ConfigFileError: Please verify ~/config.json exists")
     exit()
 
@@ -92,7 +92,7 @@ def download_latest_sensor(os_name: str, download_path: str):
         exit()
 
     # Download falcon-container-sensor
-    if os.path.exists(download_path + "/" + file_name) == False:
+    if not os.path.exists(download_path + "/" + file_name):
         falcon.DownloadSensorInstallerById(
             parameters={
                 "id": latest_sha,
@@ -111,7 +111,7 @@ def import_container_sensor(download_path: str, file_name: str, repo_uri: str):
         local_image = docker_client.images.load(f)
     image_name = local_image[0].tags[0]
     import_tag = image_name.split(":")[1]
-    tag_pattern = '(\d+\.){2}\d+-\d+'
+    tag_pattern = r'(\d+\.){2}\d+-\d+'
     tag = re.search(tag_pattern, import_tag).group()
     resp = local_image[0].tag(repository=repo_uri, tag=tag)
     if resp:
