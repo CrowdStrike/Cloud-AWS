@@ -41,5 +41,3 @@ def lambda_handler(event, context):
             return (False)
     else:
         logger.info('Control Tower Event Captured :{}'.format(event))
-
-

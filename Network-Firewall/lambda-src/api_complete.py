@@ -26,7 +26,7 @@ class APIHarness:
         self.token_renew_window = 20
         self.token_time = time.time()
         self.token_expired = lambda: True if (time.time() - self.token_time) >= (
-                    self.token_expiration - self.token_renew_window) else False
+            self.token_expiration - self.token_renew_window) else False
         self.authenticated = False
         self.valid_cred_format = lambda: True if "client_id" in self.creds and "client_secret" in self.creds else False
         self.headers = lambda: {'Authorization': 'Bearer {}'.format(self.token)} if self.token else {}

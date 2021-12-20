@@ -35,6 +35,7 @@ OS_LIST = ['windows', 'linux']
 
 class SSMPackageUpdater:  # pylint: disable=R0903
     """Class to represent our SSM package update."""
+
     def __init__(self, region_name):
         self.region = region_name
 
@@ -103,6 +104,7 @@ class SSMPackageUpdater:  # pylint: disable=R0903
 
 class S3BucketUpdater:  # pylint: disable=R0903
     """Class to represent our S3 Bucket update."""
+
     def __init__(self, region_name):
         self.region = region_name
 
@@ -179,6 +181,7 @@ class S3BucketUpdater:  # pylint: disable=R0903
 
 class DistributorPackager:  # pylint: disable=R0903
     """Class to represent a Distributor package."""
+
     def build(self, mappings_file):
         """Build the package."""
         dirs = set()

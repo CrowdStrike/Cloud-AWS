@@ -10,6 +10,7 @@ from logging.handlers import RotatingFileHandler
 
 class Logger():
     """Class to handle all logging operations."""
+
     def __init__(self, logfile, logger):
         """Create a rotating output log."""
         self.outputlog = logging.getLogger(logger)
