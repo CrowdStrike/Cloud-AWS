@@ -47,7 +47,7 @@ try:
 except ImportError as no_boto:
     raise SystemExit(
         "The AWS boto3 library is required to run Falcon Data Replicator.\nPlease execute 'pip3 install boto3'"
-        ) from no_boto
+    ) from no_boto
 import stream as event_stream
 import credvault
 import logger

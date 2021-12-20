@@ -1,6 +1,11 @@
-import json, os, boto3, base64
+import json
+import os
+import boto3
+import base64
 import logging
-import string, random, sys
+import string
+import random
+import sys
 #from botocore.vendored import requests
 import requests
 import urllib3
@@ -22,7 +27,8 @@ LocalAccount = os.environ['LocalAccount']
 aws_region = os.environ['aws_region']
 Falcon_Discover_Url = 'https://ctstagingireland.s3-'+aws_region+'.amazonaws.com/crowdstrike_role_creation_ss.yaml'
 
-def register_falcon_discover_account(payload, api_keys,api_method) -> bool:
+
+def register_falcon_discover_account(payload, api_keys, api_method) -> bool:
     cs_action = api_method
     url = "https://api.crowdstrike.com/cloud-connect-aws/entities/accounts/v1?mode=manual"
     auth_token = get_auth_token(api_keys)
@@ -189,5 +195,3 @@ def lambda_handler(event, context):
         response_data = {}
         response_data["Status"] = str(e)
         cfnresponse_send(event, context, 'FAILED', response_data, "CustomResourcePhysicalID")
-
-

@@ -6,6 +6,7 @@ import boto3
 
 class CredVault():  # pylint: disable=R0902
     """Class to handle configuration lookups."""
+
     def __init__(self, logger):
         """Init the object and base parameters."""
         region_lookup = "http://169.254.169.254/latest/meta-data/placement/availability-zone"

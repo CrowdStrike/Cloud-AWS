@@ -32,6 +32,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 ssm_client = boto3.client('ssm')
 
+
 def delete_ssm_params(parameter_names):
     try:
         response = ssm_client.delete_parameters(
@@ -43,6 +44,7 @@ def delete_ssm_params(parameter_names):
             return False
     except:
         logger.error("Unidentified error")
+
 
 def create_ssm_param(parameter_name, parameter_description, parameter_value, parameter_type, overwrite):
     try:

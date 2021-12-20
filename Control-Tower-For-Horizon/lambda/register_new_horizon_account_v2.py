@@ -23,6 +23,7 @@ CSAccountNumber = os.environ['CSAccountNumber']
 CSAssumingRoleName = os.environ['CSAssumingRoleName']
 aws_region = os.environ['aws_region']
 
+
 def deregister_falcon_horizon_account(account_id, api_keys, api_method) -> bool:
     cs_action = api_method
     url = "https://api.crowdstrike.com/cloud-connect-cspm-aws/entities/account/v1?ids="+account_id
@@ -227,5 +228,3 @@ def lambda_handler(event, context):
         logger.info('Got exception {}'.format(e))
         response_data = {"Status": str(e)}
         cfnresponse_send(event, context, 'FAILED', response_data, "CustomResourcePhysicalID")
-
-

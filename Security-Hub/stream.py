@@ -14,6 +14,7 @@ import logger
 
 class Stream():  # pylint: disable=R0902
     """Class to represent a single stream."""
+
     def __init__(self, stream_config, api_interface, sqs_queue, config, current_cid):  # pylint: disable=R0913
         self.data_feed = stream_config["dataFeedURL"]
         self.token = stream_config["sessionToken"]["token"]
@@ -43,10 +44,10 @@ class Stream():  # pylint: disable=R0902
         self.partition = self.refresh_url.replace(
             f"{self.base_url}/sensors/entities/datafeed-actions/v1/",
             ""
-            ).replace(
-                f"?appId={str(self.app_id).lower()}&action_name=refresh_active_stream_session",
-                ""
-            )
+        ).replace(
+            f"?appId={str(self.app_id).lower()}&action_name=refresh_active_stream_session",
+            ""
+        )
         # Log, offset and PID files
         self.log_file = f"{str(self.app_id).lower()}_{str(self.partition)}.log"
         self.offset_file = f".{str(self.app_id).lower()}_{str(self.partition)}.offset"
@@ -109,8 +110,8 @@ class Stream():  # pylint: disable=R0902
     def refresh(self):
         """Refresh the API stream token."""
         refresher = self.api_interface.command(action="refreshActiveStreamSession", partition=self.partition, parameters={
-           "action_name": "refresh_active_stream_session",
-           "appId": str(self.app_id).lower()
+            "action_name": "refresh_active_stream_session",
+            "appId": str(self.app_id).lower()
         })
         refreshed = False
 

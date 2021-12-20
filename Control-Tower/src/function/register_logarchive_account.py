@@ -1,6 +1,11 @@
-import json, os, boto3, base64
+import json
+import os
+import boto3
+import base64
 import logging
-import string, random, sys
+import string
+import random
+import sys
 #from botocore.vendored import requests
 import requests
 import urllib3
@@ -147,7 +152,7 @@ def lambda_handler(event, context):
             API_METHOD = 'POST'
             api_message = format_notification_message(external_id)
             # Register account
-            register_result = register_falcon_discover_account(api_message, api_keys,API_METHOD)
+            register_result = register_falcon_discover_account(api_message, api_keys, API_METHOD)
             logger.info('Account registration result: {}'.format(register_result))
             if register_result:
                 cfnresponse_send(event, context, SUCCESS,  "CustomResourcePhysicalID")
@@ -183,5 +188,3 @@ def lambda_handler(event, context):
         response_data = {}
         response_data["Status"] = str(e)
         cfnresponse_send(event, context, 'FAILED',  "CustomResourcePhysicalID")
-
-

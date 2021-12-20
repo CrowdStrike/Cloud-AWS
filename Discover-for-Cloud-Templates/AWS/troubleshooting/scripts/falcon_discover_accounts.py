@@ -48,7 +48,7 @@ def check_account():
     for z in account_list:
         id_items.append(z["id"])
     # Returns the specified value for a specific account id within account_list
-    account_value = lambda i, v: [a[v] for a in account_list if a["id"] == i][0]  # noqa: E731
+    def account_value(i, v): return [a[v] for a in account_list if a["id"] == i][0]  # noqa: E731
     q_max = 10    # VerifyAWSAccountAccess has a ID max count of 10
     for index in range(0, len(id_items), q_max):
         sub_acct_list = id_items[index:index + q_max]
@@ -84,7 +84,7 @@ def check_account():
                         # Requery the API for the account_list when this happens.
                         account_list = falcon.QueryAWSAccounts(
                             parameters={"limit": "{}".format(str(query_limit))}
-                            )["body"]["resources"]
+                        )["body"]["resources"]
                         issue = account_value(result["id"], "access_health")["api"]["reason"]
                         print(f'Account {result["id"]} has a problem: {issue}')
                     # Output the account details to the user to assist with troubleshooting the account

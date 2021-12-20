@@ -52,7 +52,7 @@ def check_account():
     for acct in account_list:
         id_items.append(acct["id"])
     # Returns the specified value for a specific account id within account_list
-    account_value = lambda i, v: [a[v] for a in account_list if a["id"] == i][0]  # noqa: E731
+    def account_value(i, v): return [a[v] for a in account_list if a["id"] == i][0]  # noqa: E731
     q_max = 10    # VerifyAWSAccountAccess has a ID max count of 10
     for index in range(0, len(id_items), q_max):
         sub_acct_list = id_items[index:index + q_max]

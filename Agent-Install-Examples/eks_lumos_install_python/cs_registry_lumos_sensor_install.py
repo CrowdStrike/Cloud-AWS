@@ -22,7 +22,7 @@ except ImportError as no_falconpy:
     raise SystemExit(
         "CrowdStrike FalconPy must be installed in order to use this application.\n"
         "Please execute `python3 -m pip install crowdstrike-falconpy` and try again."
-        ) from no_falconpy
+    ) from no_falconpy
 
 
 def graceful_failure(err_msg: str, no_log: bool = False):
@@ -46,7 +46,7 @@ def get_latest_sensor(package_os_name: str):
 
     if result["status_code"] != 200:
         graceful_failure("Error accessing GetCombinedSensorInstallersByQuery : " +
-                  str(result['status_code']))
+                         str(result['status_code']))
 
     # Retrieve result and exit if empty keys
     try:
@@ -56,6 +56,7 @@ def get_latest_sensor(package_os_name: str):
         graceful_failure("Error retrieving data:", err)
 
     return file_name
+
 
 def docker_login(username, password):
     """
@@ -70,6 +71,7 @@ def docker_login(username, password):
         graceful_failure(f'Error {err}', no_log=True)
 
     return success
+
 
 def get_image_pull_token():
     """
@@ -110,6 +112,7 @@ def generate_manifest(image_name: str, cid: str, output_file: str):
         log.info("Exception %s", err)
 
     return manifest
+
 
 def deploy_manifest(yaml_file):
     "Deploy the injector manifest"
