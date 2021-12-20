@@ -1,15 +1,9 @@
 import json
 import os
-import boto3
-import base64
 import logging
-import string
-import random
 import sys
 #from botocore.vendored import requests
 import requests
-import urllib3
-from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
