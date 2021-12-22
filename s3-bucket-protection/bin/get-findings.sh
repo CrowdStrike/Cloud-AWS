@@ -1,5 +1,6 @@
 #!/bin/sh
-echo -e "\nFindings in $(echo ${BUCKET/s3:\/\//}) for the past hour"
+figlet -w 220 -f cricket Findings
+echo -e "Findings in $(echo ${BUCKET/s3:\/\//}) for the past hour:\n"
 st=$(date -d '1 hour ago' '+%Y-%m-%dT%H:%M:%SZ')
 en=$(date -d 'now' '+%Y-%m-%dT%H:%M:%SZ')
 FILTER='{"ResourceId":[{"Value":"'$(echo ${BUCKET/s3:\/\//})'","Comparison":"PREFIX"}]'
