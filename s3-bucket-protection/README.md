@@ -32,122 +32,138 @@ The serverless lambda function leverages the CrowdStrike [FalconPy SDK](https://
 interact with the CrowdStrike Falcon API to scan the files as the are uploaded to the bucket.
 
 + [AWS S3](#aws-s3)
-+ [AWS Lambda](#aws-lambda-function)
++ [AWS Lambda](#aws-lambda)
 + [AWS IAM](#aws-iam)
 + [AWS Systems Manager](#aws-systems-manager)
 
 ### AWS S3 
+Any bucket can be protected by enabling the bucket notification trigger to call the lambda function.
 - Bucket
 - Bucket notification `s3:ObjectCreated:*` -> Lambda trigger
 
-### AWS Lambda function
+### AWS Lambda
+A single serverless function is deployed for this solution.
+
+#### Lambda function
 - Python 3
 - `crowdstrike-falconpy` layer
-- Policy statement
-    - Statement ID: `AllowExecutionFromS3Bucket`
-    - Principal: `s3.amazonaws.com`
-    - Effect: `Allow`
-    - Action: `lambda:InvokeFunction`
-    - Conditions
-      ```json
-      {
-        "ArnLike": {
-            "AWS:SourceArn": "arn:aws:s3:::{LAMBDA_FUNCTION_NAME}"
-        }
+
+##### Policy statement
+- Statement ID: `AllowExecutionFromS3Bucket`
+- Principal: `s3.amazonaws.com`
+- Effect: `Allow`
+- Action: `lambda:InvokeFunction`
+- Conditions
+  ```json
+  {
+      "ArnLike": {
+          "AWS:SourceArn": "arn:aws:s3:::{LAMBDA_FUNCTION_NAME}"
       }
-      ```
-- Execution Role (detailed in IAM section below)
-- Environment variables
-    - `base_url`: CrowdStrike API base URL (only required for GovCloud users.)
-    - `CLIENT_ID_PARAM`: Name of the Parameter store parameter containing the CrowdStrike API Key.
-    - `CLIENT_SECRET_PARAM`: Name of the Parameter store parameter containing the CrowdStrike API Secret.
+  }
+  ```
+
+##### Execution Role
+[Lambda execution role](#lambda-execution-role)
+
+##### Environment variables
+- `base_url`: CrowdStrike API base URL (only required for GovCloud users.)
+- `CLIENT_ID_PARAM`: Name of the Parameter store parameter containing the CrowdStrike API Key.
+- `CLIENT_SECRET_PARAM`: Name of the Parameter store parameter containing the CrowdStrike API Secret.
 
 ### AWS IAM
-- Lambda execution role
-    - Security Hub policy
-      ```json
-      {
-        "Statement": [
-            {
-                "Action": "securityhub:GetFindings",
-                "Effect": "Allow",
-                "Resource": "arn:aws:securityhub:{REGION}:{ACCOUNT_ID}:hub/default",
-                "Sid": ""
-            },
-            {
-                "Action": "securityhub:BatchImportFindings",
-                "Effect": "Allow",
-                "Resource": "arn:aws:securityhub:{REGION}:517716713836:product/crowdstrike/*",
-                "Sid": ""
-            }
-        ],
-        "Version": "2012-10-17"
-      }
-      ```
-    - S3 policy
-      ```json
-      {
-        "Statement": [
-            {
-                "Action": [
-                    "s3:GetObjectVersion",
-                    "s3:GetObject",
-                    "s3:DeleteObjectVersion",
-                    "s3:DeleteObject"
-                ],
-                "Effect": "Allow",
-                "Resource": "arn:aws:s3:::{BUCKET_NAME}/*",
-                "Sid": ""
-            }
-        ],
-        "Version": "2012-10-17"
-      }
-      ```
-    - SSM policy
-      ```json
-      {
-        "Statement": [
-            {
-                "Action": [
-                    "ssm:GetParametersByPath",
-                    "ssm:GetParameters",
-                    "ssm:GetParameterHistory",
-                    "ssm:GetParameter"
-                ],
-                "Effect": "Allow",
-                "Resource": "arn:aws:ssm:{REGION}:{ACCOUNT_ID}:parameter/*",
-                "Sid": ""
-            }
-        ],
-        "Version": "2012-10-17"
-      }
-      ```
-    - Execution policy
-      ```json
-      {
-        "Statement": [
-            {
-                "Action": "logs:CreateLogGroup",
-                "Effect": "Allow",
-                "Resource": "arn:aws:logs:{REGION}:{ACCOUNT_ID}:*",
-                "Sid": ""
-            },
-            {
-                "Action": [
-                    "logs:PutLogEvents",
-                    "logs:CreateLogStream"
-                ],
-                "Effect": "Allow",
-                "Resource": "arn:aws:logs:{REGION}:{ACCOUNT_ID}:log-group:/aws/lambda/{LAMBDA_FUNCTION_NAME}:*",
-                "Sid": ""
-            }
-        ],
-        "Version": "2012-10-17"
-      }
-      ```
+IAM is utilized to store execution permissions for our Lambda function.
+
+#### Lambda execution role
+The execution role for the Lambda function contains policies for SecurityHub, Systems Manager, S3 and CloudWatch.
+
+##### Security Hub policy
+```json
+{
+    "Statement": [
+        {
+            "Action": "securityhub:GetFindings",
+            "Effect": "Allow",
+            "Resource": "arn:aws:securityhub:{REGION}:{ACCOUNT_ID}:hub/default",
+            "Sid": ""
+        },
+        {
+            "Action": "securityhub:BatchImportFindings",
+            "Effect": "Allow",
+            "Resource": "arn:aws:securityhub:{REGION}:517716713836:product/crowdstrike/*",
+            "Sid": ""
+        }
+    ],
+    "Version": "2012-10-17"
+}
+```
+> Note: The resource ARN for `securityhub:BatchImportFindings` must use the account ID specified above.
+
+##### S3 policy
+```json
+{
+    "Statement": [
+        {
+            "Action": [
+                "s3:GetObjectVersion",
+                "s3:GetObject",
+                "s3:DeleteObjectVersion",
+                "s3:DeleteObject"
+            ],
+            "Effect": "Allow",
+            "Resource": "arn:aws:s3:::{BUCKET_NAME}/*",
+            "Sid": ""
+        }
+    ],
+    "Version": "2012-10-17"
+}
+```
+##### SSM policy
+```json
+{
+    "Statement": [
+        {
+            "Action": [
+                "ssm:GetParametersByPath",
+                "ssm:GetParameters",
+                "ssm:GetParameterHistory",
+                "ssm:GetParameter"
+            ],
+            "Effect": "Allow",
+            "Resource": "arn:aws:ssm:{REGION}:{ACCOUNT_ID}:parameter/*",
+            "Sid": ""
+        }
+    ],
+    "Version": "2012-10-17"
+}
+```
+##### Execution policy
+```json
+{
+    "Statement": [
+        {
+            "Action": "logs:CreateLogGroup",
+            "Effect": "Allow",
+            "Resource": "arn:aws:logs:{REGION}:{ACCOUNT_ID}:*",
+            "Sid": ""
+        },
+        {
+            "Action": [
+                "logs:PutLogEvents",
+                "logs:CreateLogStream"
+            ],
+            "Effect": "Allow",
+            "Resource": "arn:aws:logs:{REGION}:{ACCOUNT_ID}:log-group:/aws/lambda/{LAMBDA_FUNCTION_NAME}:*",
+            "Sid": ""
+        }
+    ],
+    "Version": "2012-10-17"
+}
+```
 
 ### AWS Systems Manager
-- Parameter Store parameters
-    - CrowdStrike API Key (SecureString)
-    - CrowdStrike API Secret (SecureString)
+Systems Manager Parameter Store is utilized to securely store our CrowdStrike API credentials.
+
+#### Parameter Store parameters
+- CrowdStrike API Key (SecureString)
+- CrowdStrike API Secret (SecureString)
 
