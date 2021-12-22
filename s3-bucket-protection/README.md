@@ -8,6 +8,7 @@
 + [Solution components](#solution-components)
 + [Demonstration](DEMO.md)
 + [On-demand scanning](on-demand)
++ [Deploying to an existing bucket](existing)
 
 ## Overview
 This solution integrates CrowdStrike Falcon Quick Scan with AWS S3, AWS Security Hub and AWS Systems Manager (Parameter Store), allowing for files to be scanned and threats remediated as objects are added to the bucket.
