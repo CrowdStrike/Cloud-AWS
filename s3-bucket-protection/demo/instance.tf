@@ -57,9 +57,9 @@ resource "aws_instance" "amzn_instance" {
         rm malicious.zip
         rm malqueryinator.py
         # HELPER SCRIPTS
-        wget -O /usr/local/bin/get-findings https://raw.githubusercontent.com/CrowdStrike/Cloud-AWS/main/s3-bucket-protection/bin/get-findings.sh
-        wget -O /usr/local/bin/upload https://raw.githubusercontent.com/CrowdStrike/Cloud-AWS/main/s3-bucket-protection/bin/upload.sh
-        wget -O /usr/local/bin/list-bucket https://raw.githubusercontent.com/CrowdStrike/Cloud-AWS/main/s3-bucket-protection/bin/list-bucket.sh
+        wget -O /usr/local/bin/get-findings https://raw.githubusercontent.com/jshcodes/Cloud-AWS/s3-bucket/s3-bucket-protection/bin/get-findings.sh
+        wget -O /usr/local/bin/upload https://raw.githubusercontent.com/jshcodes/Cloud-AWS/s3-bucket/s3-bucket-protection/bin/upload.sh
+        wget -O /usr/local/bin/list-bucket https://raw.githubusercontent.com/jshcodes/Cloud-AWS/s3-bucket/s3-bucket-protection/bin/list-bucket.sh
         chmod +x /usr/local/bin/*
 		EOF
  tags = {

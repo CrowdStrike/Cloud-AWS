@@ -16,7 +16,9 @@ data "archive_file" "lambda_archive" {
   output_path = "${path.cwd}/lambda/${var.lambda_function_filename}"
   source_dir  = "${data.null_data_source.wait_for_archive_delay.outputs["source_dir"]}"
   excludes = [ 
-    "${path.cwd}/lambda/falconpy-layer.zip"
+    var.falconpy_layer_filename,
+    "s3-bucket-protection.zip",
+    var.lambda_function_filename
     ]
 }
 resource "aws_lambda_layer_version" "falconpy" {
