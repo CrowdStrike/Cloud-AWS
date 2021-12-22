@@ -3,7 +3,7 @@
 [![Twitter URL](https://img.shields.io/twitter/url?label=Follow%20%40CrowdStrike&style=social&url=https%3A%2F%2Ftwitter.com%2FCrowdStrike)](https://twitter.com/CrowdStrike)
 
 # On-demand AWS S3 bucket scanner
-This example provides a stand-alone solution for scanning a S3 bucket.
+This example provides a stand-alone solution for scanning a S3 bucket before implementing protection.
 While similar to the serverless function, this solution will only scan the bucket's _existing_ file contents.
 
 > This example requires the `boto3` and `crowdstrike-falconpy` (v0.8.7+) packages.
