@@ -16,4 +16,6 @@ Pipfile*
 /Discover-for-Cloud-Templates/AWS/troubleshooting/scripts/falcon-discover-accounts.json
 /Discover-for-Cloud-Templates/AWS/troubleshooting/aws-discover-troubleshooting.docx
 .DS_Store
-
+terraform.tfstat*
+.terraform
+.terraform.lock.hcl
