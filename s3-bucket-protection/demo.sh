@@ -38,10 +38,10 @@ then
 	read -p "EC2 Instance Key Name: " ECKEY
 	read -p "Trusted IP address: " TRUSTED
     UNIQUE=$(echo $RANDOM | md5sum | sed "s/[[:digit:].-]//g" | head -c 8)
-    if ! [ -f terraform/terraform.tfstate ]; then
-        terraform -chdir=terraform init
+    if ! [ -f demo/.terraform.lock.hcl ]; then
+        terraform -chdir=demo init
     fi
-	terraform -chdir=terraform apply -compact-warnings --var falcon_client_id=$FID \
+	terraform -chdir=demo apply -compact-warnings --var falcon_client_id=$FID \
 		--var falcon_client_secret=$FSECRET --var instance_key_name=$ECKEY \
 		--var trusted_ip=$TRUSTED/32 --var unique_id=$UNIQUE --auto-approve
     echo -e "$RD\nPausing for 30 seconds to allow configuration to settle.$NC"
@@ -51,7 +51,7 @@ then
 fi
 if [[ "$MODE" == "down" ]]
 then
-	terraform -chdir=terraform destroy -compact-warnings --auto-approve
+	terraform -chdir=demo destroy -compact-warnings --auto-approve
     rm lambda/quickscan-bucket.zip
     env_destroyed
 	exit 0
