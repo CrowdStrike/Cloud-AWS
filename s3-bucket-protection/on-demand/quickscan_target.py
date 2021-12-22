@@ -99,15 +99,22 @@ class Configuration:  # pylint: disable=R0902
 
 def submit_scan(incoming_analyzer: Analysis):
     """Submit the collected file batch for analysis."""
-    # Submit our volume for analysis and grab the id of our scan submission
-    scan_id = Scanner.scan_samples(body=incoming_analyzer.payload())["body"]["resources"][0]
-    # Inform the user of our progress
-    logger.info("Scan %s submitted for analysis", scan_id)
-    # Retrieve our scan results from the API and report them
-    report_results(scan_uploaded_samples(incoming_analyzer, scan_id), incoming_analyzer)
-    # Clean up our uploaded files from out of the API
-    clean_up_artifacts(incoming_analyzer)
-
+    scanned = Scanner.scan_samples(body=incoming_analyzer.payload())
+    if scanned["status_code"] < 300:
+        # Submit our volume for analysis and grab the id of our scan submission
+        scan_id = scanned["body"]["resources"][0]
+        # Inform the user of our progress
+        logger.info("Scan %s submitted for analysis", scan_id)
+        # Retrieve our scan results from the API and report them
+        report_results(scan_uploaded_samples(incoming_analyzer, scan_id), incoming_analyzer)
+        # Clean up our uploaded files from out of the API
+        clean_up_artifacts(incoming_analyzer)
+    else:
+        if "errors" in scanned["body"]:
+            logger.warning("%s. Unable to continue processing.", scanned["body"]["errors"][0]["message"])
+        else:
+            # Rate limit only
+            logger.warning("Rate limit exceeded.")
 
 def upload_bucket_samples():
     """Retrieve keys from a bucket and then uploads them to the Sandbox API."""
