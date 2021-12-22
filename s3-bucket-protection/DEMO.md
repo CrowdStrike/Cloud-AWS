@@ -177,6 +177,8 @@ This folder is located in `~/testfiles` and contains multiple samples named acco
 + 2 safe sample files
 + 3 malware sample files
     - These samples are downloaded from CrowdStrike MalQuery as part of the demonstration instance bootstrap.
+    - The [FalconPy](https://github.com/CrowdStrike/falconpy) code sample
+    [MalQueryinator](https://github.com/CrowdStrike/falconpy/tree/main/samples/malquery#search-and-download-samples-from-malquery) is leveraged to accomplish this.
 + 2 unscannable sample files
 
 ##### Example
