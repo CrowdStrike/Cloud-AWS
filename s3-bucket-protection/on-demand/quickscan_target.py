@@ -109,7 +109,7 @@ def submit_scan(incoming_analyzer: Analysis):
         report_results(scan_uploaded_samples(incoming_analyzer, scan_id), incoming_analyzer)
     else:
         if "errors" in scanned["body"]:
-            logger.warning("%s. Unable to continue processing.", scanned["body"]["errors"][0]["message"])
+            logger.warning("%s. Unable to submit volume for scan.", scanned["body"]["errors"][0]["message"])
         else:
             # Rate limit only
             logger.warning("Rate limit exceeded.")
