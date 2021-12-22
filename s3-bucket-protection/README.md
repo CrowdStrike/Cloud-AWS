@@ -46,7 +46,10 @@ A single serverless function is deployed for this solution.
 
 #### Lambda function
 - Python 3
-- `crowdstrike-falconpy` layer
+- Must contain a `crowdstrike-falconpy` layer
+- [Policy statement](#policy-statement)
+- [Execution role](#lambda-execution-role)
+- [Environment variables](#environment-variables)
 
 ##### Policy statement
 - Statement ID: `AllowExecutionFromS3Bucket`
@@ -62,9 +65,6 @@ A single serverless function is deployed for this solution.
   }
   ```
 
-##### Execution Role
-[Lambda execution role](#lambda-execution-role)
-
 ##### Environment variables
 - `base_url`: CrowdStrike API base URL (only required for GovCloud users.)
 - `CLIENT_ID_PARAM`: Name of the Parameter store parameter containing the CrowdStrike API Key.
@@ -75,6 +75,11 @@ IAM is utilized to store execution permissions for our Lambda function.
 
 #### Lambda execution role
 The execution role for the Lambda function contains policies for SecurityHub, Systems Manager, S3 and CloudWatch.
+
++ [Security Hub](#security-hub-policy)
++ [S3](#s3-policy)
++ [Systems Manager](#systems-manager-policy)
++ [CloudWatch](#cloudwatch-policy)
 
 ##### Security Hub policy
 ```json
@@ -117,7 +122,7 @@ The execution role for the Lambda function contains policies for SecurityHub, Sy
     "Version": "2012-10-17"
 }
 ```
-##### SSM policy
+##### Systems Manager policy
 ```json
 {
     "Statement": [
@@ -136,7 +141,7 @@ The execution role for the Lambda function contains policies for SecurityHub, Sy
     "Version": "2012-10-17"
 }
 ```
-##### Execution policy
+##### CloudWatch policy
 ```json
 {
     "Statement": [
