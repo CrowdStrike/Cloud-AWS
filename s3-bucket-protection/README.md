@@ -5,7 +5,7 @@
 # CrowdStrike Falcon S3 Bucket Protection
 
 + [Overview](#overview)
-+ [Integration components](#integration-components)
++ [Solution components](#solution-components)
 + [Demonstration](DEMO.md)
 
 ## Overview
@@ -14,18 +14,19 @@ This solution integrates CrowdStrike Falcon Quick Scan with AWS S3, AWS Security
 ### Process diagram
 ![Process Diagram](../docs/img/s3-bucket-protection-process-diagram.png)
 
-1. Files are uploaded to the bucket
-2. Bucket triggers the lambda function
-3. Lambda function reads in Falcon API credentials from Systems Manager Parameter Store
-4. Lambda function uploads file to Falcon X Sandbox for analysis
-5. Lambda function retrieves the scan results
-6. Malicious files are immediately removed from the bucket
-7. A finding is generated in Security Hub for all malicious uploads
+### Process
+1. Files are uploaded to the bucket.
+2. Bucket triggers the lambda function.
+3. Lambda function reads in Falcon API credentials from Systems Manager Parameter Store.
+4. Lambda function uploads file to Falcon X Sandbox for analysis.
+5. Lambda function retrieves the scan results.
+6. Malicious files are immediately removed from the bucket.
+7. A finding is generated in Security Hub for all malicious uploads.
 
-> All lambda activity is also logged to Amazon CloudWatch
+> All lambda activity is also logged to Amazon CloudWatch.
 
 
-## Integration components
+## Solution components
 This solution leverages an S3 bucket trigger to call AWS Lambda for processing. 
 The serverless lambda function leverages the CrowdStrike [FalconPy SDK](https://github.com/CrowdStrike/falconpy) to
 interact with the CrowdStrike Falcon API to scan the files as the are uploaded to the bucket.
@@ -149,6 +150,4 @@ interact with the CrowdStrike Falcon API to scan the files as the are uploaded t
 - Parameter Store parameters
     - CrowdStrike API Key (SecureString)
     - CrowdStrike API Secret (SecureString)
-
----
 
