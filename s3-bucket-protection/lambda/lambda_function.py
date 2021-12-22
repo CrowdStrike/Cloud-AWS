@@ -42,13 +42,13 @@ except KeyError:
     CLIENT_ID_PARAM_NAME = "BUCKET_SCAN_CLIENT_ID"
 
 try:
-    CLIENT_SECRET_PARAM_NAME = os.environ["CLIENT_SECRET_PARAM"]
+    CLIENT_SEC_PARAM_NAME = os.environ["CLIENT_SECRET_PARAM"]
 except KeyError:
-    CLIENT_SECRET_PARAM_NAME = "BUCKET_SCAN_CLIENT_SECRET"
+    CLIENT_SEC_PARAM_NAME = "BUCKET_SCAN_CLIENT_SECRET"
 
 # Grab our Falcon API credentials from SSM Parameter Store
 try:
-    ssm_response = ssm.get_parameters(Names=[CLIENT_ID_PARAM_NAME, CLIENT_SECRET_PARAM_NAME],
+    ssm_response = ssm.get_parameters(Names=[CLIENT_ID_PARAM_NAME, CLIENT_SEC_PARAM_NAME],
                                       WithDecryption=True
                                       )
     client_id = ssm_response['Parameters'][0]['Value']
