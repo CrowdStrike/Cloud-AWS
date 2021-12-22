@@ -138,7 +138,7 @@ def lambda_handler(event, _):  # pylint: disable=R0912,R0914,R0915
                     detection["bucket"] = bucket_name
                     detection["file"] = key
                     manifest = generate_manifest(detection, region)
-                    result = send_to_security_hub(manifest, region)
+                    _ = send_to_security_hub(manifest, region)
                     log.warning(scan_msg)
                     # Remove the threat
                     try:
