@@ -1,3 +1,7 @@
+![CrowdStrike](https://raw.github.com/CrowdStrike/Cloud-AWS/main/docs/img/cs-logo.png)
+
+[![Twitter URL](https://img.shields.io/twitter/url?label=Follow%20%40CrowdStrike&style=social&url=https%3A%2F%2Ftwitter.com%2FCrowdStrike)](https://twitter.com/CrowdStrike)
+
 # S3 Bucket Protection demonstration
 This demonstration leverages Terraform to provide a functional demonstration of this integration.
 All of the necessary resources for using this solution to protect an AWS S3 bucket are implemented for you
