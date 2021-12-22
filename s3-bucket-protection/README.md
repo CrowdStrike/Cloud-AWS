@@ -263,8 +263,46 @@ There are several helper scripts implemented within the environment to demonstra
 ##### get-findings
 Displays any negative findings for the demonstration bucket.
 
+**Example**
+```shell
+[ec2-user@ip-10-99-10-100 ~]$ get-findings
+ _______ __          __ __
+|   _   |__.-----.--|  |__.-----.-----.-----.
+|.  1___|  |     |  _  |  |     |  _  |__ --|
+|.  __) |__|__|__|_____|__|__|__|___  |_____|
+|:  |                           |_____|
+|::.|
+`---'
+
+Findings in efdcecfa-s3-protected-bucket for the past hour:
+
+Falcon Alert. Malware detected in bucket: efdcecfa-s3-protected-bucket
+Malware has recently been identified in S3 bucket efdcecfa-s3-protected-bucket.
+
+The file (malicious2.bin) has been removed from the bucket.
+
+Falcon Alert. Malware detected in bucket: efdcecfa-s3-protected-bucket
+Malware has recently been identified in S3 bucket efdcecfa-s3-protected-bucket.
+
+The file (malicious3.bin) has been removed from the bucket.
+
+Falcon Alert. Malware detected in bucket: efdcecfa-s3-protected-bucket
+Malware has recently been identified in S3 bucket efdcecfa-s3-protected-bucket.
+
+The file (malicious1.bin) has been removed from the bucket.
+```
+
 ##### list-bucket
 Lists the contents of the demonstration bucket.
+
+**Example**
+```shell
+[ec2-user@ip-10-99-10-100 ~]$ list-bucket
+2021-12-22 05:40:10      28904 safe1.bin
+2021-12-22 05:40:10      81896 safe2.bin
+2021-12-22 05:40:11    1119957 unscannable1.png
+2021-12-22 05:40:12      58579 unscannable2.jpg
+```
 
 ##### upload
 Uploads the entire contents of the testfiles folder to the demonstration bucket.
@@ -273,6 +311,20 @@ This folder is located in `~/testfiles` and contains multiple samples named acco
 + 2 safe sample files
 + 3 malware sample files
 + 2 unscannable sample files
+
+**Example**
+```shell
+[ec2-user@ip-10-99-10-100 ~]$ upload
+Uploading test files, please wait...
+upload: testfiles/malicious1.bin to s3://efdcecfa-s3-protected-bucket/malicious1.bin
+upload: testfiles/malicious2.bin to s3://efdcecfa-s3-protected-bucket/malicious2.bin
+upload: testfiles/malicious3.bin to s3://efdcecfa-s3-protected-bucket/malicious3.bin
+upload: testfiles/safe1.bin to s3://efdcecfa-s3-protected-bucket/safe1.bin
+upload: testfiles/safe2.bin to s3://efdcecfa-s3-protected-bucket/safe2.bin
+upload: testfiles/unscannable1.png to s3://efdcecfa-s3-protected-bucket/unscannable1.png
+upload: testfiles/unscannable2.jpg to s3://efdcecfa-s3-protected-bucket/unscannable2.jpg
+Upload complete. Check CloudWatch logs or use the get-findings command for scan results.
+```
 
 #### Console example
 The following screenshots demonstrate the same functionality using the AWS console.
