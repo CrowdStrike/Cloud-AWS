@@ -107,14 +107,14 @@ def submit_scan(incoming_analyzer: Analysis):
         logger.info("Scan %s submitted for analysis", scan_id)
         # Retrieve our scan results from the API and report them
         report_results(scan_uploaded_samples(incoming_analyzer, scan_id), incoming_analyzer)
-        # Clean up our uploaded files from out of the API
-        clean_up_artifacts(incoming_analyzer)
     else:
         if "errors" in scanned["body"]:
             logger.warning("%s. Unable to continue processing.", scanned["body"]["errors"][0]["message"])
         else:
             # Rate limit only
             logger.warning("Rate limit exceeded.")
+    # Clean up our uploaded files from out of the API
+    clean_up_artifacts(incoming_analyzer)
 
 def upload_bucket_samples():
     """Retrieve keys from a bucket and then uploads them to the Sandbox API."""
