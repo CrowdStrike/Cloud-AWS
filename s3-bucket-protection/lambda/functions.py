@@ -57,9 +57,5 @@ def send_to_security_hub(manifest, region):
         except (ClientError, EndpointConnectionError) as err:
             # Boto3 issue communicating with SH, throw the error in the log
             print(str(err))
-        except:  # pylint: disable=W0702
-            # Unknown error / issue, log the result
-            trace = traceback.format_exc()
-            print(f"An error has occurred.\n{trace}")
 
     return import_response
