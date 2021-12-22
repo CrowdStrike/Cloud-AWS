@@ -63,7 +63,7 @@ Deployment takes approximately 30 seconds, after which you will be presented wit
 From the same folder where you deployed, execute the command:
 
 ```shell
-./existing.sh down
+./existing.sh remove
 ```
 
 You will be asked the name of the bucket that you are removing protection from.
