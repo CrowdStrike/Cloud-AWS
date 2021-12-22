@@ -210,7 +210,7 @@ The following screenshots demonstrate the same functionality using the AWS conso
 From the same folder where you stood up the environment, execute the command:
 
 ```shell
-./demo down
+./demo.sh down
 ```
 
 You will receive no further prompts.
