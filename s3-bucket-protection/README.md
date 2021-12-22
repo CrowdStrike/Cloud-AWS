@@ -310,6 +310,7 @@ Uploads the entire contents of the testfiles folder to the demonstration bucket.
 This folder is located in `~/testfiles` and contains multiple samples named according to the sample's type.
 + 2 safe sample files
 + 3 malware sample files
+    - These samples are downloaded from CrowdStrike MalQuery as part of the demonstration instance bootstrap.
 + 2 unscannable sample files
 
 **Example**
