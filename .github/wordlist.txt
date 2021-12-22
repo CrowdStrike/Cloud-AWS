@@ -319,3 +319,13 @@ InstanceTypeParameter
 SecHubInstaller
 TrustedIp
 CIDs
+PEM
+customizable
+testfiles
+MalQuery
+MalQueryinator
+unscannable
+serverless
+GovCloud
+SecureString
+julian
