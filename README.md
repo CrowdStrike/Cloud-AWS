@@ -9,6 +9,7 @@
 | [AWS Network Firewall with CrowdStrike Threat Intelligence](Network-Firewall/README.md) | Build capabilities such as automated blocking of malicious domains (via AWS Network Firewall) based on CrowdStrike detection alerts, or perform threat hunting derived from CrowdStrike domain-based Indicators of Activity (IOAs). |
 | [AWS Private Link with CrowdStrike Sensor Proxy](aws-privatelink/README.md) | Utilize AWS PrivateLink to provide provide private connectivity between your CrowdStrike Falcon protected workloads and the CrowdStrike cloud. |
 | [AWS Security Hub with CrowdStrike Event Streams API](Falcon-Integration-Gateway/README.md) | The Falcon Integration Gateway publishes detections identified by CrowdStrike Falcon for instances residing within Amazon Web Services (AWS) to AWS Security Hub. |
+| [AWS S3 Protected Bucket with CrowdStrike Quick Scan API](s3-bucket-protection) | S3 Bucket Protection secures your AWS storage buckets by scanning files as they are uploaded to the bucket using the CrowdStrike Quick Scan API. |
 
 ## CrowdStrike Sensor Automation
 | Integration Name | Description |
