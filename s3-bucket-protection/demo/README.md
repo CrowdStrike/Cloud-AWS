@@ -88,6 +88,8 @@ EC2 Instance Key Name: instance-key-name
 Trusted IP address: a.b.c.d
 ```
 
+The latest version of [FalconPy](https://github.com/CrowdStrike/falconpy) is then downloaded as a Lambda layer from https://falconpy.io.
+
 If this is the first time you're executing the demonstration, Terraform will initialize the working folder after you submit these values. After this process completes, Terraform will begin to stand-up the environment.
 
 The demonstration instance is assigned an external IP address, and a security group that allows inbound SSH access from the trusted IP address you provide. The username and external IP address for this instance will be provided when environment creation is complete.
