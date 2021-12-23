@@ -73,7 +73,7 @@ From the root folder for this integration (`s3-bucket-protection`) execute the f
 You will be asked to provide:
 + Your CrowdStrike API credentials.
     - These values will not display when entered.
-+ The name of the PEM key to use for SSH access.
++ The name of the PEM key to use for SSH access. (Do not include the `.pem` extension.)
 + Your external IP address.
 
 ```shell
