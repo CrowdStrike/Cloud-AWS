@@ -41,7 +41,7 @@ as part of the environment configuration process, including sample files and com
 + The current external IP address of the machine you are testing from.
 
 ## Additional components
-In order to demonstrate functionality, this demonstration adds the additional AWS components along with the integration's required components.
+In order to demonstrate functionality, this demonstration adds the following additional AWS components along with the integration's required components.
 
 ### AWS VPC
 + VPC
