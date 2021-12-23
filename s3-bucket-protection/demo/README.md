@@ -61,7 +61,7 @@ In order to demonstrate functionality, this demonstration adds the following add
     - Attached to the SSH inbound security group
 
 ### Demonstration architecture diagram
-![Demonstration architecture](../../docs/img/s3-bucket-protection-demo-architecture.png)
+![Demonstration architecture](https://raw.github.com/CrowdStrike/Cloud-AWS/main/docs/img/s3-bucket-protection-demo-architecture.png)
 
 ## Standing up the demonstration
 From the root folder for this integration (`s3-bucket-protection`) execute the following command:
@@ -216,10 +216,10 @@ Upload complete. Check CloudWatch logs or use the get-findings command for scan 
 The following screenshots demonstrate the same functionality using the AWS console.
 
 #### Reviewing Security Hub findings
-![Findings](../docs/img/s3-bucket-protection-finding-list.png)
+![Findings](https://raw.github.com/CrowdStrike/Cloud-AWS/main/docs/img/s3-bucket-protection-finding-list.png)
 
 #### Reviewing finding details
-![Finding details](../docs/img/s3-bucket-protection-finding-display.png)
+![Finding details](https://raw.github.com/CrowdStrike/Cloud-AWS/main/docs/img/s3-bucket-protection-finding-display.png)
 
 ---
 
