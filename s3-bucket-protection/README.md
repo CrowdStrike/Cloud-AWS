@@ -6,9 +6,9 @@
 
 + [Overview](#overview)
 + [Solution components](#solution-components)
-+ [Demonstration](DEMO.md)
-+ [On-demand scanning](on-demand)
-+ [Deploying to an existing bucket](existing)
++ [Demonstration](#demonstration)
++ [On-demand scanning](#on-demand-scanning)
++ [Deploying to an existing bucket](#deploying-to-an-existing-bucket)
 
 ## Overview
 This solution integrates CrowdStrike Falcon Quick Scan with AWS S3, AWS Security Hub and AWS Systems Manager (Parameter Store), allowing for files to be scanned and threats remediated as objects are added to the bucket.
@@ -174,3 +174,20 @@ Systems Manager Parameter Store is utilized to securely store our CrowdStrike AP
 - CrowdStrike API Key (SecureString)
 - CrowdStrike API Secret (SecureString)
 
+
+## Demonstration
+A demonstration has been developed for this integration. This demonstration creates a new bucket, implements S3 Bucket Protection on that bucket, and then deploys an instance with several test scripts and sample files for testing the integration in a real environment. You may access this demonstration by executing the `demo.sh` script.
+
+For more details regard this demonstration, review the content located [here](demo).
+
+## On-demand scanning
+For scenarios where you either do not want to implement real-time protection, or where you are wanting to confirm the contents of a bucket before implementing protection, an on-demand scanning solution is provided as part of this integration.
+
+This solution leverages the same APIs and logic that is implemented by the serverless handler that provides real-time protection.
+
+The read more about this component, review the documentation located [here](on-demand).
+
+## Deploying to an existing bucket
+A helper routine is provided as part of this integration that assists with deploying protection to an existing bucket. This helper leverages Terraform, and can be started by executing the `existing.sh` script.
+
+For more details about deploying protection to a pre-existing bucket, review the documentation located [here](existing).
