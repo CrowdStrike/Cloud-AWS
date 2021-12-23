@@ -64,7 +64,7 @@ In order to demonstrate functionality, this demonstration adds the following add
 ![Demonstration architecture](../../docs/img/s3-bucket-protection-demo-architecture.png)
 
 ## Standing up the demonstration
-From this folder execute the following command:
+From the root folder for this integration (`s3-bucket-protection`) execute the following command:
 
 ```shell
 ./demo.sh up
