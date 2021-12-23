@@ -36,6 +36,8 @@ then
 	read -sp "CrowdStrike API Client SECRET: " FSECRET
     echo
     read -p "Bucket name: " BUCKET_NAME
+    rm lambda/falconpy-layer.zip >/dev/null 2>&1
+    curl -o lambda/falconpy-layer.zip https://falconpy.io/downloads/falconpy-layer.zip
     if ! [ -f existing/.terraform.lock.hcl ]; then
         terraform -chdir=existing init
     fi

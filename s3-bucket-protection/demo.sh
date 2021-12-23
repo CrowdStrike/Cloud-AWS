@@ -38,6 +38,8 @@ then
 	read -p "EC2 Instance Key Name: " ECKEY
 	read -p "Trusted IP address: " TRUSTED
     UNIQUE=$(echo $RANDOM | md5sum | sed "s/[[:digit:].-]//g" | head -c 8)
+    rm lambda/falconpy-layer.zip >/dev/null 2>&1
+    curl -o lambda/falconpy-layer.zip https://falconpy.io/downloads/falconpy-layer.zip
     if ! [ -f demo/.terraform.lock.hcl ]; then
         terraform -chdir=demo init
     fi
