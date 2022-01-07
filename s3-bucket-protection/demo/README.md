@@ -34,11 +34,15 @@ as part of the environment configuration process, including sample files and com
 + The pre-existing PEM key for SSH access to the demonstration instance. This key must exist within the region your demonstration stands up in. (Default: `us-east-2`)
     - You will be asked for the name of this key when the `demo.sh` script executes.
 + CrowdStrike Falcon API credentials with the following scopes:
+    - MalQuery - `READ` (used to download malware samples)
     - Quick Scan - `READ`, `WRITE`
     - Sample Uploads - `READ`,`WRITE`
     - You will be asked to provide these credentials when the `demo.sh` script executes.
++ `md5sum` (used to generate a unique bucket name)
 + Terraform installed on the machine you are testing from.
 + The current external IP address of the machine you are testing from.
+
+> This demonstration has been tested using MacOS and Linux, running either BASH or ZSH.
 
 ## Additional components
 In order to demonstrate functionality, this demonstration adds the following additional AWS components along with the integration's required components.
