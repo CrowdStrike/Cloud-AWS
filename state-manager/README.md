@@ -24,7 +24,7 @@
     - [AWS Parameter Store](#aws-parameter-store)
     - [AWS State Manager](#aws-state-manager)
   + [CrowdStrike FalconPy](#crowdstrike-falconpy)
-- [Implementation Steps](#implementation-steps)
+- [Implementation the solution](#implementation-the-solution)
   + [Prerequisites](#prerequisites)
   + [Helper Scripts](#helper-scripts)
   + [Deployment Steps](#deployment-steps)
@@ -213,7 +213,7 @@ For more details regarding FalconPy, refer to the project [repository](https://g
 
 ---
 
-## Implementation Steps
+## Implementation the solution
 
 ### Prerequisites
 
