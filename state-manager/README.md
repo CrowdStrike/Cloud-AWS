@@ -24,7 +24,7 @@
     - [AWS Parameter Store](#aws-parameter-store)
     - [AWS State Manager](#aws-state-manager)
   + [CrowdStrike FalconPy](#crowdstrike-falconpy)
-- [Implementation Steps](#implementation-steps)
+- [Implementing the solution](#implementing-the-solution)
   + [Prerequisites](#prerequisites)
   + [Helper Scripts](#helper-scripts)
   + [Deployment Steps](#deployment-steps)
@@ -213,7 +213,7 @@ For more details regarding FalconPy, refer to the project [repository](https://g
 
 ---
 
-## Implementation Steps
+## Implementing the solution
 
 ### Prerequisites
 
@@ -276,7 +276,7 @@ OR
 - Navigate to the AWS console and upload the file directly to the `script` folder. Create this folder if it does not exist.
 
 #### Step 4. Deploy the stack via CloudFormation
-A CloudFormation template is used to stand up the infrastructure for this solution. You can use deploy this template using the AWS Console or the command line.
+A CloudFormation template is used to stand up the infrastructure for this solution. You can deploy this template using the AWS Console or the command line.
 
 ##### Parameters
 This template consumes the following parameters.
@@ -319,7 +319,7 @@ aws cloudformation create-stack --stack-name [STACK-NAME] \
 
 ###### AWS Console Deployment
 
-1. In your AWS Console, navigate to **CloudFormation -> Create stack -> With new resources (standard)**
+1. In your AWS Console, navigate to **CloudFormation** -> **Create stack** -> **With new resources (standard)**
 
 2. Under **Specify template**, select **Upload a template file** and upload the `ssm_agent_deployment_by_tag.yaml` included in this solution, then click **Next**
    ![State Manager CFT Step 1](images/state-manager-cft-1.png)
