@@ -4,6 +4,7 @@
 
 # Falcon Agent deployment using EventBridge and State Manager
 
+
 - [Overview](#overview)
   + [Architecture Diagram](#architecture-diagram)
   + [Process](#process)
@@ -11,12 +12,16 @@
   + [Additional notes](#additional-notes)
 - [Solution Components](#solution-components)
   + [AWS EventBridge](#aws-eventbridge)
+    - [Event pattern](#event-pattern)
   + [AWS IAM](#aws-iam)
     - [Execution Role](#execution-role)
+      * [AmazonSSMAutomationRole](#amazonssmautomationrole)
+      * [Allow Read EC2 access](#allow-read-ec2-access)
   + [AWS S3](#aws-s3)
   + [AWS Systems Manager](#aws-systems-manager)
     - [AWS Automation](#aws-automation)
     - [AWS Distributor](#aws-distributor)
+    - [AWS Parameter Store](#aws-parameter-store)
     - [AWS State Manager](#aws-state-manager)
   + [CrowdStrike FalconPy](#crowdstrike-falconpy)
 - [Implementation Steps](#implementation-steps)
@@ -29,8 +34,8 @@
     - [Step 4. Deploy the stack via CloudFormation](#step-4-deploy-the-stack-via-cloudformation)
       * [Parameters](#parameters)
       * [Deployment](#deployment)
-        + [AWS Console](#aws-console)
-        + [AWS CLI](#aws-cli)
+        + [AWS CLI Deployment](#aws-cli-deployment)
+        + [AWS Console Deployment](#aws-console-deployment)
 
 
 ## Overview
