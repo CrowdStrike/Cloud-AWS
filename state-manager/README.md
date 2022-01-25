@@ -276,7 +276,7 @@ OR
 - Navigate to the AWS console and upload the file directly to the `script` folder. Create this folder if it does not exist.
 
 #### Step 4. Deploy the stack via CloudFormation
-A CloudFormation template is used to stand up the infrastructure for this solution. You can use deploy this template using the AWS Console or the command line.
+A CloudFormation template is used to stand up the infrastructure for this solution. You can deploy this template using the AWS Console or the command line.
 
 ##### Parameters
 This template consumes the following parameters.
