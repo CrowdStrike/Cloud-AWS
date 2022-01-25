@@ -36,6 +36,7 @@
       * [Deployment](#deployment)
         + [AWS CLI Deployment](#aws-cli-deployment)
         + [AWS Console Deployment](#aws-console-deployment)
+- [Reviewing executions](#reviewing-executions)
 
 
 ## Overview
@@ -62,6 +63,8 @@ This solution leverages [The CrowdStrike Python SDK](#crowdstrike-falconpy), AWS
 - AWS State Manager assocations apply on a scheduled basis, which can be overridden using the helper script (`apply_association.py`) provided. 
 - This solutions provides support in the specific region where you deploy. If you're running multi-region workloads, deploy this solution across all regions you wish to manage.
 - This solution demonstrates using **Tags** as a `Target Type`, and only supports one value due to AWS solution requirements. To learn more about the various types of targets available to you, read [SSM State Manager Association Target Types](#ssm-state-manager-association-target-types).
+
+---
 
 ## Solution Components
 
@@ -208,6 +211,7 @@ python3 -m pip install crowdstrike-falconpy
 
 For more details regarding FalconPy, refer to the project [repository](https://github.com/CrowdStrike/falconpy).
 
+---
 
 ## Implementation Steps
 
@@ -339,4 +343,11 @@ aws cloudformation create-stack --stack-name [STACK-NAME] \
    ![State Manager CFT Deployment](images/state-manager-cft-deploy-complete.png)
 
 
-> It takes approximately 2 to 3 minutes to stand up this solution using CloudFormation. Immediately after deployment completes, the association is applied, and all instances with the correct tag / value will be processed for Falcon agent installation.
+> It takes approximately 2 to 3 minutes to stand up this solution using CloudFormation. Immediately after deployment completes, the association is applied and all instances with the correct tag value combination will be processed for Falcon agent installation.
+
+---
+
+## Reviewing executions
+All executions, either scheduled or triggered, will be shown in the AWS Systems Manager Automation dashboard. You can access this dashboard in the AWS Console under **AWS Systems Manager** -> **Automation**.
+
+![AWS Systems Manager Automation dashboard](images/systems-manager-automation-executions.png)
