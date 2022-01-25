@@ -4,42 +4,43 @@
 
 # Falcon Agent deployment using EventBridge and State Manager
 
-
-- [Overview](#overview)
-  + [Architecture Diagram](#architecture-diagram)
-  + [Process](#process)
-  + [Solution benefits](#solution-benefits)
-  + [Additional notes](#additional-notes)
-- [Solution Components](#solution-components)
-  + [AWS EventBridge](#aws-eventbridge)
-    - [Event pattern](#event-pattern)
-  + [AWS IAM](#aws-iam)
-    - [Execution Role](#execution-role)
-      * [AmazonSSMAutomationRole](#amazonssmautomationrole)
-      * [Allow Read EC2 access](#allow-read-ec2-access)
-  + [AWS S3](#aws-s3)
-  + [AWS Systems Manager](#aws-systems-manager)
-    - [AWS Automation](#aws-automation)
-    - [AWS Distributor](#aws-distributor)
-    - [AWS Parameter Store](#aws-parameter-store)
-    - [AWS State Manager](#aws-state-manager)
-  + [CrowdStrike FalconPy](#crowdstrike-falconpy)
-- [Implementing the solution](#implementing-the-solution)
-  + [Prerequisites](#prerequisites)
-  + [Helper Scripts](#helper-scripts)
-  + [Deployment Steps](#deployment-steps)
-    - [Step 1. Clone this repository](#step-1-clone-this-repository)
-    - [Step 2. Create the SSM Distributor Package](#step-2-create-the-ssm-distributor-package)
-    - [Step 3. Helper upload](#step-3-helper-upload)
-    - [Step 4. Deploy the stack via CloudFormation](#step-4-deploy-the-stack-via-cloudformation)
-      * [Parameters](#parameters)
-      * [Deployment](#deployment)
-        + [AWS CLI Deployment](#aws-cli-deployment)
-        + [AWS Console Deployment](#aws-console-deployment)
-- [Reviewing executions](#reviewing-executions)
-
+- [Falcon Agent deployment using EventBridge and State Manager](#falcon-agent-deployment-using-eventbridge-and-state-manager)
+  - [Overview](#overview)
+    - [Architecture Diagram](#architecture-diagram)
+    - [Process](#process)
+    - [Solution benefits](#solution-benefits)
+    - [Additional notes](#additional-notes)
+  - [Solution Components](#solution-components)
+    - [AWS EventBridge](#aws-eventbridge)
+      - [Event pattern](#event-pattern)
+    - [AWS IAM](#aws-iam)
+      - [Execution Role](#execution-role)
+        - [AmazonSSMAutomationRole](#amazonssmautomationrole)
+        - [Allow Read EC2 access](#allow-read-ec2-access)
+    - [AWS S3](#aws-s3)
+    - [AWS Systems Manager](#aws-systems-manager)
+      - [AWS Automation](#aws-automation)
+      - [AWS Distributor](#aws-distributor)
+      - [AWS Parameter Store](#aws-parameter-store)
+      - [AWS State Manager](#aws-state-manager)
+        - [Target Types](#target-types)
+    - [CrowdStrike FalconPy](#crowdstrike-falconpy)
+  - [Implementing the solution](#implementing-the-solution)
+    - [Prerequisites](#prerequisites)
+    - [Helper Scripts](#helper-scripts)
+    - [Deployment Steps](#deployment-steps)
+      - [Step 1. Clone this repository](#step-1-clone-this-repository)
+      - [Step 2. Create the SSM Distributor Package](#step-2-create-the-ssm-distributor-package)
+      - [Step 3. Helper upload](#step-3-helper-upload)
+      - [Step 4. Deploy the stack via CloudFormation](#step-4-deploy-the-stack-via-cloudformation)
+        - [Parameters](#parameters)
+        - [Deployment](#deployment)
+          - [AWS CLI Deployment](#aws-cli-deployment)
+          - [AWS Console Deployment](#aws-console-deployment)
+  - [Reviewing executions](#reviewing-executions)
 
 ## Overview
+
 This solution leverages [The CrowdStrike Python SDK](#crowdstrike-falconpy), AWS EventBridge, and AWS Systems Manager ([AWS Automations](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-state.html), AWS Distributor, and [AWS State Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-state.html)) to manage CrowdStrike Falcon agent deployment for EC2 instances. Upon instance termination, agents are automatically removed from the Falcon Console.
 
 ### Architecture Diagram
@@ -53,16 +54,15 @@ This solution leverages [The CrowdStrike Python SDK](#crowdstrike-falconpy), AWS
 ### Solution benefits
 
 - Automated agent deployment as part of instance lifecycle management
-    - Support for all instances, regardless of infrastructure deployment patterns. (Standalone, Load-balanced, ASG, etc.)
-    - Supports ephemeral instances
-    - Addresses configuration drift
-    - Removes terminated instances from the Falcon Console
+  - Support for all instances, regardless of infrastructure deployment patterns. (Standalone, Load-balanced, ASG, etc.)
+  - Supports ephemeral instances
+  - Addresses configuration drift
+  - Removes terminated instances from the Falcon Console
 
 ### Additional notes
 
-- AWS State Manager assocations apply on a scheduled basis, which can be overridden using the helper script (`apply_association.py`) provided. 
+- AWS State Manager assocations apply on a scheduled basis, which can be overridden using the helper script (`apply_association.py`) provided.
 - This solutions provides support in the specific region where you deploy. If you're running multi-region workloads, deploy this solution across all regions you wish to manage.
-- This solution demonstrates using **Tags** as a `Target Type`, and only supports one value due to AWS solution requirements. To learn more about the various types of targets available to you, read [SSM State Manager Association Target Types](#ssm-state-manager-association-target-types).
 
 ---
 
@@ -77,9 +77,11 @@ This solution leverages [The CrowdStrike Python SDK](#crowdstrike-falconpy), AWS
 - [CrowdStrike FalconPy](#crowdstrike-falconpy)
 
 ### AWS EventBridge
+
 AWS EventBridge is used to trigger the SSM Automation deployment document when instances are moved to the `terminated` status. This is handled using an EventBridge rule.
 
 #### Event pattern
+
 ```json
 {
   "detail-type": ["EC2 Instance State-change Notification"],
@@ -90,14 +92,16 @@ AWS EventBridge is used to trigger the SSM Automation deployment document when i
 }
 ```
 
-
 ### AWS IAM
+
 IAM is utilized to store execution permissions for the automation.
 
 #### Execution Role
+
 This role is used to provide execution permissions to the SSM Automation document. There are two policies attached.
 
 ##### AmazonSSMAutomationRole
+
 This is an AWS provided policy.
 
 ```json
@@ -162,6 +166,7 @@ This is an AWS provided policy.
 ```
 
 ##### Allow Read EC2 access
+
 A limited read scope policy allows the automation to retrieve EC2 tags.
 
 ```json
@@ -181,27 +186,57 @@ A limited read scope policy allows the automation to retrieve EC2 tags.
 ```
 
 ### AWS S3
+
 A single AWS S3 bucket is used to store the AWS Distributor package and the `agent-handler.zip` attachment layer.
 
 ### AWS Systems Manager
+
 AWS Systems Manager is used to handle automation and deploy packages.
 
 #### AWS Automation
+
 A single SSM Automation Document is used to handle all agent management logic. This document contains steps for installation and removal of the agent, and includes an attachment containing the necessary helpers for interacting with your tenant within the CrowdStrike cloud.
 
 #### AWS Distributor
+
 A single AWS Distributor package is created, containing manifests and installers for Amazon Linux 2 (x64) and Microsoft Windows (10+/2016+). This is a bundled variation, so the binary installers are included within this distribution as well.
 
 #### AWS Parameter Store
+
 Three AWS Parameter Store parameters are created. These are used to provide credentials to the automation helper in a secure fashion.
 
 #### AWS State Manager
-A single AWS State Manager association is created, creating the relationship between our targets (any instances with the correct tag and tag value) and our automation document.
+
+A single AWS State Manager Association is created, creating the relationship between the targets you specify and the SSM Automation Document.
+
+##### Target Types
+
+AWS State Manager allows you to create Associations with various types of target configurations. It's important to remember the following:
+
+- Associations are applied to resources within the region where the Association is created. If you're running multi-region workloads, deploy this solution in the other regions.
+- If you're using **Tag Key and Value**, **Tag Key**, or **Resource Groups** as your `Target Type`, note that you can only use one combination per Association due to limitations of AWS State Manager. If you need multiple combinations, you'll need to create multiple Associations.
+
+As noted earlier,Associations are applied only Please note that as of today, only the combination of Tag Key and Value is supported.
+
+1. **Tag Key and Value**: Applies the Association to EC2s that contain a specific tag key/value combination.
+   1. CloudFormation Parameter example:
+      1. `TargetTagKey`: tag:{replace-with-tag-key}
+      2. `TargetTagValue`: {replace-with-tag-value}
+2. **Tag Key**: Applies the Association to EC2s that contain a specific tag key.
+   1. CloudFormation Parameter example:
+      1. `TargetTagKey`: tag-key
+      2. `TargetTagValue`: {replace-with-tag-key}
+3. **Resource Groups**: Applies the Association to a Resource Group of EC2s.
+4. **All Instance in Region**: Applies the Association to all EC2s.
+   1. CloudFormation Parameter example:
+      1. `TargetTagKey`: InstanceIds
+      2. `TargetTagValue`: *
 
 ### CrowdStrike FalconPy
+
 The CrowdStrike Python SDK, FalconPy is used to interact with the CrowdStrike API as part of automation steps.
 
-The FalconPy SDK contains a collection of Python classes that abstract CrowdStrike Falcon OAuth2 API interaction, removing duplicative code and allowing developers to focus on just the logic of their solution requirements. 
+The FalconPy SDK contains a collection of Python classes that abstract CrowdStrike Falcon OAuth2 API interaction, removing duplicative code and allowing developers to focus on just the logic of their solution requirements.
 
 FalconPy can be installed quickly using the following command:
 
@@ -229,7 +264,6 @@ For more details regarding FalconPy, refer to the project [repository](https://g
     - Hosts: READ
     - Sensor Download : READ
 
-
 ### Helper Scripts
 
 The following scripts are provided to assist with deploying and demonstrating this solution.
@@ -242,43 +276,53 @@ The following scripts are provided to assist with deploying and demonstrating th
 | `cs_install_automation.py` | Collection of python scripts leveraging the [CrowdStrike Python SDK](https://github.com/CrowdStrike/falconpy) to lookup tenant details and delete agents for terminated hosts. This file is bundled within the `agent-handler.zip` file. |
 | `helper-sha.sh` | Calculates the SHA256 value for the current version of the `agent-helper.zip` file. Provided if changes are required to `cs_install_automation.py`. |
 
-
 ### Deployment Steps
 
 #### Step 1. Clone this repository
+
 ```shell
 git clone https://github.com/CrowdStrike/Cloud-AWS/ cs-cloud-aws
 cd cs-cloud-aws/state-manager
 ```
 
 #### Step 2. Create the SSM Distributor Package
+
 1. Navigate to the `ssm-distributor` folder inside this solution.
 2. Execute the `create-package.sh` helper script.
+
     ```shell
     ./create-package..sh [FALCON API CLIENT ID] [FALCON API CLIENT SECRET] [AWS REGION] [SSM PACKAGE NAME] [S3 BUCKET NAME]
     ```
+
     **Example**
+
     ```shell
     ./create-package.sh $MY_KEY $MY_SECRET us-east-2 CrowdStrike-Falcon-Agent cs-agent-deployment-my-company
     ```
+
     > This script will automatically create the S3 bucket if you've passed in a name to a bucket that does not exist.
 3. In your AWS Console, navigate to **Systems Manager** -> **Distributor** -> **_Owned by me_** and confirm that the package created successfully.
 
 #### Step 3. Helper upload
+
 Upload the `agent-handler.zip` file to the `script` folder in the S3 bucket.
 
 - Using the AWS CLI.
+
   ```
   aws s3 cp util/agent-handler.zip s3://{BUCKET_NAME}/script/
   ```
 
 OR
+
 - Navigate to the AWS console and upload the file directly to the `script` folder. Create this folder if it does not exist.
 
 #### Step 4. Deploy the stack via CloudFormation
+
 A CloudFormation template is used to stand up the infrastructure for this solution. You can deploy this template using the AWS Console or the command line.
 
 ##### Parameters
+
 This template consumes the following parameters.
 
 | Parameter | Description |
@@ -291,14 +335,14 @@ This template consumes the following parameters.
 | `FalconClientID` | _CrowdStrike Falcon API Client ID with the **`Hosts: READ`** and **`Sensor Download: READ`** scopes.<BR/><BR/>**REQUIRED**_ |
 | `FalconClientSecret` | _CrowdStrike Falcon API Client Secret.<BR/><BR/>**REQUIRED**_ |
 | `MaxConcurrency` | _Percentage of total targets on which the SSM State Manager should run the SSM Automation on concurrently._ |
-| `MaxErrors` | _Threshold percentage of failed instances in your Association before SSM State Manager deems the association as a failure._ |
+| `MaxErrors` | _Threshold percentage of failed instances in your Association before SSM State Manager deems the Association as a failure._ |
 | `S3BucketName` | _Name of the S3 bucket used to store the CrowdStrike Falcon distributor package, and the agent installation helper script.<BR/><BR/>**REQUIRED**_ |
 | `SSMAssociationName` | _(CloudFormation Resource) - Name of the SSM State Manager Association used to manage the the lifecycle of the Falcon Agent._ |
 | `SSMAutomationAssumeRoleName` | _(CloudFormation Resource) - Name of the IAM Role used by SSM Automation to manage the lifecycle of the Falcon Agent._ |
 | `SSMDocumentName` | _(CloudFormation Resource) - Name of the SSM Document used to manage the manage the lifecycle of the Falcon Agent._ |
 | `SSMPackageName` | _Name of the SSM Distributor package you created earlier in the guide. Leave this unchanged unless you passed a different value to the `-p` flag._ |
 | `SSMParamPrefix` | _Prefix used for SSM parameter names created._ |
-| `ScheduleRateExpressions` | _Rate at which SSM State Manager should re-apply the Association, expressed in [Rate Expressions](https://docs.aws.amazon.com/systems-manager/latest/userguide/reference-cron-and-rate-expressions.html). _Associations support the following rate expressions: intervals of 30 minutes or greater and less than 31 days._ |
+| `ScheduleRateExpressions` | _Rate at which SSM State Manager should re-apply the Association, expressed in [Rate Expressions](https://docs.aws.amazon.com/systems-manager/latest/userguide/reference-cron-and-rate-expressions.html)._Associations support the following rate expressions: intervals of 30 minutes or greater and less than 31 days._ |
 | `TargetTagKey` | _Name of the tag used for instance targeting._<BR/><BR/>**Default Value: _SENSOR_DEPLOY_**  |
 | `TargetTagValue` | _Value of the tag used for instance targeting._<BR/><BR/>**Default Value: _TRUE_** |
 
@@ -308,6 +352,7 @@ This template consumes the following parameters.
 - [AWS Console deployment](#aws-console-deployment)
 
 ###### AWS CLI Deployment
+
 ```shell
 aws cloudformation create-stack --stack-name [STACK-NAME] \
   --template-body file://ssm_agent_deployment_by_tag.yaml \
@@ -342,12 +387,12 @@ aws cloudformation create-stack --stack-name [STACK-NAME] \
    You will be presented with a `CREATE_COMPLETE` message for the stack when the process has finished.
    ![State Manager CFT Deployment](images/state-manager-cft-deploy-complete.png)
 
-
-> It takes approximately 2 to 3 minutes to stand up this solution using CloudFormation. Immediately after deployment completes, the association is applied and all instances with the correct tag value combination will be processed for Falcon agent installation.
+> It takes approximately 2 to 3 minutes to stand up this solution using CloudFormation. Immediately after deployment completes, the Association is applied and all instances with the correct tag value combination will be processed for Falcon agent installation.
 
 ---
 
 ## Reviewing executions
+
 All executions, either scheduled or triggered, will be shown in the AWS Systems Manager Automation dashboard. You can access this dashboard in the AWS Console under **AWS Systems Manager** -> **Automation**.
 
 ![AWS Systems Manager Automation dashboard](images/systems-manager-automation-executions.png)
