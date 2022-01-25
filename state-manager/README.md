@@ -2,12 +2,12 @@
 
 ![Twitter URL](https://img.shields.io/twitter/url?label=Follow%20%40CrowdStrike&style=social&url=https%3A%2F%2Ftwitter.com%2FCrowdStrike)
 
-# Automated Falcon Agent deployment using EventBridge and State Manager
+# Automated Falcon Agent deployment using State Manager and EventBridge
 
-- [Automated Falcon Agent deployment using EventBridge and State Manager](#automated-falcon-agent-deployment-using-eventbridge-and-state-manager)
+- [Automated Falcon Agent deployment using State Manager and EventBridge](#automated-falcon-agent-deployment-using-state-manager-and-eventbridge)
   - [Overview](#overview)
     - [Architecture diagram](#architecture-diagram)
-    - [Process Flow](#process-flow)
+    - [Process flow](#process-flow)
     - [Solution benefits](#solution-benefits)
     - [Additional notes](#additional-notes)
   - [Solution components](#solution-components)
@@ -41,13 +41,13 @@
 
 ## Overview
 
-This solution leverages [The CrowdStrike Python SDK](#crowdstrike-falconpy), AWS EventBridge, and AWS Systems Manager ([AWS Automations](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-state.html), AWS Distributor, and [AWS State Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-state.html)) to manage CrowdStrike Falcon agent deployment for EC2 instances. Upon instance termination, agents are automatically removed from the Falcon Console.
+This solution leverages [The CrowdStrike Python SDK](#crowdstrike-falconpy), AWS EventBridge, and AWS Systems Manager ([AWS Automations](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-state.html), [AWS Distributor](https://docs.aws.amazon.com/systems-manager/latest/userguide/distributor.html), and [AWS State Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-state.html)) to automate the CrowdStrike Falcon Agent deployment for EC2 instances. Upon instance termination, agents are automatically removed from the Falcon Console.
 
 ### Architecture diagram
 
 ![Diagram depicting automated deployment of Falcon Agent with AWS SSM State Manager](images/architecture-diagram.png)
 
-### Process Flow
+### Process flow
 
 ![Process flow diagram](images/process-flow.png)
 
@@ -309,7 +309,7 @@ Upload the `agent-handler.zip` file to the `script` folder in the S3 bucket.
 
 - Using the AWS CLI.
 
-  ```
+  ```shell
   aws s3 cp util/agent-handler.zip s3://{BUCKET_NAME}/script/
   ```
 
