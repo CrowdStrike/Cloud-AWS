@@ -319,7 +319,7 @@ aws cloudformation create-stack --stack-name [STACK-NAME] \
 
 ###### AWS Console Deployment
 
-1. In your AWS Console, navigate to **CloudFormation -> Create stack -> With new resources (standard)**
+1. In your AWS Console, navigate to **CloudFormation** -> **Create stack** -> **With new resources (standard)**
 
 2. Under **Specify template**, select **Upload a template file** and upload the `ssm_agent_deployment_by_tag.yaml` included in this solution, then click **Next**
    ![State Manager CFT Step 1](images/state-manager-cft-1.png)
