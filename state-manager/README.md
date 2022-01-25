@@ -320,7 +320,7 @@ aws cloudformation create-stack --stack-name [STACK-NAME] \
 2. Under **Specify template**, select **Upload a template file** and upload the `ssm_agent_deployment_by_tag.yaml` included in this solution, then click **Next**
    ![State Manager CFT Step 1](images/state-manager-cft-1.png)
 
-3. Provide a **Stack name** and update the **Parameters** if the default values don't match your deployment:
+3. Provide a **Stack name** and update the **Parameters** if the default values do not match your deployment:
    ![State Manager CFT Step 2](images/state-manager-cft-2.png)
 
 4. Apply any additional tags or advanced configuration options necessary for your environment (none are required) and then click **Next**.
@@ -339,5 +339,4 @@ aws cloudformation create-stack --stack-name [STACK-NAME] \
    ![State Manager CFT Deployment](images/state-manager-cft-deploy-complete.png)
 
 
-
-
+> It takes approximately 2 to 3 minutes to stand up this solution using CloudFormation. Immediately after deployment completes, the association is applied, and all instances with the correct tag / value will be processed for Falcon agent installation.
