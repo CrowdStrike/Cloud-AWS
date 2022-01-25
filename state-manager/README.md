@@ -69,13 +69,108 @@ This solution leverages [The CrowdStrike Python SDK](#crowdstrike-falconpy), AWS
 - [CrowdStrike FalconPy](#crowdstrike-falconpy)
 
 ### AWS EventBridge
-AWS EventBridge is used to trigger the SSM Automation deployment document when instances are moved to the `terminated` status.
+AWS EventBridge is used to trigger the SSM Automation deployment document when instances are moved to the `terminated` status. This is handled using an EventBridge rule.
+
+#### Event pattern
+```json
+{
+  "detail-type": ["EC2 Instance State-change Notification"],
+  "source": ["aws.ec2"],
+  "detail": {
+    "state": ["terminated"]
+  }
+}
+```
+
 
 ### AWS IAM
 IAM is utilized to store execution permissions for the automation.
 
 #### Execution Role
-> _IAM policy JSON here_
+This role is used to provide execution permissions to the SSM Automation document. There are two policies attached.
+
+##### AmazonSSMAutomationRole
+This is an AWS provided policy.
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "lambda:InvokeFunction"
+            ],
+            "Resource": [
+                "arn:aws:lambda:*:*:function:Automation*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateImage",
+                "ec2:CopyImage",
+                "ec2:DeregisterImage",
+                "ec2:DescribeImages",
+                "ec2:DeleteSnapshot",
+                "ec2:StartInstances",
+                "ec2:RunInstances",
+                "ec2:StopInstances",
+                "ec2:TerminateInstances",
+                "ec2:DescribeInstanceStatus",
+                "ec2:CreateTags",
+                "ec2:DeleteTags",
+                "ec2:DescribeTags",
+                "cloudformation:CreateStack",
+                "cloudformation:DescribeStackEvents",
+                "cloudformation:DescribeStacks",
+                "cloudformation:UpdateStack",
+                "cloudformation:DeleteStack"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssm:*"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "sns:Publish"
+            ],
+            "Resource": [
+                "arn:aws:sns:*:*:Automation*"
+            ]
+        }
+    ]
+}
+```
+
+##### Allow Read EC2 access
+A limited read scope policy allows the automation to retrieve EC2 tags.
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "ec2:DescribeInstances",
+                "ec2:DescribeTags"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        }
+    ]
+}
+```
 
 ### AWS S3
 A single AWS S3 bucket is used to store the AWS Distributor package and the `agent-handler.zip` attachment layer.
@@ -84,8 +179,16 @@ A single AWS S3 bucket is used to store the AWS Distributor package and the `age
 AWS Systems Manager is used to handle automation and deploy packages.
 
 #### AWS Automation
+A single SSM Automation Document is used to handle all agent management logic. This document contains steps for installation and removal of the agent, and includes an attachment containing the necessary helpers for interacting with your tenant within the CrowdStrike cloud.
+
 #### AWS Distributor
+A single AWS Distributor package is created, containing manifests and installers for Amazon Linux 2 (x64) and Microsoft Windows (10+/2016+). This is a bundled variation, so the binary installers are included within this distribution as well.
+
+#### AWS Parameter Store
+Three AWS Parameter Store parameters are created. These are used to provide credentials to the automation helper in a secure fashion.
+
 #### AWS State Manager
+A single AWS State Manager association is created, creating the relationship between our targets (any instances with the correct tag and tag value) and our automation document.
 
 ### CrowdStrike FalconPy
 The CrowdStrike Python SDK, FalconPy is used to interact with the CrowdStrike API as part of automation steps.
@@ -192,16 +295,10 @@ This template consumes the following parameters.
 
 ##### Deployment
 
-###### AWS Console
-1. In your AWS Console, navigate to **CloudFormation -> Create stack -> With new resources (standard)**
-2. Under **Specify template**, select **Upload a template file** and upload the `infrastructure.yaml` included in this solution, then click **Next**
-3. Provide a **Stack name** and update the **Parameters** if the default values don't match your deployment:
+- [AWS CLI deployment](#aws-cli-deployment)
+- [AWS Console deployment](#aws-console-deployment)
 
-    > _Screenshot here_
-
-4. Create the CloudFormation, providing any custom configurations you require in the subsequent steps.
-
-###### AWS CLI
+###### AWS CLI Deployment
 ```shell
 aws cloudformation create-stack --stack-name [STACK-NAME] \
   --template-body file://ssm_agent_deployment_by_tag.yaml \
@@ -210,5 +307,32 @@ aws cloudformation create-stack --stack-name [STACK-NAME] \
     ParameterKey=S3BucketName,ParameterValue=[S3BucketName] \
   --region [AWS REGION] --capabilities CAPABILITY_NAMED_IAM
 ```
+
+###### AWS Console Deployment
+
+1. In your AWS Console, navigate to **CloudFormation -> Create stack -> With new resources (standard)**
+
+2. Under **Specify template**, select **Upload a template file** and upload the `ssm_agent_deployment_by_tag.yaml` included in this solution, then click **Next**
+   ![State Manager CFT Step 1](images/state-manager-cft-1.png)
+
+3. Provide a **Stack name** and update the **Parameters** if the default values don't match your deployment:
+   ![State Manager CFT Step 2](images/state-manager-cft-2.png)
+
+4. Apply any additional tags or advanced configuration options necessary for your environment (none are required) and then click **Next**.
+   ![State Manager CFT Step 3](images/state-manager-cft-3.png)
+
+5. Review your selections, and then on the bottom of the page click the `I acknowledge that AWS CloudFormation might create IAM resources with custom names` check box. After doing so, click the **Create Stack** button.
+   ![State Manager CFT Step 4](images/state-manager-cft-4.png)
+
+6. Your stack will now start to deploy.
+   ![State Manager CFT Deployment](images/state-manager-cft-deploy-1.png)
+
+   You can click the refresh button to watch as the deployment progresses.
+   ![State Manager CFT Deployment](images/state-manager-cft-deploy-2.png)
+
+   You will be presented with a `CREATE_COMPLETE` message for the stack when the process has finished.
+   ![State Manager CFT Deployment](images/state-manager-cft-deploy-complete.png)
+
+
 
 
