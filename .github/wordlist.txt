@@ -331,3 +331,11 @@ SecureString
 julian
 SecurityHub
 ZSH
+EventBridge
+duplicative
+decommissioning
+uninstallation
+Automations
+eventbridge
+DeployFalconAgent
+FalconAgent
