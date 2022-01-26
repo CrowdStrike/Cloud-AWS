@@ -327,7 +327,7 @@ This template consumes the following parameters.
 
 | Parameter | Description |
 | :--- | :--- |
-| `Action` | _Should be left as `Install`. `Uninstall` is used for event-based decomissioning via EventBridge._ |
+| `Action` | _Should be left as `Install`. `Uninstall` is used for event-based decommissioning via EventBridge._ |
 | `AutomationHandlerHash` | _SHA256 hash of the `agent-handler.zip` file. This value only needs to be updated if you run the `build-helper.sh` utility. |
 | `EventBridgeExecutionRoleName` | _(CloudFormation Resource) - Name of the IAM Role used by EventBridge to trigger the SSM Automation when an EC2 instance is terminated._ |
 | `EventBridgeRuleName` | _(CloudFormation Resource) - Name of the EventBridge Rule used to trigger the SSM Automation when an EC2 instance is terminated._ |
