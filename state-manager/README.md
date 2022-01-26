@@ -61,7 +61,7 @@ This solution leverages [The CrowdStrike Python SDK](#crowdstrike-falconpy), AWS
 
 ### Additional notes
 
-- AWS State Manager assocations apply on a scheduled basis, which can be overridden using the helper script (`apply_association.py`) provided.
+- AWS State Manager associations apply on a scheduled basis, which can be overridden using the helper script (`apply_association.py`) provided.
 - This solutions provides support in the specific region where you deploy. If you're running multi-region workloads, deploy this solution across all regions you wish to manage.
 
 ---
