@@ -6,7 +6,7 @@ from botocore.exceptions import ClientError, EndpointConnectionError
 from julian import to_jd
 
 
-def generate_manifest(detection, region):
+def generate_manifest(detection, region, mitigating):
     """Generate a manifest for submission to Security Hub."""
     sts = boto3.client('sts')
     account_id = sts.get_caller_identity()['Account']
@@ -14,6 +14,10 @@ def generate_manifest(detection, region):
     create_date = f"{now.date()}T{now.time()}Z"
     jdate = to_jd(now)
     manifest = {}
+    if mitigating:
+        desc_msg = f"The file ({detection['file']}) has been removed from the bucket.\n"
+    else:
+        desc_msg = f"The file ({detection['file']}) was NOT removed from the bucket and should be removed manually.\n"
     try:
         manifest["SchemaVersion"] = "2018-10-08"
         manifest["ProductArn"] = f"arn:aws:securityhub:{region}:517716713836:product/crowdstrike/crowdstrike-falcon"
@@ -27,8 +31,7 @@ def generate_manifest(detection, region):
         manifest["Severity"] = {"Original": "CRITICAL", "Label": "CRITICAL"}
         manifest["Title"] = f"Falcon Alert. Malware detected in bucket: {detection['bucket']}"
         manifest["Description"] = f"Malware has recently been identified in S3 bucket {detection['bucket']}."
-        manifest["Description"] = f"{manifest['Description']}\n\n" + \
-            f"The file ({detection['file']}) has been removed from the bucket.\n"
+        manifest["Description"] = f"{manifest['Description']}\n\n{desc_msg}"
         manifest["Resources"] = [{"Type": "AwsS3Bucket", "Id": detection["bucket"], "Region": region}]
     except KeyError:
         print(f"Could not translate info for malware event in bucket {detection['bucket']}")
