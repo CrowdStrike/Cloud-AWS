@@ -32,7 +32,7 @@ main() {
 }
 
 cs_sensor_register() {
-    /opt/CrowdStrike/falconctl -s --cid="${cs_falcon_cid}"
+    /opt/CrowdStrike/falconctl -s -f --cid="${cs_falcon_cid}"
 }
 
 cs_sensor_restart() {
