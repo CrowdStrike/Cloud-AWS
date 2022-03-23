@@ -3,7 +3,6 @@ import logging
 import os
 import random
 import string
-import sys
 import time
 
 # from botocore.vendored import requests
@@ -145,7 +144,7 @@ def lambda_handler(event, context):
             except Exception as e:
                 logger.info('cant convert delay_timer type {} error {}'.format(type(delay_timer), e))
                 delay = 60
-                pass
+
             logger.info('Got ARN of Role Pausing for {} seconds for role setup'.format(delay))
             time.sleep(delay)
             register_result = register_falcon_discover_account(api_message, falcon)
