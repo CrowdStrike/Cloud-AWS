@@ -238,10 +238,8 @@ def lambda_handler(event, context):
             keyDict['ParameterKey'] = 'LogArchiveAccount'
             keyDict['ParameterValue'] = LogArchiveAccount
             CRWD_Discover_paramList.append(dict(keyDict))
-            for key_dict in CRWD_Discover_paramList:
-                if key_dict["ParameterKey"] == "s":
-                    CRWD_Discover_paramList.pop(key_dict)
-            logger.info('CRWD_Discover ParamList:{}'.format(CRWD_Discover_paramList))
+
+
             logger.info('AdminRoleARN: {}'.format(AdminRoleARN))
             logger.info('CrowdstrikeTemplateUrl: {}'.format(CrowdstrikeTemplateUrl))
             logger.info('ExecRole: {}'.format(ExecRole))
@@ -249,6 +247,9 @@ def lambda_handler(event, context):
 
             CRWD_Discover_result = launch_crwd_discover(CrowdstrikeTemplateUrl, CRWD_Discover_paramList, AdminRoleARN,
                                                         ExecRole, cList, STACKSETNAME)
+
+            CRWD_Discover_paramList = [i for i in CRWD_Discover_paramList if not (i["ParameterKey"] == "s")]
+            logger.info('CRWD_Discover ParamList:{}'.format(CRWD_Discover_paramList))
             logger.info('CRWD-Discover Stackset: {}'.format(CRWD_Discover_result))
 
             if CRWD_Discover_result:
