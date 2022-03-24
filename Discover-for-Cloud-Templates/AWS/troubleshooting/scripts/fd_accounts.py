@@ -10,11 +10,18 @@ and delete operations within a customer Falcon Discover environment.
 # This project can be accessed here: https://github.com/CrowdStrike/falconpy #
 #                                                                            #
 # Modified 2021.10.13, Version 2 - Add support for all CrowdStrike clouds    #
+# Modified 2022.03.16, Version 3 - Add support to retrieve individual        #
+#                                   account details via get                  #
 ##############################################################################
 import argparse
 import json
 # Falcon SDK - All in one uber-class
-from falconpy.api_complete import APIHarness
+try:
+    from falconpy import APIHarness
+except ImportError as no_falconpy:
+    raise SystemExit(
+        "The CrowdStrike FalconPy library must be installed to run this utility."
+        ) from no_falconpy
 
 
 # ############## FORMAT API PAYLOAD
@@ -37,7 +44,7 @@ def format_api_payload(rate_limit_reqs=0, rate_limit_time=0):
 
 
 # ############## CHECK ACCOUNTS
-def check_account():
+def check_account():  # pylint: disable=R0914
     """Retrieves all registered accounts and checks their status."""
     # Retrieve the account list
     account_list = falcon.command(action="QueryAWSAccounts",
@@ -45,24 +52,24 @@ def check_account():
                                   )["body"]["resources"]
     # Log the results of the account query to a file if logging is enabled
     if log_enabled:
-        with open('falcon-discover-accounts.json', 'w+') as file_output:
+        with open('falcon-discover-accounts.json', 'w+', encoding="utf-8") as file_output:
             json.dump(account_list, file_output)
     # Create a list of our account IDs out of account_list
     id_items = []
     for acct in account_list:
         id_items.append(acct["id"])
     # Returns the specified value for a specific account id within account_list
-    def account_value(i, v): return [a[v] for a in account_list if a["id"] == i][0]  # noqa: E731
+    account_value = lambda i, v: [a[v] for a in account_list if a["id"] == i][0]  # noqa: E731
     q_max = 10    # VerifyAWSAccountAccess has a ID max count of 10
     for index in range(0, len(id_items), q_max):
         sub_acct_list = id_items[index:index + q_max]
-        temp_list = ",".join([a for a in sub_acct_list])
+        temp_list = list(sub_acct_list)
         # Check our AWS account access against the list of accounts returned in our query
         access_response = falcon.command(action="VerifyAWSAccountAccess", ids=temp_list)
         if access_response['status_code'] == 200 or access_response['status_code'] == 409:
             # Loop through each ID we verified
             resource_list = access_response["body"]["resources"]
-            for result in [result for result in (resource_list or [])]:
+            for result in resource_list:
                 if result["successful"]:
                     # This account is correctly configured
                     print(f'Account {result["id"]} is ok!')
@@ -81,7 +88,7 @@ def check_account():
                     try:
                         problem = account_value(result["id"], "access_health")["api"]["reason"]
                         print(f'Account {result["id"]} has a problem: {problem}')
-                    except:  # noqa: E722
+                    except:  # noqa: E722  pylint: disable=W0702
                         # The above call will produce an error if we're running
                         # check immediately after registering an account as
                         # the access_health branch hasn't been populated yet.
@@ -93,16 +100,16 @@ def check_account():
                         print(f'Account {result["id"]} has a problem: {issue}')
                     # Output the account details to the user to assist with troubleshooting the account
                     print(f'Current settings {json.dumps(account_values_to_check, indent=4)}\n')
-            for status in [status for status in (access_response["body"]["errors"] or [])]:
+            for status in [status for status in (access_response["body"]["errors"] or [])]:  # pylint: disable=R1721
                 # This account has an issue
                 print(f'Account {status["id"]} has an error: {status["message"]}!')
         else:
             try:
                 # An error has occurred
-                print("Got response error code {}".format(access_response["status_code"]))
-            except:  # noqa: E722
+                print(f"Got response error code {access_response['status_code']}")
+            except:  # noqa: E722  pylint: disable=W0702
                 # Handle any egregious errors that break our return error payload
-                print("Got response error code {} message {}".format(access_response["status_code"], access_response["body"]))
+                print(f"Got response error code {access_response['status_code']} message {access_response['body']}")
 
 
 # ############## REGISTER ACCOUNT
@@ -129,12 +136,25 @@ def update_account():
         print(f"Update failed with response: {up_status} {up_message}")
 
 
+# ############## VERIFY ACCOUNT
+def get_account():
+    """Call the API to get the requested account."""
+    # VerifyAWSAccountAccess(self, parameters, body, ids):
+    get_response = falcon.command(action="GetAWSAccounts", ids=local_account)
+    if get_response["status_code"] == 200:
+        print(json.dumps(get_response["body"]["resources"][0], indent=4, sort_keys=True))
+    else:
+        get_status = get_response["status_code"]
+        get_message = get_response["body"]["errors"][0]["message"]
+        print(f"Update failed with response: {get_status} {get_message}")
+
+
 # ############## DELETE ACCOUNT
 def delete_account():
     """Call the API to delete the requested account,
     multiple IDs can be deleted by passing in a comma-delimited list
     """
-    delete_response = falcon.command(action="DeleteAWSAccounts", parameters={}, ids=local_account)
+    delete_response = falcon.command(action="DeleteAWSAccounts", ids=local_account)
     if delete_response["status_code"] == 200:
         print("Successfully deleted account.")
     else:
@@ -161,7 +181,10 @@ if __name__ == "__main__":
     parser.add_argument('-i', '--iam_role_arn',
                         help='IAM AWS IAM Role ARN that grants access to resources for Crowdstrike', required=False)
     # Always required
-    parser.add_argument('-c', '--command', help='Troubleshooting action to perform', required=True)
+    parser.add_argument('-c', '--command',
+                        help='Troubleshooting action to perform options are check, update, register, delete, get ',
+                        required=True
+                        )
     parser.add_argument("-f", "--falcon_client_id", help="Falcon Client ID", required=True)
     parser.add_argument("-s", "--falcon_client_secret", help="Falcon Client Secret", required=True)
     args = parser.parse_args()
@@ -169,12 +192,10 @@ if __name__ == "__main__":
     # ############## SET GLOBALS
     command = args.command
     # Only execute our defined commands
-    if command.lower() in "check,update,register,delete":
-        if command.lower() in "update,register":
+    if command.lower() in "check,update,register,delete,get".split(","):
+        if command.lower() in "update,register".split(","):
             # All fields required for update and register
-            if (args.cloudtrail_bucket_owner_id is None
-                    or args.cloudtrail_bucket_region is None
-                    or args.local_account is None
+            if (args.local_account is None
                     or args.external_id is None
                     or args.iam_role_arn is None):
                 parser.error(f"The {command} command requires the -r, -o, -a, -e, -i arguments to also be specified.")
@@ -184,10 +205,10 @@ if __name__ == "__main__":
                 local_account = args.local_account
                 external_id = args.external_id
                 iam_role_arn = args.iam_role_arn
-        elif command.lower() in "delete":
-            # Delete only requires the local account ID
+        elif command.lower() in ["delete", "get"]:
+            # Delete or verify only requires the local account ID
             if args.local_account is None:
-                parser.error(f"The {command} command requires the -l argument to also be specified.")
+                parser.error(f"The {command} command requires the -a argument to also be specified.")
             else:
                 local_account = args.local_account
     else:
@@ -213,7 +234,7 @@ if __name__ == "__main__":
                             client_secret=falcon_client_secret,
                             base_url=CLOUD_URL
                             )
-    except Exception as err:  # noqa: E722
+    except Exception as err:  # noqa: E722  pylint: disable=W0703
         # We can't communicate with the endpoint
         print(f'Unable to communicate with API {str(err)}')
     # Authenticate
@@ -228,7 +249,9 @@ if __name__ == "__main__":
                 register_account()
             if command.lower() == "delete":
                 delete_account()
-        except Exception as err:
+            if command.lower() == "get":
+                get_account()
+        except Exception as err:  # pylint: disable=W0703
             # Handle any previously unhandled errors
             print(f"Command failed with error: {str(err)}.")
         # Discard our token before we exit
