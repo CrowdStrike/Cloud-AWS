@@ -1,4 +1,4 @@
-# Implementation Guide for CrowdStrike Falcon Sensor for Linux on Kubernetes cluster using Helm Chart
+# Implementation Guide for CrowdStrike Falcon Sensor for Linux DaemonSet on Kubernetes cluster using Helm Chart
 
 This guide works through creation of new Kubernetes cluster, deployment of Falcon Sensor for Linux using Helm Chart, and demonstration of detection capabilities of Falcon Container Workload Protection.
 
@@ -109,7 +109,7 @@ Example commands in this guide are tailored and tested on Ubuntu 20.04.
 
 ## Deployment
 
-### Step 3: Build falcon-node-sensor container image
+### Step 3: Clone the Falcon Sensor for Linux DaemonSet image
 
  - Enter the [cloud-tools-image](https://github.com/CrowdStrike/cloud-tools-image) container
    ```
@@ -135,38 +135,19 @@ Example commands in this guide are tailored and tested on Ubuntu 20.04.
    $ FALCON_CLOUD=us-1
    ```
 
- - Build falcon-node-sensor container for your particular OS that is running on your cluster nodes
-   ```
-   $ falcon-node-sensor-build ubuntu20
-   ```
-   To see various build options see [upstream project](https://github.com/CrowdStrike/Dockerfiles).
-
-### Step 4: Push falcon-node-sensor image to the kube registry
-
  - Save desired image location to environment variable. We will use Microk8s container registry that is running on the node on port 32000.
    ```
    $ FALCON_NODE_IMAGE_URI=localhost:32000/falcon-node-sensor
    ```
    Note: In our example we are running Kubernetes on single cluster and hence we can use `localhost` in image URI. If you are running multi-node cluster, please make sure to supply appropriate network address to the registry.
 
- - Push the image to the kube registry
+ - Clone Falcon Sensor for Linux DaemonSet image to your newly created repository.
+ - Note: the below script will use the tag of "latest" in the destination repository
    ```
-   $ docker tag falcon-node-sensor:latest $FALCON_NODE_IMAGE_URI:latest
-   ```
-   ```
-   $ docker push $FALCON_NODE_IMAGE_URI
-   Using default tag: latest
-   The push refers to repository [localhost:32000/falcon-node-sensor]
-   913513e672ba: Pushed
-   2c5b2be1a19c: Pushed
-   88cd0d79914e: Pushed
-   c20d459170d8: Pushed
-   db978cae6a05: Pushed
-   aeb3f02e9374: Pushed
-   latest: digest: sha256:132eea2728db09c49fecfae78778f11225f6e9818c71c4f5b2321a0dae4d0c95 size: 1572
+   falcon-node-sensor-push $FALCON_NODE_IMAGE_URI
    ```
 
-### Step 5: Deploy the DaemonSet using the helm chart
+### Step 4: Deploy the Falcon Sensor for Linux using the helm chart
 
  - Provide CrowdStrike Falcon Customer ID as environment variable. This CID will be used be helm chart to register your cluster nodes to the CrowdStrike Falcon platform.
    ```
@@ -212,11 +193,6 @@ Example commands in this guide are tailored and tested on Ubuntu 20.04.
    $ kubectl get pods -n falcon-system
    NAME                              READY   STATUS    RESTARTS   AGE
    falcon-helm-falcon-sensor-bs98m   2/2     Running   0          21s
-   ```
- - (optional) Verify that given pod has registered with CrowdStrike Falcon and received unique identifier.
-   ```
-   $ kubectl exec -n falcon-system falcon-helm-falcon-sensor-bs98m -c falcon-node-sensor -- falconctl -g --aid
-   aid="a582XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
    ```
  - (optional) Verify that Falcon Sensor for Linux has insert itself to the kernel
     ```
