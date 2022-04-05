@@ -89,6 +89,7 @@ CSAssumingRoleName
 CSFalconVersion
 CSPM
 DaemonSet
+daemonset
 dataflow
 deamons
 decrypt
