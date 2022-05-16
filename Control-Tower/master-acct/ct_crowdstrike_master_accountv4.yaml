@@ -44,6 +44,10 @@ Parameters:
     Description: IAM Role Name (May be modified)
     Type: String
     Default: CrowdStrikeFalcon
+  StackSetName:
+    Description: The name of the CrowdStrike Discover StackSet
+    Type: String
+    Default: CrowdStrike-Discover-Stackset
   CSAssumingRoleName:
     Type: String
     Description: Assuming IAM Role Name
@@ -71,17 +75,12 @@ Mappings:
 
   CSCloud:
     us1:
-
       CSAssumingRoleName: CS-Prod-HG-CsCloudconnectaws
       CSAccount: 292230061137
-
     us2:
-
       CSAssumingRoleName: mav-gyr-main-s001-cs-cloudconnectaws
       CSAccount: 292230061137
-
     eu:
-
       CSAssumingRoleName: lion-lanner-main-s001-cs-cloudconnectaws
       CSAccount: 292230061137
 
@@ -210,6 +209,7 @@ Resources:
         - !Ref lambdaLayer
       Environment:
         Variables:
+          StackSetName: !Ref StackSetName
           CrowdStrikeCloud: !Ref CrowdStrikeCloud
           RoleCreationDelayTimer: !Ref RoleCreationDelayTimer
           AwsRegion: !Ref AWS::Region
@@ -297,15 +297,16 @@ Resources:
     Properties:
       Code:
         S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
-        S3Key: crowdstrikeAccts_lambda.zip
+        S3Key: crowdstrikeAccts_lambdav4.zip
       Layers:
         - !Ref lambdaLayer
       Environment:
         Variables:
+          StackSetName: !Ref StackSetName
           RoleName: !Ref RoleName
           CSAccountNumber: !Ref CSAccountNumber
           CSAssumingRoleName: !Ref CSAssumingRoleName
-      Handler: crowdstrikeAccts_lambda.lambda_handler
+      Handler: crowdstrikeAccts_lambdav4.lambda_handler
       MemorySize: 128
       Role: !GetAtt "LambdaRoleToCaptureEvents.Arn"
       Runtime: python3.7
