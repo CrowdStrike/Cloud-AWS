@@ -164,6 +164,7 @@ def lambda_handler(event, context):
         # Add support for different CrowdStrike clouds
         CrowdStrikeCloud = os.environ['CrowdStrikeCloud']
         #
+
         RoleCreationDelayTimer = os.environ['RoleCreationDelayTimer']
         AwsRegion = os.environ['AwsRegion']
         LogArchiveAccount = os.environ['LogArchiveAccount']
@@ -172,7 +173,7 @@ def lambda_handler(event, context):
         CSAccountNumber = os.environ['CSAccountNumber']
         CSAssumingRoleName = os.environ['CSAssumingRoleName']
         CrowdStrikeCredentialsSecret = os.environ['CrowdstrikeCredentialsSecret']
-        
+        STACKSETNAME = os.environ['StackSetName']
         
         #
         # Moved to virtual hosted-style URLs.
@@ -185,10 +186,10 @@ def lambda_handler(event, context):
         ExecRole = 'AWSControlTowerExecution'
         AdminRoleARN = 'arn:aws:iam::' + AccountId + ':role/service-role/AWSControlTowerStackSetRole'
         logger.info('EVENT Received: {}'.format(event))
-        STACKSETNAME='CrowdStrike-Discover-Stackset'
         response_data = {}
 
         if event['RequestType'] in ['Create']:
+            external_id = event['ResourceProperties']['ExternalID']
             logger.info('Event = ' + event['RequestType'])
 
             # Parameters for CRWD-Discover stackset
@@ -202,7 +203,7 @@ def lambda_handler(event, context):
             for s in secretList.keys():
                 keyDict = {'ParameterKey': s, 'ParameterValue': secretList[s]}
                 CRWD_Discover_paramList.append(dict(keyDict))
-            ExternalID = get_random_alphanum_string(8)
+
             #
             #Add support for additional CrowdStrike clouds
             #
@@ -212,7 +213,7 @@ def lambda_handler(event, context):
             #
 
             keyDict['ParameterKey'] = 'ExternalID'
-            keyDict['ParameterValue'] = ExternalID
+            keyDict['ParameterValue'] = external_id
             CRWD_Discover_paramList.append(dict(keyDict))
 
             keyDict['ParameterKey'] = 'RoleCreationDelayTimer'
@@ -260,6 +261,7 @@ def lambda_handler(event, context):
                 return
 
         elif event['RequestType'] in ['Update']:
+            external_id = event['ResourceProperties']['ExternalID']
             logger.info('Event = ' + event['RequestType'])
 
             cfnresponse_send(event, context, 'SUCCESS', response_data, "CustomResourcePhysicalID")

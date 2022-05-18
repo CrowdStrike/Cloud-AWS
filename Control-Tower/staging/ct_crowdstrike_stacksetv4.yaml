@@ -172,6 +172,7 @@ Resources:
           CSAssumingRoleName: !Ref CSAssumingRoleName
           LocalAccount: !Ref AWS::AccountId
           aws_region: !Ref AWS::Region
+          delay_timer: !Ref RoleCreationDelayTimer
 
       Code:
         S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]

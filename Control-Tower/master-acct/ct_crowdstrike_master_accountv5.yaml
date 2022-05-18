@@ -1,6 +1,16 @@
 AWSTemplateFormatVersion: '2010-09-09'
+# Version 5
+# Fixes issue with Lambda function used to push stack to new account.   Originally used hardcoded stackset name
+# StackSet name now defined as a parameter during creation
+#
+
 Description: Control Tower Lifecycle Events
 Parameters:
+  RoleCreationDelayTimer:
+    Description: Delay timer wait for role creation before registering acct (Time in seconds)
+    Type: Number
+    MaxValue: 800
+    Default: 60
   FalconClientId:
     Description: Your Falcon OAuth2 API Key.
     NoEcho: 'true'
@@ -11,26 +21,28 @@ Parameters:
     NoEcho: 'true'
     Type: String
 
-
-  ExternalId:
-    Description: ExternalID Used for authenticating assume role requests.
-    NoEcho: 'true'
+  CrowdStrikeCloud:
+    Default: us1
+    Description:  The CrowdStrike Cloud your CID is hosted in us1, us2 or eu
     Type: String
-
-  CSAccountNumber:
-    Default: '292230061137'
-    Description: CrowdStrike Account ID.
-    Type: String
-
-
+    AllowedValues:
+      - us1
+      - us2
+      - eu
   RoleName:
     Description: IAM Role Name (May be modified)
     Type: String
     Default: CrowdStrikeFalcon
-  CSAssumingRoleName:
+
+  ExternalID:
+    Description: External ID associated with the role assumed by CrowdStrike
     Type: String
-    Description: Assuming IAM Role Name
-    Default: CS-Prod-HG-CsCloudconnectaws
+
+  StackSetName:
+    Description: The name of the CrowdStrike Discover StackSet
+    Type: String
+    Default: CrowdStrike-Discover-Stackset
+
   LogArchiveAccount:
     Type: String
     Description: AccountId of Log Archive Bucket
@@ -51,25 +63,31 @@ Mappings:
       NAME: crowdstrike-sa-resources-ct-eu-west-1
     ap-southeast-2:
       NAME: crowdstrike-sa-resources-ct-ap-southeast-2
+  CSCloud:
+    us1:
+      CSAssumingRoleName: CS-Prod-HG-CsCloudconnectaws
+      CSAccount: 292230061137
+    us2:
+      CSAssumingRoleName: mav-gyr-main-s001-cs-cloudconnectaws
+      CSAccount: 292230061137
+    eu:
+      CSAssumingRoleName: lion-lanner-main-s001-cs-cloudconnectaws
+      CSAccount: 292230061137
+
+
 
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
-          default: CrowdStrike Account Parameters. (Do Not Modify)
-        Parameters:
-          - CSAccountNumber
-          - CSAssumingRoleName
-      - Label:
           default: CrowdStrike Role Parameters.
         Parameters:
           - RoleName
-          - ExternalId
       - Label:
           default: CrowdStrike Falcon API keys.
         Parameters:
-           - FalconClientId
-           - FalconSecret
+          - FalconClientId
+          - FalconSecret
       - Label:
           default: Log Archive Account Details
         Parameters:
@@ -78,9 +96,17 @@ Metadata:
 Resources:
   CrowdStrikeCredentials:
     Type: AWS::SecretsManager::Secret
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W77
+            reason: "Not required to be shared across accounts."
     Properties:
       Description: CrowdStrike Credentials
-      Name: CrowdStrikeAPISecret
+      Name: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - CrowdStrikeAPISecret
       SecretString:
         Fn::Join:
           - ''
@@ -92,8 +118,12 @@ Resources:
 
   launchLambdaRole:
     Type: AWS::IAM::Role
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "Wildcard required to list secrets"
     Properties:
-      RoleName: launchLambdaRole
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -101,7 +131,7 @@ Resources:
             Principal:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
-            Condition: {}
+            Condition: { }
       Path: /
       Policies:
         - PolicyName: Get_Values
@@ -135,7 +165,7 @@ Resources:
                 - cloudformation:ListStackInstances
                 - cloudformation:DeleteStackInstances
                 - cloudformation:DeleteStackSet
-              Resource: !Join [':', ['arn:aws:cloudformation', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'stackset/*:*']]
+              Resource: !Join [ ':', [ 'arn:aws:cloudformation', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'stackset/*:*' ] ]
         - PolicyName: Pass_Role
           PolicyDocument:
             Version: '2012-10-17'
@@ -144,7 +174,7 @@ Resources:
               Effect: Allow
               Action:
                 - iam:PassRole
-              Resource: !Join [':', ['arn:aws:iam:', !Ref "AWS::AccountId", 'role/service-role/AWSControlTowerStackSetRole']]
+              Resource: !Join [ ':', [ 'arn:aws:iam:', !Ref "AWS::AccountId", 'role/service-role/AWSControlTowerStackSetRole' ] ]
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
         - arn:aws:iam::aws:policy/AWSOrganizationsReadOnlyAccess
@@ -159,40 +189,45 @@ Resources:
       SourceAccount: !Ref "AWS::AccountId"
 
   LambdaToLaunchStackSet:
-    DependsOn:
-      - "launchLambdaRole"
-      - CrowdStrikeCredentials
     Type: 'AWS::Lambda::Function'
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W89
+            reason: "Should not run inside a VPC as this is a custom resource"
+          - id: W92
+            reason: "Lambda will only run once in stackset lifecycle as it is a custom resource"
     DeletionPolicy: Delete
     Properties:
       Code:
         S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
-        S3Key: create_stackset_lambda.zip
+        S3Key: create_stackset_lambdav4.zip
       Layers:
         - !Ref lambdaLayer
+      ReservedConcurrentExecutions: 1
       Environment:
         Variables:
+          StackSetName: !Ref StackSetName
+          CrowdStrikeCloud: !Ref CrowdStrikeCloud
+          RoleCreationDelayTimer: !Ref RoleCreationDelayTimer
           AwsRegion: !Ref AWS::Region
           LogArchiveAccount: !Ref LogArchiveAccount
           LogArchiveBucketRegion: !Ref LogArchiveBucketRegion
-          RoleName : !Ref RoleName
-          CSAccountNumber: !Ref CSAccountNumber
-          CSAssumingRoleName: !Ref CSAssumingRoleName
+          RoleName: !Ref RoleName
+          CSAccountNumber: !FindInMap [ CSCloud, !Ref CrowdStrikeCloud, CSAccount ]
+          CSAssumingRoleName: !FindInMap [ CSCloud, !Ref CrowdStrikeCloud, CSAssumingRoleName ]
           CrowdstrikeCredentialsSecret: !Ref CrowdStrikeCredentials
-      Handler: create_stackset_lambda.lambda_handler
+      Handler: create_stackset_lambdav4.lambda_handler
       Runtime: python3.7
       MemorySize: 128
       Role: !GetAtt "launchLambdaRole.Arn"
       Timeout: 180
   TriggerLambda1:
     Type: 'Custom::TriggerLambda'
-    DependsOn:
-      - LambdaToLaunchStackSet
-      - "launchLambdaRole"
-      - permissionForEventsToInvokeLambda
     Properties:
       FalconSecret: !Ref FalconSecret
       FalconClientId: !Ref FalconClientId
+      ExternalID: !Ref ExternalID
       ServiceToken: !GetAtt
         - LambdaToLaunchStackSet
         - Arn
@@ -208,8 +243,6 @@ Resources:
       LayerName: requests-package
 
   CrowdStrikeCaptureControlTowerLifeCycleEvents:
-    DependsOn:
-      - TriggerCustomizationsOnLifeCycleEvent
     Type: AWS::Events::Rule
     Properties:
       Description: Capture Control Tower LifeCycle Events and Trigger an Action
@@ -219,21 +252,20 @@ Resources:
             - CreateManagedAccount
             - UpdateManagedAccount
           eventSource:
-          - controltower.amazonaws.com
+            - controltower.amazonaws.com
         detail-type:
-        - AWS Service Event via CloudTrail
+          - AWS Service Event via CloudTrail
         source:
-        - aws.controltower
+          - aws.controltower
       Name: CrowdStrikeCaptureControlTowerLifeCycleEvents
       State: ENABLED
       Targets:
-      - Arn: !GetAtt "TriggerCustomizationsOnLifeCycleEvent.Arn"
-        Id: IDCrowdStrikeCaptureControlTowerLifeCycleEvents
+        - Arn: !GetAtt "TriggerCustomizationsOnLifeCycleEvent.Arn"
+          Id: IDCrowdStrikeCaptureControlTowerLifeCycleEvents
 
   LambdaRoleToCaptureEvents:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: LambdaRoleToCaptureEvents
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -241,7 +273,7 @@ Resources:
             Principal:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
-            Condition: {}
+            Condition: { }
       Path: /
       Policies:
         - PolicyName: inline-policy
@@ -251,26 +283,31 @@ Resources:
               - Effect: Allow
                 Action:
                   - 'cloudformation:CreateStackInstances'
-                Resource: !Join [':',['arn:aws:cloudformation', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'stackset/*:*']]
+                Resource: !Join [ ':',[ 'arn:aws:cloudformation', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'stackset/*:*' ] ]
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
   TriggerCustomizationsOnLifeCycleEvent:
-    DependsOn:
-    - LambdaRoleToCaptureEvents
     Type: AWS::Lambda::Function
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W89
+            reason: "Should not run inside a VPC as this is a custom resource"
+          - id: W92
+            reason: "Lambda will only run once in stackset lifecycle as it is a custom resource"
     Properties:
       Code:
         S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
-        S3Key: crowdstrikeAccts_lambda.zip
+        S3Key: crowdstrikeAccts_lambdav4.zip
       Layers:
         - !Ref lambdaLayer
+      ReservedConcurrentExecutions: 1
       Environment:
         Variables:
-          RoleName: !Ref RoleName
-          CSAccountNumber: !Ref CSAccountNumber
-          CSAssumingRoleName: !Ref CSAssumingRoleName
-      Handler: crowdstrikeAccts_lambda.lambda_handler
+          StackSetName: !Ref StackSetName
+
+      Handler: crowdstrikeAccts_lambdav4.lambda_handler
       MemorySize: 128
       Role: !GetAtt "LambdaRoleToCaptureEvents.Arn"
       Runtime: python3.7
