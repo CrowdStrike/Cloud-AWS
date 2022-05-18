@@ -21,7 +21,7 @@ def lambda_handler(event, context):
         cmdStatus = newAccInfo['state']
         if cmdStatus == 'SUCCEEDED':
             '''Sucessful event recieved'''
-            ouInfo = newAccInfo['organizationalUnit']
+            # ouInfo = newAccInfo['organizationalUnit']
             # ouName = ouInfo['organizationalUnitName']
             # odId = ouInfo['organizationalUnitId']
             accId = newAccInfo['account']['accountId']
