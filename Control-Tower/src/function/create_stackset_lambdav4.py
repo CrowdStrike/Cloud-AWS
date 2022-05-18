@@ -261,7 +261,7 @@ def lambda_handler(event, context):
                 return
 
         elif event['RequestType'] in ['Update']:
-            external_id = event['ResourceProperties']['ExternalID']
+            # external_id = event['ResourceProperties']['ExternalID']
             logger.info('Event = ' + event['RequestType'])
 
             cfnresponse_send(event, context, 'SUCCESS', response_data, "CustomResourcePhysicalID")
