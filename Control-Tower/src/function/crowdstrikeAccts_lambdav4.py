@@ -1,8 +1,7 @@
-import json
 import boto3
 import logging
 import os
-from botocore.vendored import requests
+
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -12,7 +11,7 @@ result = {"ResponseMetadata": {"HTTPStatusCode": "400"}}
 
 
 def lambda_handler(event, context):
-    masterAcct = event['account']
+    # masterAcct = event['account']
     eventDetails = event['detail']
     regionName = eventDetails['awsRegion']
     eventName = eventDetails['eventName']
@@ -23,13 +22,13 @@ def lambda_handler(event, context):
         if cmdStatus == 'SUCCEEDED':
             '''Sucessful event recieved'''
             ouInfo = newAccInfo['organizationalUnit']
-            ouName = ouInfo['organizationalUnitName']
-            odId = ouInfo['organizationalUnitId']
+            # ouName = ouInfo['organizationalUnitName']
+            # odId = ouInfo['organizationalUnitId']
             accId = newAccInfo['account']['accountId']
-            accName = newAccInfo['account']['accountName']
+            # accName = newAccInfo['account']['accountName']
             CFT = boto3.client('cloudformation')
             try:
-                result = CFT.create_stack_instances(StackSetName=stackset_name, Accounts=[accId], Regions=[regionName])
+                _ = CFT.create_stack_instances(StackSetName=stackset_name, Accounts=[accId], Regions=[regionName])
                 logger.info('Processed {} Sucessfully'.format(stackset_name))
 
             except Exception as e:
