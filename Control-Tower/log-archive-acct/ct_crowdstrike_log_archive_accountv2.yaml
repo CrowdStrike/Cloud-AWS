@@ -19,8 +19,6 @@ Metadata:
           default: Logging Account.
         Parameters:
           - LogArchiveBucketName
-
-
     ParameterLabels:
       CrowdStrikeCloud:
         default: The CrowdStrike Cloud your CID is hosted in
@@ -32,13 +30,10 @@ Metadata:
         default: Default IAM Role (Can be modified)
       ExternalID:
         default: External ID Enter 6 or more characters alphanumeric without white space
-
-
 Outputs:
   RoleARN:
     Description: The ARN of the role that can be assumed by Crowdstrike Discover.
     Value: !GetAtt 'S3AccessiamRole.Arn'
-
 Mappings:
   S3perRegion:
     us-east-1:
@@ -56,17 +51,17 @@ Mappings:
     us1:
       CSAssumingRoleName: CS-Prod-HG-CsCloudconnectaws
       CSAccountNumber: 292230061137
-      SNSTopic: :292230061137:cs-cloudconnect-aws-cloudtrail
+      SNSTopic: cs-cloudconnect-aws-cloudtrail
 
     us2:
       CSAssumingRoleName: mav-gyr-main-s001-cs-cloudconnectaws
       CSAccountNumber: 292230061137
-      SNSTopic: :292230061137:cs-us2-cloudconnect-aws-cloudtrail
+      SNSTopic: cs-us2-cloudconnect-aws-cloudtrail
 
     eu:
       CSAssumingRoleName: lion-lanner-main-s001-cs-cloudconnectaws
       CSAccountNumber: 292230061137
-      SNSTopic: :292230061137:cs-lion-cloudconnect-aws-cloudtrail
+      SNSTopic: cs-lion-cloudconnect-aws-cloudtrail
 
 Parameters:
 
@@ -119,7 +114,6 @@ Resources:
   launchLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: LambdaRoleToCaptureEvents
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -134,7 +128,7 @@ Resources:
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
-              Sid: VisualEditor1
+              Sid: ''
               Effect: Allow
               Action:
                 - s3:PutBucketNotification
@@ -159,6 +153,13 @@ Resources:
     DependsOn:
       - launchLambdaRole
     Type: AWS::Lambda::Function
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W89
+            reason: "Should not run inside a VPC as this is a custom resource"
+          - id: W92
+            reason: "Lambda will only run once in stackset lifecycle as it is a custom resource"
     Properties:
       Code:
         S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
@@ -185,14 +186,21 @@ Resources:
           - ''
           - - 'arn:aws:sns:'
             - !Ref 'AWS::Region'
+            - ':'
+            - !FindInMap [ CSCloud, !Ref CrowdStrikeCloud, CSAccountNumber ]
+            - ':'
             - !FindInMap [ CSCloud, !Ref CrowdStrikeCloud, SNSTopic ]
       ServiceToken: !GetAtt
         - AddNotificationToBucket
         - Arn
 
-
   S3AccessiamRole:
     Type: AWS::IAM::Role
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W28
+            reason: "Static role name required for account registration"
     Properties:
       RoleName: !Ref 'RoleName'
       AssumeRolePolicyDocument:
@@ -223,9 +231,11 @@ Resources:
             Effect: Allow
             Resource:
               - !Join
-                - ''
+                -  ''
                 - - 'arn:aws:s3:::'
                   - !Ref 'LogArchiveBucketName'
+                  - '/*'
+
             Sid: ''
         Version: '2012-10-17'
       Roles:
@@ -234,6 +244,11 @@ Resources:
       - S3AccessiamRole
   iamPolicyDescribeAccess:
     Type: AWS::IAM::Policy
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W12
+            reason: "CrowdStrike requires read access to all resources of those types"
     Properties:
       PolicyName: DescribeAPICalls
       PolicyDocument:
@@ -260,7 +275,6 @@ Resources:
   RegisterAcctLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: CrowdstrikeRegisterAcctLambdaRole
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -291,6 +305,13 @@ Resources:
     DependsOn:
       - "RegisterAcctLambdaRole"
     Type: AWS::Lambda::Function
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W89
+            reason: "Should not run inside a VPC as this is a custom resource"
+          - id: W92
+            reason: "Lambda will only run once in stackset lifecycle as it is a custom resource"
     Properties:
       Environment:
         Variables:
@@ -309,6 +330,7 @@ Resources:
         S3Key: register_new_accountv4.zip
       Layers:
         - !Ref lambdaLayer
+      ReservedConcurrentExecutions: 1
       Handler: register_new_accountv4.lambda_handler
       MemorySize: 128
       Role: !GetAtt RegisterAcctLambdaRole.Arn
