@@ -141,9 +141,9 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-12
 ### Step 5: Deploy the DaemonSet using the helm chart
 
  - Provide CrowdStrike Falcon Customer ID as environment variable. This CID will be used be helm chart to register your cluster nodes to the CrowdStrike Falcon platform.
-```
-$ CID=1234567890ABCDEFG1234567890ABCDEF-12
-```
+   ```
+   $ CID=1234567890ABCDEFG1234567890ABCDEF-12
+   ```
 
  - Add the CrowdStrike Falcon Helm repository
    ```
