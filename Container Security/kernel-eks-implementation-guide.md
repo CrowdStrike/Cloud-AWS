@@ -135,7 +135,7 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-12
  - Clone Falcon Sensor for Linux DaemonSet image to your newly created repository.
  - Note: the below script will use the tag of "latest" in the destination repository
    ```
-   falcon-node-sensor-push $FALCON_IMAGE_URI
+   falcon-node-sensor-push $FALCON_NODE_IMAGE_URI
    ```
 
 ### Step 5: Deploy the DaemonSet using the helm chart
