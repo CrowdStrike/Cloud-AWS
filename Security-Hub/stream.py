@@ -202,7 +202,7 @@ class Stream():  # pylint: disable=R0902
             reviewed += 1
             if self.api_config["confirm_provider"]:
                 if "service_provider" in resource_detail:
-                    if resource_detail["service_provider"] == "AWS_EC2":
+                    if resource_detail["service_provider"][:3].upper() == "AWS":
                         decoded_mac, resource_mac = self.get_compare_values(decode, resource_detail)
                         if decoded_mac == resource_mac:
                             payload = self.create_payload(resource_detail, decode)
