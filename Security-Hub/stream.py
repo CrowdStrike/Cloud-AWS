@@ -63,7 +63,7 @@ class Stream():  # pylint: disable=R0902
         # Our active spout
         self.spigot = False
         # Token reporting lambdas
-        self.token_expired = bool(int(time.time()) > ((int(self.refresh_interval)-60)+self.epoch))
+        self.token_expired = lambda: True if bool(int(time.time()) > ((int(self.refresh_interval)-60)+self.epoch)) else False
         self.token_remains = lambda: ((int(self.refresh_interval)-60)+self.epoch)-int(time.time())
         # Thread running flag
         self.running = True
@@ -286,7 +286,7 @@ class Stream():  # pylint: disable=R0902
                             # Update our position in the stream
                             self.set_offset(cur_offset)
                         # Are we close to exceeding our epoch window? (refresh 1 minute before)
-                        if self.token_expired:
+                        if self.token_expired():
                             self.refresh()
                     else:
                         self.set_offset(cur_offset)
