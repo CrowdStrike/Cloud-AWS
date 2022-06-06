@@ -57,6 +57,7 @@ CLI
 ClientID
 ClientSecret
 cloudconnect
+cloudconnectaws
 cloudformation
 Cloudformation
 CloudFormation
@@ -86,6 +87,8 @@ CRWD
 CSAccountNumber
 csagent
 CSAssumingRoleName
+CSCloud
+CsCloudconnectaws
 CSFalconVersion
 CSPM
 DaemonSet
@@ -148,6 +151,7 @@ Goto
 gsutil
 GuardDuty
 GW
+gyr
 hostname
 html
 http
@@ -183,6 +187,7 @@ kubectl
 KubeDNS
 Kubernetes
 kubernetes
+lanner
 licensors
 lifecycle
 Lifecycle
@@ -193,6 +198,7 @@ LTS
 MacOS
 MatchAttributes
 makeself
+mav
 md
 MERCHANTABILITY
 microk
