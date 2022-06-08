@@ -16,6 +16,8 @@ Mappings:
       NAME: crowdstrike-sa-resources-ct-us-west-2
     eu-west-1:
       NAME: crowdstrike-sa-resources-ct-eu-west-1
+    ap-southeast-1:
+      NAME: crowdstrike-sa-resources-ct-ap-southeast-1
     ap-southeast-2:
       NAME: crowdstrike-sa-resources-ct-ap-southeast-2
 
@@ -39,18 +41,17 @@ Parameters:
       - us1
       - us2
       - eu
+
   RoleCreationDelayTimer:
     Description: Delay timer wait for role creation before registering acct (Time in seconds)
     Type: Number
     MaxValue: 800
     Default: 60
+
   FalconClientId:
     Description: Falcon OAuth2 Client ID.
     Type: String
     NoEcho: true
-
-  S3Bucket:
-    Type: String
 
   FalconSecret:
     Description: Falcon Oath2 API secret.
@@ -75,8 +76,7 @@ Parameters:
     Type: String
 
   CSAssumingRoleName:
-    Description: Name of the IAM role used within CrowdStrike to assume access to
-      your account.
+    Description: Name of the IAM role used within CrowdStrike to assume access to your account.
     Type: String
 
   LogArchiveAccount:
@@ -162,7 +162,7 @@ Resources:
     Type: AWS::Lambda::LayerVersion
     Properties:
       Content:
-        S3Bucket: !Ref S3Bucket
+        S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
         S3Key: falconpy-layer.zip
       Description: Layer for falconpy package
       LayerName: falconpy-package
@@ -182,7 +182,7 @@ Resources:
           aws_region: !Ref AWS::Region
           delay_timer: !Ref RoleCreationDelayTimer
       Code:
-        S3Bucket:  !Ref S3Bucket
+        S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
         S3Key: register_org_account.zip
       Layers:
         - !Ref lambdaLayer
@@ -203,6 +203,7 @@ Resources:
       ServiceToken: !GetAtt
         - manageInstanceFalconAPI
         - Arn
+        
   CrowdStrikeRegisterAcctLambdaRole:
     Type: AWS::IAM::Role
     Properties:

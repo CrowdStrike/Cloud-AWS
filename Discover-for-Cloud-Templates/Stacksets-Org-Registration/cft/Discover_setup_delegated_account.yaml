@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 #
 # Version 5
-# Native stackset creation via cloudformation and additional options
+# Singapore region support
 #
 Description: Template to create a StackSet for enabling CrowdStrike Discover in member accounts
 Parameters:
@@ -33,10 +33,12 @@ Parameters:
       - us1
       - us2
       - eu
+
   RoleName:
     Description: IAM Role Name (May be modified)
     Type: String
     Default: CrowdStrikeFalcon
+
   LogArchiveAccount:
     Type: String
     Description: AccountId of Log Archive Bucket
@@ -99,6 +101,8 @@ Mappings:
       NAME: crowdstrike-sa-resources-ct-us-west-2
     eu-west-1:
       NAME: crowdstrike-sa-resources-ct-eu-west-1
+    ap-southeast-1:
+      NAME: crowdstrike-sa-resources-ct-ap-southeast-1
     ap-southeast-2:
       NAME: crowdstrike-sa-resources-ct-ap-southeast-2
   CSCloud:
@@ -149,8 +153,6 @@ Resources:
           ParameterValue: !Ref LogArchiveAccount
         - ParameterKey: LogArchiveBucketName
           ParameterValue: !Ref LogArchiveBucketName
-        - ParameterKey: S3Bucket
-          ParameterValue: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
         - ParameterKey: ExternalID
           ParameterValue: !Ref ExternalID
         - ParameterKey: FalconClientId
@@ -176,7 +178,6 @@ Resources:
         LogArchiveBucketRegion: !Ref LogArchiveBucketRegion
         LogArchiveAccount: !Ref LogArchiveAccount
         LogArchiveBucketName: !Ref LogArchiveBucketName
-        S3Bucket: !FindInMap [ S3perRegion, !Ref "AWS::Region", NAME ]
         ExternalID: !Ref ExternalID
         FalconClientId: !Ref FalconClientId
         FalconSecret: !Ref FalconSecret
