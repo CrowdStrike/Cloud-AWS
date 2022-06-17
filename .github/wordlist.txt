@@ -14,6 +14,7 @@ AmazonSSMManagedInstanceCore
 AMI
 AMIs
 ap
+APAC
 api
 APIGatewayClientID
 APIGatewayClientIDKey
