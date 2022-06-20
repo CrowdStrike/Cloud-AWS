@@ -25,10 +25,22 @@ main() {
         print_usage
         exit 1
     fi
+
     echo -n 'Falcon Sensor Install  ... '; cs_sensor_install;  echo '[ Ok ]'
     echo -n 'Falcon Sensor Register ... '; cs_sensor_register; echo '[ Ok ]'
     echo -n 'Falcon Sensor Restart  ... '; cs_sensor_restart;  echo '[ Ok ]'
     echo 'Falcon Sensor deployed successfully.'
+}
+
+cs_sensor_exit_if_sensor_running() {
+    if type service >/dev/null 2>&1; then
+         service falcon-sensor status >/dev/null 2>&1
+    elif type systemctl >/dev/null 2>&1; then
+        systemctl -q is-active falcon-sensor
+    fi
+    if [ $? -eq 0 ]; then
+        exit 0;
+    fi
 }
 
 cs_sensor_register() {
@@ -302,6 +314,8 @@ EOF
     rm "$tempfile"
 }
 
+
+cs_sensor_exit_if_sensor_running;
 
 set -e
 
