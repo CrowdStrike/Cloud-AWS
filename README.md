@@ -1,17 +1,18 @@
 ![](https://raw.githubusercontent.com/CrowdStrike/falconpy/main/docs/asset/cs-logo.png)
 
-
 ## AWS Service Integrations
+
 | Integration Name | Description |
 |:-|:-|
 | [AWS Control Tower with CrowdStrike Discover for Cloud and Containers](Control-Tower/README.md) | Configure AWS Control Tower to register new AWS accounts with CrowdStrike Discover for Cloud and Containers. |
 | [AWS Control Tower with CrowdStrike Horizon](Control-Tower-For-Horizon/README.md) | Configure AWS Control Tower to register new AWS accounts with CrowdStrike Horizon. |
 | [AWS Network Firewall with CrowdStrike Threat Intelligence](Network-Firewall/README.md) | Build capabilities such as automated blocking of malicious domains (via AWS Network Firewall) based on CrowdStrike detection alerts, or perform threat hunting derived from CrowdStrike domain-based Indicators of Activity (IOAs). |
-| [AWS Private Link with CrowdStrike Sensor Proxy](aws-privatelink/README.md) | Utilize AWS PrivateLink to provide provide private connectivity between your CrowdStrike Falcon protected workloads and the CrowdStrike cloud. |
+| [AWS PrivateLink with CrowdStrike Sensor Proxy](aws-privatelink/README.md) | Leverage AWS PrivateLink to provide private connectivity between your CrowdStrike-protected workloads and the CrowdStrike cloud. |
 | [AWS Security Hub with CrowdStrike Event Streams API](Falcon-Integration-Gateway/README.md) | The Falcon Integration Gateway publishes detections identified by CrowdStrike Falcon for instances residing within Amazon Web Services (AWS) to AWS Security Hub. |
 | [AWS S3 Protected Bucket with CrowdStrike Quick Scan API](s3-bucket-protection) | S3 Bucket Protection secures your AWS storage buckets by scanning files as they are uploaded to the bucket using the CrowdStrike Quick Scan API. |
 
 ## CrowdStrike Sensor Automation
+
 | Integration Name | Description |
 |:-|:-|
 | [AWS Autoscale Groups for Auto Register/Deregister](Agent-Install-Examples/Cloudformation/autoscale/README.md) | Utilize AWS Autoscale Groups to install the CrowdStrike Falcon Sensor during virtual machine initialization, and AWS Autoscale Lifecycle hooks to deregister the instance with CrowdStrike upon virtual machine termination. |
