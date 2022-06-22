@@ -348,3 +348,16 @@ eventbridge
 DeployFalconAgent
 FalconAgent
 RoleCreationDelayTimer
+ae
+az
+bb
+cloudsink
+ddcb
+dea
+eb
+euc
+fc
+fd
+lfodown
+svc
+usw
