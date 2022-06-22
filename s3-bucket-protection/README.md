@@ -71,6 +71,7 @@ A single serverless function is deployed for this solution.
 - `base_url`: CrowdStrike API base URL (only required for GovCloud users.)
 - `CLIENT_ID_PARAM`: Name of the Parameter store parameter containing the CrowdStrike API Key.
 - `CLIENT_SECRET_PARAM`: Name of the Parameter store parameter containing the CrowdStrike API Secret.
+- `MITIGATE_THREATS`: Boolean representing if identified threats should be removed from the bucket. Set to `FALSE` to disable mitigation, defaults to `TRUE`.
 
 ### AWS IAM
 IAM is utilized to store execution permissions for our Lambda function.

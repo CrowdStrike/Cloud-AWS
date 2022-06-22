@@ -136,23 +136,19 @@ Setup consists of the following high-level tasks:
 
     Login to the ``log-archive`` account and apply the CloudFormation template "*ct_crowdstrike_log_archive_account.yaml*" from the ``log-archive-acct`` folder.
 
-    The CloudFormation template will create a Role named ``FalconDiscover`` in the ``log-archive`` account that will permit read access to objects in the S3 bucket and discover resources in the account. The role is restricted such that only the IAM role "*arn:aws:iam:292230061137:role/CS-Prod-HG-CsCloudconnectaws*" can assume the role in the account to read the log files.
+    The CloudFormation template will create an IAM Role that is defined using the input parameter ``RoleName`` in the ``log-archive`` account that will permit read access to objects in the S3 bucket and discover resources in the account. The role is restricted such that only the IAM role "*arn:aws:iam:"CrowdStrike Account":role/"CrowdStrike Assuming Role Name"* can assume the role in the account to read the log files.  The values for "CrowdStrike Account" and "CrowdStrike Assuming Role Name" are provided in the mapping section of the template and are dependant on the Crowdstrike cloud your CID is provisioned in.
 
     ![AWS Roles for Falcon Discover)](images/aws-roles-falcondiscover.png)
 
-    The template will also create an S3 bucket event notification that will send an SNS notification to the CrowdStrike SNS topic "*arn:aws:sns:(region):292230061137:cs-cloudconnect-aws-cloudtrail*":
+    The template will also create an S3 bucket event notification that will send an SNS notification to the CrowdStrike SNS topic "*arn:aws:sns:(region):<CrowdStrike Account>:CrowdStrike Assuming Role Name*":
 
     ![AWS Roles for Falcon Discover)](images/cs-cloudconnect-aws-cloudtrails.png)
 
-4) Load the CloudFormation template in the ``master`` account.
+5) Load the CloudFormation template in the ``master`` account.
 
     Go to the master account and apply the CloudFormation template "*ct_crowdstrike_master_accountv2.yaml*" from the ``master-acct`` folder.
 
     Description of Parameters:
-
-    * **CSAccountNumber**: The number supplied in the template, ``292230061137``, should **NOT** be changed unless directed by CrowdStrike.
-
-    * **CSAssumingRoleName**: The name supplied in the template ``CS-Prod-HG-CSCloudconnectaws`` should **NOT** be changed unless directed by CrowdStrike.
 
     * **ExternalID**: String of random characters. Reference [https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html).
     
@@ -165,10 +161,12 @@ Setup consists of the following high-level tasks:
     * **LogArchiveBucketRegion**: Region where CloudTrail log archive bucket that was created by Control Tower.
 
     * **RoleName**: This name may be modified as required.
+   
+    * **StackSetName**: The name of the StackSet that will be created in the master account.
     
-    * **RoleCreationDelayTimer**: Time delay before registering the account.  Provides time for the newly created role to be replicated to all regions before we register the account in the CrowdStrike API
+  * **RoleCreationDelayTimer**: Time delay before registering the account.  Provides time for the newly created role to be replicated to all regions before we register the account in the CrowdStrike API
     
-    The CloudFormation template will create the following resources in the account:
+  The CloudFormation template will create the following resources in the account:
     
 
     * StackSet will be applied to new accounts.
@@ -203,7 +201,7 @@ Setup consists of the following high-level tasks:
 
     The StackSet will configure two resources:
 
-      * IAM Role named ``FalconDiscover``
+      * IAM Role named defined by the parameter ``RoleName``
       * Lambda function to register the account with Falcon Discover service
 
     Verify that the IAM role has been configured in the new account:

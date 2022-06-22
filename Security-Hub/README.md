@@ -41,7 +41,7 @@ This solution consists of three primary components
 ---
 
 ## Installation
-+ Installing via CloudFormation
++ [Installing via CloudFormation](cloudformation)
 + [Installing via Terraform](terraform)
 + [Installing manually](manual-install.md)
 

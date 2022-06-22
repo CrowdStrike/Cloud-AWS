@@ -8,6 +8,7 @@ import os
 import time
 import logging
 import urllib.parse
+import json
 import boto3
 from botocore.exceptions import ClientError
 # FalconPy SDK - Auth, Sample Uploads and Quick Scan
@@ -28,6 +29,9 @@ ssm = boto3.client('ssm')
 
 # Current region
 region = os.environ.get('AWS_REGION')
+
+# Mitigate threats?
+MITIGATE = bool(json.loads(os.environ.get("MITIGATE_THREATS", "TRUE").lower()))
 
 # Base URL
 try:
@@ -81,7 +85,7 @@ def lambda_handler(event, _):  # pylint: disable=R0912,R0914,R0915
     upload_file_size = int(
         bucket.Object(key=key).get()["ResponseMetadata"]["HTTPHeaders"]["content-length"]
         )
-    if upload_file_size < MAX_FILE_SIZE:
+    if upload_file_size < MAX_FILE_SIZE:  # pylint: disable=R1702  # (6 is fine)
         try:
             filename = os.path.basename(key)
             response = Samples.upload_sample(file_name=filename,
@@ -137,16 +141,26 @@ def lambda_handler(event, _):  # pylint: disable=R0912,R0914,R0915
                     detection["sha"] = upload_sha
                     detection["bucket"] = bucket_name
                     detection["file"] = key
-                    manifest = generate_manifest(detection, region)
-                    _ = send_to_security_hub(manifest, region)
                     log.warning(scan_msg)
-                    # Remove the threat
-                    try:
-                        threat = s3.Object(bucket_name, key)
-                        threat.delete()
-                    except ClientError as err:
-                        log.warning("Unable to remove threat %s from bucket %s", key, bucket_name)
-                        print(f"{err}")
+                    threat_removed = False
+                    if MITIGATE:
+                        # Remove the threat
+                        try:
+                            threat = s3.Object(bucket_name, key)
+                            threat.delete()
+                            threat_removed = True
+                        except ClientError as err:
+                            log.warning("Unable to remove threat %s from bucket %s", key, bucket_name)
+                            print(f"{err}")
+                    else:
+                        # Mitigation is disabled. Complain about this in the log.
+                        log.warning("Threat discovered (%s). Mitigation disabled, threat persists in %s bucket.",
+                                    key,
+                                    bucket_name
+                                    )
+                    # Inform Security Hub of the threat and our mitigation status
+                    manifest = generate_manifest(detection, region, threat_removed)
+                    _ = send_to_security_hub(manifest, region)
                 else:
                     # Unrecognized response
                     scan_msg = f"Unrecognized response ({result['verdict']}) received from API for {key}."

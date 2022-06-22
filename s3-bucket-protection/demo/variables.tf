@@ -33,6 +33,11 @@ variable "lambda_function_name" {
     type = string
     default = "s3_bucket_protection"
 }
+variable "lambda_mitigate_threats" {
+    description = "Remove malicious files from the bucket as they are discovered."
+    type = string
+    default = "TRUE"
+}
 variable "ssm_param_client_id" {
     description = "Name of the SSM parameter storing the API client ID"
     type = string

@@ -32,7 +32,7 @@ main() {
 }
 
 cs_sensor_register() {
-    /opt/CrowdStrike/falconctl -s --cid="${cs_falcon_cid}"
+    /opt/CrowdStrike/falconctl -s -f --cid="${cs_falcon_cid}"
 }
 
 cs_sensor_restart() {
@@ -179,7 +179,7 @@ aws_ssm_parameter() {
     security_token="$(echo "$_security_credentials" | grep Token | sed -e 's/  "Token" : "//' -e 's/",$//')"
     datetime=$(date -u +"%Y%m%dT%H%M%SZ")
     date=$(date -u +"%Y%m%d")
-    request_data='{"Names":["'"${param_name}"'"]}'
+    request_data='{"Names":["'"${param_name}"'"],"WithDecryption":"true"}'
     request_data_dgst=$(echo -n "$request_data" | openssl dgst -sha256 | awk -F' ' '{print $2}')
     request_dgst=$(
         cat <<EOF | head -c -1 | openssl dgst -sha256 | awk -F' ' '{print $2}'

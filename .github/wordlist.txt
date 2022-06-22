@@ -14,6 +14,7 @@ AmazonSSMManagedInstanceCore
 AMI
 AMIs
 ap
+APAC
 api
 APIGatewayClientID
 APIGatewayClientIDKey
@@ -57,6 +58,7 @@ CLI
 ClientID
 ClientSecret
 cloudconnect
+cloudconnectaws
 cloudformation
 Cloudformation
 CloudFormation
@@ -86,9 +88,12 @@ CRWD
 CSAccountNumber
 csagent
 CSAssumingRoleName
+CSCloud
+CsCloudconnectaws
 CSFalconVersion
 CSPM
 DaemonSet
+daemonset
 dataflow
 deamons
 decrypt
@@ -147,6 +152,7 @@ Goto
 gsutil
 GuardDuty
 GW
+gyr
 hostname
 html
 http
@@ -182,6 +188,7 @@ kubectl
 KubeDNS
 Kubernetes
 kubernetes
+lanner
 licensors
 lifecycle
 Lifecycle
@@ -192,6 +199,7 @@ LTS
 MacOS
 MatchAttributes
 makeself
+mav
 md
 MERCHANTABILITY
 microk
@@ -331,3 +339,12 @@ SecureString
 julian
 SecurityHub
 ZSH
+EventBridge
+duplicative
+decommissioning
+uninstallation
+Automations
+eventbridge
+DeployFalconAgent
+FalconAgent
+RoleCreationDelayTimer

@@ -1,0 +1,27 @@
+{
+  "linux": [
+    {
+      "id": "amzn2",
+      "dir": "CS_AMAZON2_x86_64",
+      "file": "CS_AMAZON2_x86_64.zip",
+      "name": "amazon",
+      "major_version": "2",
+      "minor_version": "",
+      "arch_type": "x86_64",
+      "install_tool": "yum"
+    }
+  ],
+  "windows": [
+    {
+      "dir": "CS_WINDOWS",
+      "file": "CS_WINDOWS.zip",
+      "id": "windows",
+      "name": "windows",
+      "major_version": "_any",
+      "minor_version": "",
+      "arch_type": "_any",
+      "install_tool": "",
+      "installer_matcher": "exe"
+    }
+  ]
+}

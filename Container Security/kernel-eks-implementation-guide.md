@@ -1,6 +1,6 @@
-# Implementation Guide for CrowdStrike Falcon Sensor for Linux on EKS Kubernetes cluster using Helm Chart
+# Implementation Guide for CrowdStrike Falcon Sensor for Linux DaemonSet on EKS Kubernetes cluster using Helm Chart
 
-This guide works through creation of a new Kubernetes cluster, deployment of the Falcon Sensor for Linux using Helm Chart, and demonstration of detection capabilities of Falcon Container Workload Protection.
+This guide works through creation of a new Kubernetes cluster, deployment of the Falcon Sensor for Linux DaemonSet using Helm Chart, and demonstration of detection capabilities of Falcon Container Workload Protection.
 
 No prior Kubernetes or Falcon knowledge is needed to follow this guide. First sections of this guide focus on creation of EKS cluster, however, these sections may be skipped if you have access to an existing cluster.
 
@@ -13,7 +13,7 @@ Time needed to follow this guide: 45 minutes.
 - You will need a workstation with a linux platform
 - You will need AWS credentials and [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html) configured
 - Docker installed locally on the workstation
-- API Credentials from Falcon with Sensor Download Permissions
+- API Credentials from Falcon with Falcon Images Download Permissions
   * For this step and practice of least privilege, you would want to create a dedicated API secret and key.
 - Verify connectivity with AWS CLI
   * ``aws ec2 describe-instances`` should return without error
@@ -112,9 +112,9 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-12
    }
    ```
 
- - Note the `repositoryUri` of the newly created repository to the environment variable for further use. Falcon Container Sensor will be available under this URI.
+ - Note the `repositoryUri` of the newly created repository to the environment variable for further use. Falcon Sensor for Linux DaemonSet image will be available under this URI.
 
-### Step 4: Build falcon-node-sensor container image
+### Step 4: Clone Falcon Sensor for Linux DaemonSet image to ECR container repository
  - Add the ECR `repositoryUri` in an environment variable.
    ```
    $ FALCON_NODE_IMAGE_URI=$(aws ecr describe-repositories --region $CLOUD_REGION | jq -r '.repositories[] | select(.repositoryName=="falcon-node-sensor") | .repositoryUri')
@@ -132,42 +132,23 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-12
    $ export FALCON_CLOUD=us-2
    ```
 
- - Build falcon-node-sensor container for your particular OS that is running on your cluster nodes. By default EKS clusters use Amazon Linux 2
+ - Clone Falcon Sensor for Linux DaemonSet image to your newly created repository.
+ - Note: the below script will use the tag of "latest" in the destination repository
    ```
-   $ falcon-node-sensor-build amazonlinux2
-   ```
-   To see various build options see [upstream project](https://github.com/CrowdStrike/Dockerfiles).
-
-### Step 5: Push falcon-node-sensor image to the kube registry
-
- - Push the image to the kube registry:
-   ```
-   $ docker tag falcon-node-sensor:latest $FALCON_NODE_IMAGE_URI:latest
-   ```
-   Example output:
-   ```
-   $ docker push $FALCON_NODE_IMAGE_URI:latest
-   Using default tag: latest
-   The push refers to repository [123456789123.dkr.ecr.eu-west-1.amazonaws.com/falcon-node-sensor]
-   913513e672ba: Pushed
-   2c5b2be1a19c: Pushed
-   88cd0d79914e: Pushed
-   c20d459170d8: Pushed
-   db978cae6a05: Pushed
-   aeb3f02e9374: Pushed
-   latest: digest: sha256:132eea2728db09c49fecfae78778f11225f6e9818c71c4f5b2321a0dae4d0c95 size: 1572
+   falcon-node-sensor-push $FALCON_NODE_IMAGE_URI
    ```
 
-### Step 6: Deploy the DaemonSet using the helm chart
+### Step 5: Deploy the DaemonSet using the helm chart
 
  - Provide CrowdStrike Falcon Customer ID as environment variable. This CID will be used be helm chart to register your cluster nodes to the CrowdStrike Falcon platform.
-```
-$ CID=1234567890ABCDEFG1234567890ABCDEF-12
-```
+   ```
+   $ CID=1234567890ABCDEFG1234567890ABCDEF-12
+   ```
 
  - Add the CrowdStrike Falcon Helm repository
    ```
    $ helm repo add crowdstrike https://crowdstrike.github.io/falcon-helm
+   $ helm repo update
    ```
 
  - Install CrowdStrike Falcon Helm Chart. Above command will install the CrowdStrike Falcon Helm Chart with the release name falcon-helm in the falcon-system namespace.
@@ -209,34 +190,13 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-12
    Example output:
    ```
    NAME                              READY   STATUS    RESTARTS   AGE
-   falcon-helm-falcon-sensor-bs98m   2/2     Running   0          21s
-   ```
- - (optional) Verify that given pod has registered with CrowdStrike Falcon and received unique identifier.
-   ```
-   $ for i in $(kubectl get pods -n falcon-system | awk 'FNR > 1' | awk '{print $1}')
-     do 
-              echo "$i - $(kubectl exec $i -n falcon-system -c falcon-node-sensor -- falconctl -g --aid)"
-     done
-   ```
-   Example output:
-   ```
-     falcon-helm-falcon-sensor-XXXX - aid="a582XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-   ```
- - (optional) Check the Reduced Functionality Mode state of the Falcon Sensor.
- - Note that the value returned should be false if running on supported kernel and platform versions.
-   ```
-   $ for i in $(kubectl get pods -n falcon-system | awk 'FNR > 1' | awk '{print $1}')
-     do 
-           echo "$i - $(kubectl exec $i -n falcon-system -c falcon-node-sensor -- falconctl -g --rfm-state)"
-     done
-    ```
-    Example output:
-    ```
-     falcon-helm-falcon-sensor-XXXX - rfm-state=false."
+   falcon-helm-falcon-sensor-nszf2   1/1     Running   0          92s
+   falcon-helm-falcon-sensor-tb584   1/1     Running   0          92s
    ```
  - (optional) Verify that Falcon Sensor for Linux has insert itself to the kernel
- - Note that this must be done on Kubernetes worker nodes so access to these nodes is required for this step.
+ - Note that this must be done on Kubernetes worker nodes so access to these nodes is required for this step. You can access worker nodes through the daemonset pods.
     ```
+    $ kubectl exec <podname> -n falcon-system --stdin --tty -- /bin/sh
     $ lsmod | grep falcon
     falcon_lsm_serviceable     724992  1
     falcon_nf_netcontain        20480  1
