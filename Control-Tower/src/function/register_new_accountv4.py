@@ -27,7 +27,6 @@ CSAssumingRoleName = os.environ['CSAssumingRoleName']
 LocalAccount = os.environ['LocalAccount']
 aws_region = os.environ['aws_region']
 delay_timer = os.environ['delay_timer']
-Falcon_Discover_Url = 'https://ctstagingireland.s3-' + aws_region + '.amazonaws.com/crowdstrike_role_creation_ss.yaml'
 
 
 def delete_falcon_discover_account(payload, api_interface) -> bool:
