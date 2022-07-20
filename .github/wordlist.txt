@@ -361,3 +361,17 @@ fd
 lfodown
 svc
 usw
+Webhook
+webhook
+deployable
+zip'ed
+dateutil
+jmespath
+mccabe
+mypy
+pathspec
+platformdirs
+pycodestyle
+pyflakes
+tomli
+DevSecOps

@@ -13,7 +13,7 @@ Inspired by [Automate Amazon EC2 instance isolation by using tags](https://aws.a
 - [Architectural Overview](#architectural-overview)
   - [Workflow process](#workflow-process)
   - [Permissions](#permissions)
-- [Prequisites and assumptions](#prequisites-and-assumptions)
+- [Prerequisites and assumptions](#prerequisites-and-assumptions)
   - [IAM Role in target account](#iam-role-in-target-account)
 - [Deployment methods](#deployment-methods)
 - [Contribution Notes](#contribution-notes)
@@ -32,11 +32,11 @@ Inspired by [Automate Amazon EC2 instance isolation by using tags](https://aws.a
 
 The webhook is designed to be deployed into your designated operational or security account. From this account, the webhook would leverage an IAM Role that's delegated to access resources in a another account. This allows the webhook to be deployed once and act on resources across your environment from one location. Visit AWS's documentation to learn more about cross-account roles: [IAM tutorial: Delegate access across AWS accounts using IAM roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_cross-account-with-roles.html).
 
-## Prequisites and assumptions
+## Prerequisites and assumptions
 
 ### IAM Role in target account
 
-As mentioned in [Design](#design), a target execution role is required for the Lambda to assume into and execute the isolation. Most organizations manging AWS accounts at scale will likely have such a role provisioned in their child accounts as part of their account factory. If that's the case, then pass the name of the role into the `TargetExecutionRoleName` parameter if you're using CloudFormation or update the `TARGET_EXECUTION_ROLE_NAME` variable in the configuration file if you're deploying with Serverless Framework.
+As mentioned in [Design](#design), a target execution role is required for the Lambda to assume into and execute the isolation. Most organizations managing AWS accounts at scale will likely have such a role provisioned in their child accounts as part of their account factory. If that's the case, then pass the name of the role into the `TargetExecutionRoleName` parameter if you're using CloudFormation or update the `TARGET_EXECUTION_ROLE_NAME` variable in the configuration file if you're deploying with Serverless Framework.
 
 If you don't have such a role created in your environment, you can reference the CloudFormation template `iam-execution-role.yml` and deploy it as a CloudFormation StackSet across your accounts/organization.
 
