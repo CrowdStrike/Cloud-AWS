@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Deploys a IAM Execution Role with least-privilege access to isolate an EC2 instance for incident response
+
+Parameters:
+
+  IAMPrefix:
+    Description: Prefix for IAM Role and Policy
+    Type: String
+    Default: ec2-isolation-remote-execution
+
+  OperationsAccountId:
+    Description: AWS Account ID where the isolation Lambda webhook is deployed
+    Type: String
+
+Resources:
+
+  RemoteIsolationExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${OperationsAccountId}:root
+            Action: sts:AssumeRole
+
+      Description: IAM Role for isolation Lambda webhook to assume into to execute the isolation on EC2 instance
+      MaxSessionDuration: 3600
+      Path: /
+      RoleName: !Sub ${IAMPrefix}-role
+
+  RemoteIsolationExecutionPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Resource: '*'
+            Action:
+              - ec2:RevokeSecurityGroupEgress
+              - ec2:ModifyInstanceAttribute
+              - ec2:DescribeInstances
+              - ec2:CreateSecurityGroup
+              - ec2:AssociateIamInstanceProfile
+              - ec2:DescribeIamInstanceProfileAssociations
+              - ec2:DisassociateIamInstanceProfile
+              - ec2:DescribeSecurityGroups
+              - ec2:CreateTags
+              - iam:CreateRole
+              - iam:CreateInstanceProfile
+              - iam:GetInstanceProfile
+              - iam:AttachRolePolicy
+              - iam:AddRoleToInstanceProfile
+      PolicyName: !Sub ${IAMPrefix}-policy
+      Roles:
+        - !Ref RemoteIsolationExecutionRole
+
+Outputs:
+
+  IAMRoleName:
+    Description: Name of IAM Role for remote execution
+    Value: !Ref RemoteIsolationExecutionRole

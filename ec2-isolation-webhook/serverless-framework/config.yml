@@ -1,0 +1,3 @@
+service: ec2-isolation-webhook
+# Update TARGET_EXECUTION_ROLE_NAME with name of execution role Lambda will assume in target account
+# TARGET_EXECUTION_ROLE_NAME: << replace me >>
