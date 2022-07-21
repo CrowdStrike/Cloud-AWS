@@ -1,0 +1,73 @@
+service: ${self:custom.config.service}
+
+frameworkVersion: "3"
+
+custom:
+  config: ${file(config.yml)}
+
+provider:
+  name: aws
+  region: ${opt:region}
+  stage: ${opt:stage}
+  runtime: python3.9
+  role: IncidentResponseExecutionRole
+  apiGateway:
+    apiKeys:
+      - ${self:service}-${self:provider.stage}
+
+functions:
+  isolate:
+    handler: handler.lambda_handler
+    timeout: 30
+    environment:
+      TARGET_EXECUTION_ROLE_NAME: ${self:custom.config.TARGET_EXECUTION_ROLE_NAME}
+      INSTANCE_PROFILE_NAME: ${self:service}-${self:provider.stage}-instance-profile
+      SG_NAME: ${self:service}-${self:provider.stage}-security-group
+      SG_DESCRIPTION: Isolates a resource by denying all inbound and outbound traffic
+    events:
+      - http:
+          path: isolate
+          method: post
+          private: true
+          async: true
+
+resources:
+  Resources:
+    IncidentResponseExecutionRole:
+      Type: "AWS::IAM::Role"
+      Properties:
+        RoleName: ${self:service}-${self:provider.stage}-lambda-execution-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: ${self:service}-${self:provider.stage}-labmda-execution-policy
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Sid: AllowAssume
+                  Effect: Allow
+                  Action:
+                    - sts:AssumeRole
+                  Resource: "*"
+                - Sid: LogToCloudWatch
+                  Effect: Allow
+                  Action:
+                    - logs:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                  Resource:
+                    - !Join
+                      - ":"
+                      - - "arn:aws:logs"
+                        - !Ref "AWS::Region"
+                        - !Ref "AWS::AccountId"
+                        - "log-group:/aws/lambda/*:*:*"
+
+plugins:
+  - serverless-python-requirements

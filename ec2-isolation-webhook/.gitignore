@@ -1,0 +1,4 @@
+.python-version
+node_modules/
+.serverless
+.vscode
