@@ -12,7 +12,7 @@ Parameters:
     Type: String
     Default: dev
   TargetExecutionRoleName:
-    Description: Name of the IAM Role that Lamba will assume into in target account to perform isolation
+    Description: Name of the IAM Role that Lambda will assume into in target account to perform isolation
     Type: String
     Default: ec2-isolation-remote-execution-role
 

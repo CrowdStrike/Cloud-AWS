@@ -375,3 +375,6 @@ pycodestyle
 pyflakes
 tomli
 DevSecOps
+ServiceName
+TargetExecutionRoleName
+dev

@@ -69,8 +69,25 @@ PolicyDocument:
 
 This project is deployable as a CloudFormation stack or using [Serverless Framework](https://serverless.com). Please refer to the respective instructions for each deployment method:
 
-- [CloudFormation](cloudformation/README.md)
-- [Serverless Framework](serverless-framework/README.md)
+- [CloudFormation](cloudformation/)
+- [Serverless Framework](serverless-framework/)
+
+## Usage
+
+Sample `curl` command to invoke the webhook (make sure to replace the values with your environment):
+
+```curl
+curl --location --request POST 'https://{{api-gw-url}}/{{stage}}/isolate' \
+--header 'x-api-key: {{api-key}}' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "instance_id": "{{instance-id}}",
+  "account_id": "{{aws-account-id}}",
+  "region": "{{aws-region}}"
+}'
+```
+
+If invoked successfully, the API should respond with a status code `200`. Do note that you'll need to monitor your lambda function to ensure everything executed properly downstream.
 
 ## Contribution Notes
 
