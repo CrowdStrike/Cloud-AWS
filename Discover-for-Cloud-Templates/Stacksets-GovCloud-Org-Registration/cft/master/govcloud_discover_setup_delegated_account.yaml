@@ -62,8 +62,10 @@ Parameters:
     AllowedValues:
       - true
       - false
+
   BucketName:
     Description: The S3 bucket that contains the lambda zip files
+    Type: String
 
 
 Metadata:
