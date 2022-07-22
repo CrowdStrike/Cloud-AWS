@@ -1,0 +1,170 @@
+AWSTemplateFormatVersion: '2010-09-09'
+#
+# Version 5
+# Singapore region support
+#
+Description: Template to create a StackSet for enabling CrowdStrike Discover in member accounts
+Parameters:
+  RoleCreationDelayTimer:
+    Description: Delay timer wait for role creation before registering acct (Time in seconds)
+    Type: Number
+    MaxValue: 800
+    Default: 60
+
+  FalconClientId:
+    Description: Your Falcon OAuth2 API Key.
+    NoEcho: true
+    Type: String
+
+  FalconSecret:
+    Description: Your Falcon OAuth2 API Secret.
+    NoEcho: true
+    Type: String
+
+  ExternalID:
+    Description: ExternalID Used for authenticating assume role requests.
+    NoEcho: true
+    Type: String
+
+  CrowdStrikeCloud:
+    Description:  The CrowdStrike Cloud your CID is hosted in us1, us2, eu
+    Default: usgov1
+    Type: String
+    AllowedValues:
+      - usgov1
+
+  RoleName:
+    Description: IAM Role Name (May be modified)
+    Type: String
+    Default: CrowdStrikeFalcon
+
+  LogArchiveAccount:
+    Type: String
+    Description: AccountId of Log Archive Bucket
+
+  LogArchiveBucketRegion:
+    Type: String
+    Description: The region where the cloudtrail bucket is located.
+
+  LogArchiveBucketName:
+    Type: String
+    Description: Bucketname where cloudtrail logs are stored.
+
+  StackSetName:
+    Type: String
+    Description: The name of the StackSet that will be created
+    Default: CrowdstrikeDiscover-IAM-ROLES
+
+  DeployToRootAccount:
+    Type: String
+    Description: Set to true if you wish Discover for Cloud to be deployed to this Organization root account as a nested stack, cloudformation service managed permissions prevents this by default. 
+    Default: false
+    AllowedValues:
+      - true
+      - false
+  BucketName:
+    Description: The S3 bucket that contains the lambda zip files
+
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: CrowdStrike Role Parameters.
+        Parameters:
+          - StackSetName
+          - RoleName
+          - ExternalID
+          - RoleCreationDelayTimer
+      - Label:
+          default: CrowdStrike Falcon API keys.
+        Parameters:
+          - FalconClientId
+          - FalconSecret
+          - CrowdStrikeCloud
+      - Label:
+          default: Log Archive Account Details
+        Parameters:
+          - LogArchiveAccount
+          - LogArchiveBucketRegion
+          - LogArchiveBucketName
+      - Label:
+          default: Optional deploy to master account
+        Parameters:
+          - DeployToRootAccount
+
+Mappings:
+  CSCloud:
+    usgov1:
+      CSAssumingRoleName: IAM-Role-Laggar-CsCloudconnectaws
+      CSAccountNumber: 358431324613
+      SNSTopic: :358431324613:cs-cloudconnect-aws-cloudtrail
+
+Conditions:
+  DeployToRoot: !Equals
+    - !Ref DeployToRootAccount
+    - true
+Resources:
+  DiscoverStackSet:
+    Type: 'AWS::CloudFormation::StackSet'
+    Properties:
+      AutoDeployment:
+        Enabled: true
+        RetainStacksOnAccountRemoval: false
+      Capabilities: 
+        - CAPABILITY_IAM 
+        - CAPABILITY_NAMED_IAM
+        - CAPABILITY_AUTO_EXPAND
+      Description: "StackSet to manage deployment of CrowdStrike Falcon Discover for AWS"
+      Parameters:
+        - ParameterKey: CrowdStrikeCloud
+          ParameterValue: !Ref CrowdStrikeCloud
+        - ParameterKey: RoleName
+          ParameterValue: !Ref RoleName
+        - ParameterKey: RoleCreationDelayTimer
+          ParameterValue: !Ref RoleCreationDelayTimer
+        - ParameterKey: CSAccountNumber
+          ParameterValue: !FindInMap [ CSCloud, !Ref CrowdStrikeCloud, CSAccountNumber ]
+        - ParameterKey: CSAssumingRoleName
+          ParameterValue: !FindInMap [ CSCloud, !Ref CrowdStrikeCloud, CSAssumingRoleName ]
+        - ParameterKey: LogArchiveBucketRegion
+          ParameterValue: !Ref LogArchiveBucketRegion
+        - ParameterKey: LogArchiveAccount
+          ParameterValue: !Ref LogArchiveAccount
+        - ParameterKey: LogArchiveBucketName
+          ParameterValue: !Ref LogArchiveBucketName
+        - ParameterKey: ExternalID
+          ParameterValue: !Ref ExternalID
+        - ParameterKey: FalconClientId
+          ParameterValue: !Ref FalconClientId
+        - ParameterKey: FalconSecret
+          ParameterValue: !Ref FalconSecret
+      PermissionModel: SERVICE_MANAGED
+      StackSetName: !Ref StackSetName
+      TemplateURL: !Join
+        - ''
+        - - 'https://s3-'
+          - !Ref 'AWS::Region'
+          - '.amazonaws.com/'
+          - !Ref BucketName
+          - '/govcloud_ct_crowdstrike_stackset_org_acct.yaml'
+  
+  DiscoverStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Condition: DeployToRoot
+    Properties:
+      Parameters:
+        CrowdStrikeCloud: !Ref CrowdStrikeCloud
+        RoleName: !Ref RoleName
+        RoleCreationDelayTimer: !Ref RoleCreationDelayTimer
+        CSAccountNumber: !FindInMap [ CSCloud, !Ref CrowdStrikeCloud, CSAccountNumber ]
+        CSAssumingRoleName: !FindInMap [ CSCloud, !Ref CrowdStrikeCloud, CSAssumingRoleName ]
+        LogArchiveBucketRegion: !Ref LogArchiveBucketRegion
+        LogArchiveAccount: !Ref LogArchiveAccount
+        LogArchiveBucketName: !Ref LogArchiveBucketName
+        ExternalID: !Ref ExternalID
+        FalconClientId: !Ref FalconClientId
+        FalconSecret: !Ref FalconSecret
+      TemplateURL: !Sub
+        - "https://${BucketName}.s3.amazonaws.com/govcloud_ct_crowdstrike_stackset_org_acct.yaml"
+        - BucketName: !Ref BucketName
