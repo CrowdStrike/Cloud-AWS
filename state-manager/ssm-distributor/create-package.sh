@@ -31,8 +31,8 @@ then
 fi
 DOWNLOAD_HELPER="https://raw.githubusercontent.com/CrowdStrike/falconpy/main/samples/sensor_download/download_sensor.py"
 PACKAGER="https://raw.githubusercontent.com/CrowdStrike/Cloud-AWS/main/systems-manager/Packaging-utilities/examples/linux-sensor-binary/packager.py"
-curl -k -o download.py $DOWNLOAD_HELPER
-curl -k -o packager.py $PACKAGER
+curl -o download.py $DOWNLOAD_HELPER
+curl -o packager.py $PACKAGER
 python download.py -k $1 -s $2 -d -o win -n CS_WINDOWS/WindowsSensor.exe
 python download.py -k $1 -s $2 -d -o amzn -v "2" -n CS_AMAZON2_x86_64/falcon-sensor.rpm
 python download.py -k $1 -s $2 -d -o amzn -v "2 - arm64" -n CS_AMAZON2_ARM64/falcon-sensor.rpm
