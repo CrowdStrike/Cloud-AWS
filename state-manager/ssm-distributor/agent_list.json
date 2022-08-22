@@ -9,6 +9,36 @@
       "minor_version": "",
       "arch_type": "x86_64",
       "install_tool": "yum"
+    },
+	{
+      "id": "amzn2",
+      "dir": "CS_AMAZON2_ARM64",
+      "file": "CS_AMAZON2_arm64.zip",
+      "name": "amazon",
+      "major_version": "2",
+      "minor_version": "",
+      "arch_type": "arm64",
+      "install_tool": "yum"
+    },
+    {
+      "id": "ubuntu",
+      "dir": "CS_UBUNTU_x86_64",
+      "file": "CS_UBUNTU_x86_64.zip",
+      "name": "ubuntu",
+      "major_version": "_any",
+      "minor_version": "",
+      "arch_type": "x86_64",
+      "install_tool": "dpkg"
+    },
+    {
+      "id": "ubuntu",
+      "dir": "CS_UBUNTU_20_x86_64",
+      "file": "CS_UBUNTU_20_x86_64.zip",
+      "name": "ubuntu",
+      "major_version": "20",
+      "minor_version": "",
+      "arch_type": "x86_64",
+      "install_tool": "dpkg"
     }
   ],
   "windows": [
