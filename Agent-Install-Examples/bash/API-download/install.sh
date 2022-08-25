@@ -74,13 +74,19 @@ cs_sensor_download() {
         die "No sensor found for with OS Name: $cs_os_name"
     fi
 
-    INDEX=1
+    INDEX=0
     if [ -n "$cs_os_version" ]; then
         found=0
         IFS='
 '
         for l in $(echo "$existing_installers" | json_value "os_version"); do
+            INDEX=$((INDEX+1))
             l=$(echo "$l" | sed 's/ *$//g' | sed 's/^ *//g')
+
+            # arm64 installers have "arm64" suffix
+            if [ "$cs_os_architecture" != "arm64" ] && [ -z "${l##*arm64}" ]; then
+                continue
+            fi
 
             if echo "$l" | grep -q '/'; then
                 # Sensor for Ubuntu has l="14/16/18/20"
@@ -96,7 +102,6 @@ cs_sensor_download() {
                 found=1
                 break
             fi
-	          INDEX=$((INDEX+1))
         done
         if [ $found = 0 ]; then
             die "Unable to locate matching sensor: $cs_os_name@$cs_os_version"
@@ -355,6 +360,14 @@ cs_os_name=$(
 
 cs_os_version=$(
     echo "$os_version" | awk -F'.' '{print $1}'
+)
+
+cs_os_architecture=$(
+    case $(uname -m) in
+        arm64)    echo "arm64";;
+        aarch64)  echo "arm64";;
+        *)        echo "default";;
+    esac
 )
 
 aws_my_region=$(
