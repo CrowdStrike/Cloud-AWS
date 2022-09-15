@@ -64,8 +64,9 @@ Various command-line utilities are required for this demo. These command line to
 1) Install [docker](https://www.docker.com/products/docker-desktop) container runtime
 2) Install [kubectl](https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html)
 3) Install [eksctl](https://docs.aws.amazon.com/eks/latest/userguide/eksctl.html)
-4) Install [aws cli](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
-5) Install [AWS docker ECR credential helper](https://github.com/awslabs/amazon-ecr-credential-helper) (Helps uploading images to AWS ECR)
+4) Install [helm](https://helm.sh/docs/intro/install/)
+5) Install [aws cli](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
+6) Install [AWS docker ECR credential helper](https://github.com/awslabs/amazon-ecr-credential-helper) (Helps uploading images to AWS ECR)
 
 
 ## Deployment Configuration Steps
@@ -111,22 +112,6 @@ Various command-line utilities are required for this demo. These command line to
    [ℹ]  kubectl command should work with "/root/.kube/config", try 'kubectl get nodes'
    [✔]  EKS cluster "eks-fargate-cluster" in "eu-west-1" region is ready
    ```
- - Configure cluster to instantiate Falcon Admission Controller to Fargate
-
-   EKS cluster automatically decides which workloads shall be instantiated on Fargate vs EKS nodes. This decision process is configured by AWS entity called *Fargate Profile*. Fargate profiles assign workloads based on Kubernetes namespaces. By default `kube-system` and `default` namespaces are present on the cluster. Falcon Admission Controller will be deployed in Step 4 to `falcon-system` namespace. The following command configures a cluster to instantiate the Admission Controller on the Fargate.
-
-   ```
-   eksctl create fargateprofile \
-       --region $CLOUD_REGION \
-       --cluster eks-fargate-cluster \
-       --name fp-falcon-sytem \
-       --namespace falcon-system
-   ```
-   Example output
-   ```
-   [ℹ]  creating Fargate profile "fp-falcon-sytem" on EKS cluster "eks-fargate-cluster"
-   [ℹ]  created Fargate profile "fp-falcon-sytem" on EKS cluster "eks-fargate-cluster"
-   ```
 
  - Verify that your local kubectl utility has been configured to connect to the cluster.
    ```
@@ -141,7 +126,43 @@ Various command-line utilities are required for this demo. These command line to
    ```
    kubectl is command line tool that lets you control Kubernetes clusters. For configuration, kubectl looks for a file named config in the `$HOME/.kube` directory. This config was created previously by `eksctl create cluster` command and contains login information for your newly created cluster.
 
-### Step 2: Create Container Repository (For an existing ECR continue to step 3)
+
+### Step 2: Create Fargate Profile for Falcon-System Namespace
+
+ - Configure cluster to instantiate Falcon Admission Controller to Fargate
+
+   EKS cluster automatically decides which workloads shall be instantiated on Fargate vs EKS nodes. This decision process is configured by AWS entity called *Fargate Profile*. Fargate profiles assign workloads based on Kubernetes namespaces. By default `kube-system` and `default` namespaces are present on the cluster. Falcon Admission Controller will be deployed in Step 4 to `falcon-system` namespace. The following command configures a cluster to instantiate the Admission Controller on the Fargate.
+
+   ```
+   eksctl create fargateprofile \
+       --region $CLOUD_REGION \
+       --cluster eks-fargate-cluster \
+       --name fp-falcon-system \
+       --namespace falcon-system
+   ```
+   Example output
+   ```
+   [ℹ]  creating Fargate profile "fp-falcon-sytem" on EKS cluster "eks-fargate-cluster"
+   [ℹ]  created Fargate profile "fp-falcon-sytem" on EKS cluster "eks-fargate-cluster"
+   ```
+
+
+### Step 3: Install IAM OIDC Controller for EKS Fargate Cluster (Check if already installed on existing cluster)
+
+ - Determine whether you have an existing IAM OIDC provider for your cluster. Retrieve your cluster's OIDC provider ID and store it in a variable.
+   ```
+   oidc_id=$(aws eks describe-cluster --name my-cluster --query "cluster.identity.oidc.issuer" --output text | cut -d '/' -f 5)
+   ```
+ - Determine whether an IAM OIDC provider with your cluster's ID is already in your account.
+   ```
+   aws iam list-open-id-connect-providers | grep $oidc_id
+   ```
+   If output is returned from the previous command, then you already have a provider for your cluster and you can skip the next step. If no output is returned, then you must create an IAM OIDC provider for your cluster.
+ - Create an IAM OIDC identity provider for your cluster with the following command. Replace eks-fargate-cluster with the name of your eks cluster value.
+   ```
+   eksctl utils associate-iam-oidc-provider --cluster eks-fargate-cluster --approve
+   ```
+### Step 4: Create Container Repository (For an existing ECR continue to step 5)
 
  - Create container repository in AWS ECR. AWS ECR (Elastic Container Registry) is a cloud service providing a container registry. The bellow command creates a new repository in the registry and this repository will be subsequently used to store the Falcon Container sensor image.
    ```
@@ -170,7 +191,7 @@ Various command-line utilities are required for this demo. These command line to
  - Note the `repositoryUri` of the newly created repository to the environment variable for further use. Falcon Container Sensor will be available under this URI.
 
 
-### Step 3: Push the falcon sensor image to the Repository
+### Step 5: Push the falcon sensor image to the Repository
 
  - Set the FALCON_IMAGE_URI variable to your managed ECR based on the ECR `repositoryUri`
    ```
@@ -182,29 +203,118 @@ Various command-line utilities are required for this demo. These command line to
    falcon-container-sensor-push $FALCON_IMAGE_URI
    ```
 
-### Step 4: Install The Admission Controller
+### Step 6: Configure IAM Role & Service Account for Falcon Injector
 
-Admission Controller is Kubernetes service that intercepts requests to the Kubernetes API server. Falcon Container Sensor hooks to this service and injects Falcon Container Sensor to any new pod deployment on the cluster. In this step we will configure and deploy the admission hook and the admission application.
+   When running on AWS Fargate, IAM roles associated with the Fargate nodes are not propagated to the running pods. This section describes the steps needed to create and associate an IAM role with the kubernetes service account via the IAM OIDC Connector to allow the Falcon injector service to read container image information from ECR private.
+
+ - Setup your shell environment variables (replace `eks-fargate-cluster` with your cluster name)
+   ```
+   export EKS_CLUSTER_NAME=eks-fargate-cluster
+   export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+   iam_policy_name="FalconContainerInjectorPolicy"
+   iam_policy_arn="arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${iam_policy_name}"
+   iam_role_name="${EKS_CLUSTER_NAME}-Falcon-Injector-Role"
+   iam_role_arn=""arn:aws:iam::${AWS_ACCOUNT_ID}:role/${iam_role_name}"
+   ```
+
+ - Create AWS IAM Policy for ECR Image Pulling
+   ```
+   cat <<__END__ > policy.json
+   {
+      "Version": "2012-10-17",
+      "Statement": [
+            {
+              "Sid": "AllowImagePull",
+              "Effect": "Allow",
+              "Action": [
+                  "ecr:BatchGetImage",
+                  "ecr:DescribeImages",
+                  "ecr:GetDownloadUrlForLayer",
+                  "ecr:ListImages"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Sid": "AllowECRSetup",
+              "Effect": "Allow",
+              "Action": [
+                  "ecr:GetAuthorizationToken"
+              ],
+              "Resource": "*"
+            }
+        ]
+   }
+   __END__
+
+   aws iam create-policy \
+     --policy-name ${iam_policy_name} \
+     --policy-document 'file://policy.json' \
+     --description "Policy to enable Falcon Container Injector to pull container image from ECR"
+   ```
+
+ - Use eksctl to create the OIDC IAM role for the service account using the newly created policy. Note the use of the `role-only` option as Helm will be creating the kubernetes serviceAccount in the following steps. (falcon-helm creates the kubernetes serviceAccount with the name of 'crowdstrike-falcon-sa').
+   ```
+   eksctl create iamserviceaccount \
+      --name crowdstrike-falcon-sa \
+      --namespace falcon-system \
+      --region "$CLOUD_REGION" \
+      --cluster "${EKS_CLUSTER_NAME}" \
+      --attach-policy-arn "${iam_policy_arn}" \
+      --role-name "${iam_role_name}"
+      --role-only \
+      --approve
+   ```
+
+### Step 7: Install The Falcon Container Admission Controller using Helm
+
+   Admission Controller is Kubernetes service that intercepts requests to the Kubernetes API server. Falcon Container Sensor hooks to this service and injects Falcon Container Sensor to any new pod deployment on the cluster. In this step we will configure and deploy the admission hook and the admission application.
 
  - Provide CrowdStrike Falcon Customer ID as environment variable. This CID will be later used to register newly deployed pods to CrowdStrike Falcon platform.
    ```
    CID=1234567890ABCDEFG1234567890ABCDEF-12
    ```
 
- - Install the admission controller
+ - Add the CrowdStrike Falcon Helm repository & update helm cache
    ```
-   docker run --rm --entrypoint installer $FALCON_IMAGE_URI:latest \
-       -cid $CID -image $FALCON_IMAGE_URI:latest \
-       | kubectl apply -f -
+   helm repo add crowdstrike https://crowdstrike.github.io/falcon-helm && helm repo update
+   ```
+
+ - Install the admission controller using helm and setting the serviceAccount role annotation
+   ```
+   helm upgrade --install falcon-helm crowdstrike/falcon-sensor \
+   -n falcon-system --create-namespace \
+   --set falcon.cid=$CID \
+   --set node.enabled=false \
+   --set container.enabled=true \
+   --set container.image.repository=$FALCON_IMAGE_URI \
+   --set container.image.tag=latest \
+   --set serviceAccount.annotation."eks\.amazonaws\.com/role-arn"=$iam_role_arn
+
    ```
    Example output:
    ```
-   namespace/falcon-system created
-   configmap/injector-config created
-   secret/injector-tls created
-   deployment.apps/injector created
-   service/injector created
-   mutatingwebhookconfiguration.admissionregistration.k8s.io/injector.falcon-system.svc created
+   Release "falcon-helm" does not exist. Installing it now.
+   W0915 11:48:54.925693   27157 warnings.go:70] policy/v1beta1 PodSecurityPolicy is deprecated in v1.21+, unavailable in v1.25+
+   W0915 11:49:01.984130   27157 warnings.go:70] policy/v1beta1 PodSecurityPolicy is deprecated in v1.21+, unavailable in v1.25+
+   NAME: falcon-helm
+   LAST DEPLOYED: Thu Sep 15 11:48:51 2022
+   NAMESPACE: falcon-system
+   STATUS: deployed
+   REVISION: 1
+   TEST SUITE: None
+   NOTES:
+   Thank you for installing the CrowdStrike Falcon Helm Chart!
+
+   Access to the Falcon Linux and Container Sensor downloads at registry.crowdstrike.com are
+   required to complete the install of this Helm chart. If an internal registry is used instead of registry.crowdstrike.com.
+   the containerized sensor must be present in a container registry accessible from Kubernetes installation.
+   CrowdStrike Falcon sensors will deploy across all pods as sidecars in your Kubernetes cluster after
+   installing this Helm chart and starting a new pod deployment for all your applications.
+   The default image name to deploy the pod sensor is `falcon-sensor`.
+
+   When utilizing your own registry, an extremely common error on installation is accidentally forgetting to add your containerized
+   sensor to your local image registry prior to executing `helm install`. Please read the Helm Chart's ReadMe
+   for more deployment considerations.
    ```
  - (optional) Watch the progress of a deployment
    ```
@@ -212,43 +322,14 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    ```
    Example output:
    ```
-   NAME                        READY   STATUS    RESTARTS   AGE
-   injector-6499dbd4b5-v5gqr   1/1     Running   0          2d3h
+   NAME                                      READY   STATUS    RESTARTS   AGE
+   falcon-sensor-injector-56f5ff68cc-ttgjj   1/1     Running   0          99s
    ```
 
- - (optional) Run the installer with `--help` command-line argument to output available configuration options for the deployment.
-   ```
-   docker run --rm --entrypoint installer $FALCON_IMAGE_URI:latest --help
-   ```
-
-   Sample output:
-   ```
-   usage:
-     -cid string
-       	Customer id to use
-     -days int
-       	Validity of certificate in days. (default 3650)
-     -falconctl-env value
-       	FALCONCTL options in key=value format.
-     -image string
-       	Image URI to load (default "crowdstrike/falcon")
-     -mount-docker-socket
-       	A boolean flag to mount docker socket of worker node with sensor.
-     -namespaces string
-       	Comma separated namespaces with which image pull secret need to be created, applicable only with -pullsecret (default "default")
-     -pullpolicy string
-       	Pull policy to be defined for sensor image pulls (default "IfNotPresent")
-     -pullsecret string
-       	Secret name that is used to pull image (default "crowdstrike-falcon-pull-secret")
-     -pulltoken string
-       	Secret token, stringified dockerconfig json or base64 encoded dockerconfig json, that is used with pulling image
-     -sensor-resources string
-       	A valid json string or base64 encoded string of the same, which is used as k8s resources specification.
-   ```
-   Full explanation of various configuration options and deployment scenarios is available through [Falcon Console](https://falcon.crowdstrike.com/support/documentation/146/falcon-container-sensor-for-linux#additional-installation-options).
+ - To learn more about falcon-helm visit [upstream github](https://github.com/CrowdStrike/falcon-helm).
 
 
-### Step 5: Spin-up a detection pod
+### Step 7: Spin-up a detection pod
 
  - Instruct Kubernetes cluster to start a detection application
    ```
@@ -294,20 +375,13 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
    deployment.apps "detection-single" deleted
    ```
 
- - Step 2: Uninstall the admission Controller
+ - Step 2: Uninstall helm release
    ```
-   docker run --rm --entrypoint installer $FALCON_IMAGE_URI:latest \
-       -cid $CID -image $FALCON_IMAGE_URI:latest \
-       | kubectl delete -f -
+   helm uninstall falcon-helm -n falcon-system
    ```
    Example output:
    ```
-   namespace "falcon-system" deleted
-   configmap "injector-config" deleted
-   secret "injector-tls" deleted
-   deployment.apps "injector" deleted
-   service "injector" deleted
-   mutatingwebhookconfiguration.admissionregistration.k8s.io "injector.falcon-system.svc" deleted
+   release "falcon-helm" uninstalled
    ```
  - Step 3: Delete the falcon image from AWS ECR registry
    ```
@@ -370,7 +444,9 @@ Admission Controller is Kubernetes service that intercepts requests to the Kuber
  - To get started with AWS Fargate using Amazon EKS: [User Guide](https://docs.aws.amazon.com/eks/latest/userguide/fargate-getting-started.html)
  - To get started with Amazon Elastic Container (ECR) Registry [Developer Guide](https://aws.amazon.com/ecr/getting-started/)
  - To learn more about Kubernetes: [Community Homepage](https://kubernetes.io/)
+ - To learn more about eksctl: [eksctl Homepage](https://eksctl.io/)
  - To get started with `kubectl` command-line utility: [Overview of kubectl](https://kubernetes.io/docs/reference/kubectl/overview/)
+ - To get started with `helm` command-line utility: [helm Homepage](https://helm.sh/)
  - To understand role of Kubernetes Admission Controller: [Reference Documentation](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/)
 
 
