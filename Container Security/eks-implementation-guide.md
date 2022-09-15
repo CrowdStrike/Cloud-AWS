@@ -214,7 +214,7 @@ Various command-line utilities are required for this demo. These command line to
    iam_policy_name="FalconContainerInjectorPolicy"
    iam_policy_arn="arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${iam_policy_name}"
    iam_role_name="${EKS_CLUSTER_NAME}-Falcon-Injector-Role"
-   iam_role_arn=""arn:aws:iam::${AWS_ACCOUNT_ID}:role/${iam_role_name}"
+   iam_role_arn="arn:aws:iam::${AWS_ACCOUNT_ID}:role/${iam_role_name}"
    ```
 
  - Create AWS IAM Policy for ECR Image Pulling
@@ -437,6 +437,10 @@ Various command-line utilities are required for this demo. These command line to
    [ℹ]  1 task: { delete cluster control plane "eks-fargate-cluster" [async] }
    [ℹ]  will delete stack "eksctl-eks-fargate-cluster-cluster"
    [✔]  all cluster resources were deleted
+   ```
+   - Step 6: Delete the created IAM Managed Policy
+   ```
+   iam delete-policy --policy-arn $iam_policy_arn
    ```
 
 
