@@ -18,6 +18,8 @@ ASG
 AUTH
 AWSLambdaSQSQueueExecutionRole
 AddressDefinition
+AllowECRSetup
+AllowImagePull
 AmazonEC
 AmazonSQSFullAccess
 AmazonSSMAutomationRole
@@ -25,6 +27,7 @@ AmazonSSMManagedInstanceCore
 AutomationAssumeRole
 Automations
 Autoscale
+BatchGetImage
 BootStrap
 Boto
 CCID
@@ -97,6 +100,8 @@ GCloud
 GKE
 GLBCDefaultBackend
 GW
+GetAuthorizationToken
+GetDownloadUrlForLayer
 Goto
 GovCloud
 GuardDuty
@@ -121,6 +126,7 @@ LTS
 Lifecycle
 ListAccountAliases
 ListBucket
+ListImages
 MERCHANTABILITY
 MSSP
 MacOS
@@ -129,6 +135,7 @@ MalQueryinator
 MatchAttributes
 Microk
 OAuth
+OIDC
 OSX
 Optimise
 PEM
@@ -136,11 +143,13 @@ POSIX
 PackageName
 PackageVersion
 Params
+PodSecurityPolicy
 PowerShell
 Pre
 PrivateLink
 RDP
 README
+ReadMe
 ReadOnlyAccess
 ReadS
 RoleCreationDelayTimer
@@ -245,6 +254,7 @@ duplicative
 eb
 eba
 ec
+ecr
 ee
 eks
 eksctl
@@ -254,6 +264,7 @@ eventbridge
 externalID
 externalid
 falconpy
+fargate
 fc
 fd
 fe
@@ -322,10 +333,12 @@ pyyaml
 rdp
 reachability
 runtime
+sa
 sc
 scalable
 sechub
 serverless
+serviceAccount
 sfe
 sha
 sid
@@ -352,6 +365,7 @@ tfvars
 tgw
 tomli
 tooltip
+ttgjj
 txt
 uber
 ubuntu
