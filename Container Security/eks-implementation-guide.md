@@ -260,7 +260,7 @@ Various command-line utilities are required for this demo. These command line to
       --region "$CLOUD_REGION" \
       --cluster "${EKS_CLUSTER_NAME}" \
       --attach-policy-arn "${iam_policy_arn}" \
-      --role-name "${iam_role_name}"
+      --role-name "${iam_role_name}" \
       --role-only \
       --approve
    ```
@@ -288,7 +288,7 @@ Various command-line utilities are required for this demo. These command line to
    --set container.enabled=true \
    --set container.image.repository=$FALCON_IMAGE_URI \
    --set container.image.tag=latest \
-   --set serviceAccount.annotation."eks\.amazonaws\.com/role-arn"=$iam_role_arn
+   --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=$iam_role_arn
 
    ```
    Example output:
