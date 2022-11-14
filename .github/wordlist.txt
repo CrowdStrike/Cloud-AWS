@@ -392,3 +392,6 @@ xxxxxxx
 yaml
 yml
 zip'ed
+Snyk
+setuptools
+
