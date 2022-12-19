@@ -10,6 +10,7 @@
 | [AWS PrivateLink with CrowdStrike Sensor Proxy](aws-privatelink/README.md) | Leverage AWS PrivateLink to provide private connectivity between your CrowdStrike-protected workloads and the CrowdStrike cloud. |
 | [AWS Security Hub with CrowdStrike Event Streams API](Falcon-Integration-Gateway/README.md) | The Falcon Integration Gateway publishes detections identified by CrowdStrike Falcon for instances residing within Amazon Web Services (AWS) to AWS Security Hub. |
 | [AWS S3 Protected Bucket with CrowdStrike Quick Scan API](s3-bucket-protection) | S3 Bucket Protection secures your AWS storage buckets by scanning files as they are uploaded to the bucket using the CrowdStrike Quick Scan API. |
+| [AWS Verified Access with CrowdStrike Zero Trust Assessment (ZTA)](https://github.com/CrowdStrike/aws-verified-access) | Using CrowdStrike ZTA, we provide customers the ability to assess their endpoint security posture, allowing AWS Verified Access to provide conditional access to private applications that comply to your organization's device posture policies. |
 
 ## CrowdStrike Sensor Automation
 
