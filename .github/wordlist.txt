@@ -395,3 +395,5 @@ zip'ed
 Snyk
 setuptools
 ZTA
+Cybersecurity
+OCSF
