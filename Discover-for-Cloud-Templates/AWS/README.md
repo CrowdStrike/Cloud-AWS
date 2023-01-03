@@ -16,7 +16,7 @@
 
 ![Central Log Account)](troubleshooting/images/central-log-account.png)
 
-**Step 1: S3 bucket publishes and SNS notification to he Crowdstrike SNS topic**
+**Step 1: S3 bucket publishes and SNS notification to the Crowdstrike SNS topic**
 
 When a new object is written to the S3 bucket the bucket will send an SNS notification to the Crowdstrike SNS topic. Crowdstrike hosts sns topics in all available US and EU regions, ap-southeast-1, ap-southeast-2 and me-south-1 are also supported today. Other regions may be available and if your bucket exists in another region please check with support.
 
