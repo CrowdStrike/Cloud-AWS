@@ -4,8 +4,7 @@
 
 | Integration Name | Description |
 |:-|:-|
-| [AWS Control Tower with CrowdStrike Discover for Cloud and Containers](Control-Tower/README.md) | Configure AWS Control Tower to register new AWS accounts with CrowdStrike Discover for Cloud and Containers. |
-| [AWS Control Tower with CrowdStrike Horizon](Control-Tower-For-Horizon/README.md) | Configure AWS Control Tower to register new AWS accounts with CrowdStrike Horizon. |
+| [AWS Control Tower with CrowdStrike](Control-Tower/README.md) | Configure AWS Control Tower to register new AWS accounts with CrowdStrike Discover and CrowdStrike Horizon. |
 | [AWS Network Firewall with CrowdStrike Threat Intelligence](Network-Firewall/README.md) | Build capabilities such as automated blocking of malicious domains (via AWS Network Firewall) based on CrowdStrike detection alerts, or perform threat hunting derived from CrowdStrike domain-based Indicators of Activity (IOAs). |
 | [AWS PrivateLink with CrowdStrike Sensor Proxy](aws-privatelink/README.md) | Leverage AWS PrivateLink to provide private connectivity between your CrowdStrike-protected workloads and the CrowdStrike cloud. |
 | [AWS Security Hub with CrowdStrike Event Streams API](Falcon-Integration-Gateway/README.md) | The Falcon Integration Gateway publishes detections identified by CrowdStrike Falcon for instances residing within Amazon Web Services (AWS) to AWS Security Hub. |
