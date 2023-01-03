@@ -397,3 +397,4 @@ setuptools
 ZTA
 Cybersecurity
 OCSF
+misconfiguration
