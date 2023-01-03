@@ -1,25 +1,23 @@
-# CrowdStrike with AWS Control Tower 
+![CrowdStrike Falcon](https://raw.githubusercontent.com/CrowdStrike/falconpy/main/docs/asset/cs-logo.png)
 
+![Twitter URL](https://img.shields.io/twitter/url?label=Follow%20%40CrowdStrike&style=social&url=https%3A%2F%2Ftwitter.com%2FCrowdStrike)
 
-CrowdStrike now supports organization registration from the CrowdStrike console.  
+# CrowdStrike with AWS Control Tower
 
-> Note:  We strongly recommend that you review the requirements section before proceeding so that you understand the resources that the registration process will create for you. For details see this [document](Requirements.md)
+CrowdStrike now supports AWS Organization registration directly from the CrowdStrike console. This is the recommended and officially supported approach for customers looking to onboard their AWS accounts across their AWS Organization(s) into the platform.
 
-### Setting up Control Tower for Discover
+> Note:  We strongly recommend that you review the requirements section before proceeding so that you understand the resources that the registration process will create for you. For details, please refer to this [document](horizon-organization-onboarding.md)
 
-The guide can be found here.
+## Instructions
 
-For Horizon and Discover https://falcon.crowdstrike.com/documentation/294/registering-accounts
+Please refer to the following documents for instructions on how to onboard your AWS Organization onto the Falcon Horizon platform:
 
-For Discover only https://falcon.crowdstrike.com/documentation/42/cloud-workloads-discovery-aws-setup
+- [Onboarding both Falcon Horizon and Falcon Discover](https://falcon.crowdstrike.com/documentation/294/registering-accounts)
+- [Onboarding only Falcon Discover](https://falcon.crowdstrike.com/documentation/42/cloud-workloads-discovery-aws-setup)
 
+## Registering Falcon Horizon and Falcon Discover with AWS Control Tower
 
+If you choose to proceed with registering your accounts with AWS Control Tower or would like to refer to the projects for any reason, you can find them below:
 
-### Setting up Control Tower for Horizon and Discover
-
-> **Please note!** The Discover for AWS account registration process has now merged with the Horizon account registration process.   If you are enabling both Horizon and Discover please follow the Horizon setup guide in the CrowdStrike Console. For an overview of the infrastructure created see the overview [here](../Control-Tower-For-Horizon/Horizon-Requirements.md)
-
-
-Templates that use SELF-MANAGED Stacksets are available for Horizon [here](https://github.com/CrowdStrike/AWS-Control-Tower-Horizon)
-
-Templates that use SELF-MANAGED Stacksets are available for Discover [here](https://github.com/CrowdStrike/AWS-Control-Tower-Discover)
+- [AWS Control Tower for Falcon Horizon](https://github.com/CrowdStrike/AWS-Control-Tower-Horizon)
+- [AWS Control Tower for Falcon Discover](https://github.com/CrowdStrike/AWS-Control-Tower-Discover)
