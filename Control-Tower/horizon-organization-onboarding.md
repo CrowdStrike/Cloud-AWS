@@ -11,7 +11,7 @@ By processing a real-time stream of events across your accounts via Amazon Event
 
 CrowdStrike's adversary-focused approach provides real-time threat intelligence on ~200 adversary groups, 50+ IOA detections and guided remediation that improves investigation speed by up to 88%, enabling teams to respond faster and stop breaches.
 
-| ![Falcon Horizon data flow architecture diagram](./images/Horizon-Data-Flows.png) |
+| ![Falcon Horizon data flow architecture diagram](./images/horizon-general-data-flow.png) |
 |:--:|
 | *Falcon Horizon data flow architecture diagram* |
 
@@ -28,7 +28,7 @@ The registration process creates the following resources across your accounts:
    1. *Optional, but recommended. The additional trail is disabled by default, as this is an additional cost item.*
    1. *AWS CloudTrail doesn't forward `read` events to Amazon EventBridge as of this writing, hence the need for an additional trail to receive all possible events.git*
 
-| ![Falcon Horizon Indicators of Attack (IOA) architecture diagram](./images/horizon-data-flow.png) |
+| ![Falcon Horizon Indicators of Attack (IOA) architecture diagram](./images/horizon-ioa-data-flow.png) |
 |:--:|
 | *Falcon Horizon Indicators of Attack (IOA) architecture diagram* |
 
