@@ -398,3 +398,8 @@ ZTA
 Cybersecurity
 OCSF
 misconfiguration
+Onboarding
+ATT
+MITRE
+IOM
+agentless
