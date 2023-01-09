@@ -33,11 +33,15 @@ DOWNLOAD_HELPER="https://raw.githubusercontent.com/CrowdStrike/falconpy/main/sam
 PACKAGER="https://raw.githubusercontent.com/CrowdStrike/Cloud-AWS/main/systems-manager/Packaging-utilities/examples/linux-sensor-binary/packager.py"
 curl -o download.py $DOWNLOAD_HELPER
 curl -o packager.py $PACKAGER
-python3 download.py -k $1 -s $2 -d -o win -n 1 -f CS_WINDOWS/WindowsSensor.exe
-python3 download.py -k $1 -s $2 -d -o amzn -n 1 -f CS_AMAZON2_x86_64/falcon-sensor.rpm
-python3 packager.py -r $3 -p $4 -b $5
+python download.py -k $1 -s $2 -d -o win -f CS_WINDOWS/WindowsSensor.exe
+python download.py -k $1 -s $2 -d -o amzn -v "2" -f CS_AMAZON2_x86_64/falcon-sensor.rpm
+python download.py -k $1 -s $2 -d -o amzn -v "2 - arm64" -f CS_AMAZON2_ARM64/falcon-sensor.rpm
+python download.py -k $1 -s $2 -d -o ubuntu -f CS_UBUNTU_x86_64/falcon-sensor.deb
+python packager.py -r $3 -p $4 -b $5
 rm CS_WINDOWS/WindowsSensor.exe
 rm CS_AMAZON2_x86_64/falcon-sensor.rpm
+rm CS_AMAZON2_ARM64/falcon-sensor.rpm
+rm CS_UBUNTU_x86_64/falcon-sensor.deb
 rm download.py
 rm packager.py
-rm s3-bucket/* !("README.md")
+rm s3-bucket/*
