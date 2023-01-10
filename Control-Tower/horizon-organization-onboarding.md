@@ -26,7 +26,7 @@ The registration process creates the following resources across your accounts:
 
 1. An additional *Organization Wide* CloudTrail trail in the master or delegated account to forward `read` events from CloudTrail.
    1. *Optional, but recommended. The additional trail is disabled by default, as this is an additional cost item.*
-   1. *AWS CloudTrail doesn't forward `read` events to Amazon EventBridge as of this writing, hence the need for an additional trail to receive all possible events.git*
+   1. *AWS CloudTrail doesn't forward `read` events to Amazon EventBridge as of this writing, hence the need for an additional trail to receive all possible events*
 
 | ![Falcon Horizon Indicators of Attack (IOA) architecture diagram](./images/horizon-ioa-data-flow.png) |
 |:--:|
