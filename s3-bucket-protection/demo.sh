@@ -21,8 +21,9 @@ env_destroyed(){
     echo -e "$NC"
 }
 
+# Ensure script is executed from the s3-bucket-protection root directory
+[[ -d demo ]] && [[ -d lambda ]] || { echo -e "\nThis script should be executed from the s3-bucket-protection root directory.\n"; exit 1; }
 
-echo -e "\nThis script should be executed from the s3-bucket-protection root directory.\n"
 if [ -z "$1" ]
 then
    echo "You must specify 'up' or 'down' to run this script"
