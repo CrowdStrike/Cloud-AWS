@@ -4,18 +4,17 @@ resource "null_resource" "archive_delay" {
     }
 }
 
-data "null_data_source" "wait_for_archive_delay" {
-    inputs = {
-        archive_delay_id = "${null_resource.archive_delay.id}"
-        source_dir = "${path.cwd}/lambda"
-    }
+locals {
+    archive_delay_id = "${null_resource.archive_delay.id}"
+    source_dir = "${path.cwd}/lambda"
 }
+
 # Package archive
 data "archive_file" "lambda_archive" {
   type        = "zip"
   output_path = "${path.cwd}/lambda/${var.lambda_function_filename}"
-  source_dir  = "${data.null_data_source.wait_for_archive_delay.outputs["source_dir"]}"
-  excludes = [ 
+  source_dir  = "${local.source_dir}"
+  excludes = [
     var.falconpy_layer_filename,
     "s3-bucket-protection.zip",
     var.lambda_function_filename
@@ -47,7 +46,7 @@ resource "aws_lambda_function" "func" {
   environment {
     variables = {
         "CLIENT_ID_PARAM" = "${var.unique_id}_${var.ssm_param_client_id}"
-        "CLIENT_SECRET_PARAM" = "${var.unique_id}_${var.ssm_param_client_secret}" 
+        "CLIENT_SECRET_PARAM" = "${var.unique_id}_${var.ssm_param_client_secret}"
         "BASE_URL" = "${var.base_url}"
         "MITIGATE_THREATS" = "${var.lambda_mitigate_threats}"
     }
