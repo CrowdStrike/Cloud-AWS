@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  This template creates the IAM Managed Policy that allows the CrowdStrike Falcon Integration
+  Gateway to send audit events to CloudTrail Lake.
+
+  This template is intended to be used with the CrowdStrike Falcon Integration
+  Gateway. For more information, see the documentation at
+  https://github.com/CrowdStrike/falcon-integration-gateway/tree/main/docs/cloudtrail-lake
+
+
+Parameters:
+  FIGPolicyName:
+    Type: String
+    Description: The name of the policy to create for the FIG integration.
+    Default: 'cs-lake-integration-policy'
+  ChannelARN:
+    Type: String
+    Description: The Channel ARN from the CrowdStrike Partner Integration in AWS CloudTrail Lake.
+
+Resources:
+  CSIntegrationPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Ref FIGPolicyName
+      Description: Allows the CrowdStrike Falcon Integration Gateway to send audit events to CloudTrail Lake
+      Path: "/"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action: "cloudtrail-data:PutAuditEvents"
+            Resource: !Ref ChannelARN
+          - Effect: "Allow"
+            Action:
+              - "ssm:PutParameter"
+              - "ssm:GetParameter"
+            Resource: "*"
+
+Outputs:
+  PolicyArn:
+    Description: The ARN of the policy created by this template
+    Value: !Ref CSIntegrationPolicy

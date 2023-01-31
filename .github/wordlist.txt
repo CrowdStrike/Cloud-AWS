@@ -78,6 +78,7 @@ Detections
 DevSecOps
 EBS
 ECR
+ECS
 EEAB
 EIP
 EOF

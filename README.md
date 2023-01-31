@@ -4,6 +4,7 @@
 
 | Integration Name | Description |
 |:-|:-|
+| [AWS CloudTrail Lake with CrowdStrike](cloudtrail-lake/README.md) | Leverage the CrowdStrike Falcon Streaming API to log and store user activity data from the Falcon console in a seamless and efficient way with AWS CloudTrail Lake. |
 | [AWS Control Tower with CrowdStrike](Control-Tower/README.md) | Configure AWS Control Tower to register new AWS accounts with CrowdStrike Discover and CrowdStrike Horizon. |
 | [AWS Network Firewall with CrowdStrike Threat Intelligence](Network-Firewall/README.md) | Build capabilities such as automated blocking of malicious domains (via AWS Network Firewall) based on CrowdStrike detection alerts, or perform threat hunting derived from CrowdStrike domain-based Indicators of Activity (IOAs). |
 | [AWS PrivateLink with CrowdStrike Sensor Proxy](aws-privatelink/README.md) | Leverage AWS PrivateLink to provide private connectivity between your CrowdStrike-protected workloads and the CrowdStrike cloud. |

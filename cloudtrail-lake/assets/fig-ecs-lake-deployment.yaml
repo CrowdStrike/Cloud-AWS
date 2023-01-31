@@ -1,0 +1,230 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS CloudFormation template to deploy the ECS FIG Lake Integration'
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: FIG Network Configuration
+        Parameters:
+          - VpcId
+          - SubnetID
+      - Label:
+          default: Falcon API Credentials
+        Parameters:
+          - FalconAPISecrets
+          - FalconAPISecretsClientID
+          - FalconAPISecretsClientSecret
+          - FalconCloudRegion
+      - Label:
+          default: FIG CloudTrail Lake Parameters
+        Parameters:
+          - ChannelARN
+          - CloudTrailLakeRegion
+          - FIGApplicationID
+    ParameterLabels:
+      VpcId:
+        default: VPC ID to Deploy FIG
+      SubnetID:
+        default: Subnet ID in VPC
+      FalconAPISecrets:
+        default: Falcon API Secrets Manager secrets ARN
+      FalconAPISecretsClientID:
+        default: Falcon API secrets key name for Client ID
+      FalconAPISecretsClientSecret:
+        default: Falcon API secrets key name for Client Secret
+      FalconCloudRegion:
+        default: Falcon Client Region
+      ChannelARN:
+        default: CloudTrail Lake Channel ARN
+      CloudTrailLakeRegion:
+        default: CloudTrail Lake Region
+      FIGApplicationID:
+        default: FIG Application ID
+
+Parameters:
+  VpcId:
+    Type: String
+    Description: VPC where to run the FIG container.
+  SubnetID:
+    Type: String
+    Description: Subnet in VPC to deploy the FIG container into.
+  FalconAPISecrets:
+    Type: String
+    Description: The ARN of the Secrets Manager secret containing the Falcon API credentials.
+  FalconAPISecretsClientID:
+    Type: String
+    Description: The Secrets Manager key name for the Falcon API Client ID.
+    Default: client_id
+  FalconAPISecretsClientSecret:
+    Type: String
+    Description: The Secrets Manager key name for the Falcon API Client Secret.
+    Default: client_secret
+  FalconCloudRegion:
+    Type: String
+    Description: The region that the Falcon API Credentials correspond to.
+    Default: 'us-1'
+  ChannelARN:
+    Type: String
+    Description: The ARN of the CloudTrail Lake Channel to send audit events to.
+  CloudTrailLakeRegion:
+    Type: String
+    Description: The region that the CloudTrail Lake Channel is in.
+  FIGApplicationID:
+    Type: String
+    Description: The Application ID of the FIG integration in CloudTrail Lake.
+    Default: 'crwd-fig-lake'
+
+Resources:
+  # Create ECS Cluster
+  FIGLakeCluster:
+    Type: AWS::ECS::Cluster
+
+  # Create Log Group
+  FIGLakeLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+    Properties:
+      LogGroupName: !Sub '/ecs/fig/${FIGLakeCluster}'
+
+  # Create ECS Task Definition
+  FIGTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: fig-lake-integration-task
+      ContainerDefinitions:
+        - Name: fig-lake-integration-container
+          Image: quay.io/crowdstrike/falcon-integration-gateway:latest
+          Environment:
+            - Name: FALCON_CLIENT_ID
+              Value: !Sub '{{resolve:secretsmanager:${FalconAPISecrets}:SecretString:${FalconAPISecretsClientID}}}'
+            - Name: FALCON_CLIENT_SECRET
+              Value: !Sub '{{resolve:secretsmanager:${FalconAPISecrets}:SecretString:${FalconAPISecretsClientSecret}}}'
+            - Name: FALCON_CLOUD_REGION
+              Value: !Ref FalconCloudRegion
+            - Name: CLOUDTRAIL_LAKE_CHANNEL_ARN
+              Value: !Ref ChannelARN
+            - Name: CLOUDTRAIL_LAKE_REGION
+              Value: !Ref CloudTrailLakeRegion
+            - Name: FALCON_APPLICATION_ID
+              Value: !Ref FIGApplicationID
+            - Name: FIG_BACKENDS
+              Value: CLOUDTRAIL_LAKE
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref FIGLakeLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+      RequiresCompatibilities:
+        - FARGATE
+      RuntimePlatform:
+        OperatingSystemFamily: LINUX
+      NetworkMode: awsvpc
+      Cpu: 256
+      Memory: 512
+      ExecutionRoleArn: !GetAtt FIGTaskExecutionRole.Arn
+      TaskRoleArn: !GetAtt FIGTaskRole.Arn
+
+  FIGTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: fig-ecs-task-execution
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource:
+                  - !GetAtt FIGLakeLogGroup.Arn
+              - Effect: Allow
+                Action:
+                  - 'secretsmanager:GetSecretValue'
+                Resource: !Ref FalconAPISecrets
+
+  FIGTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: fig-ecs-task
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'secretsmanager:GetSecretValue'
+                Resource: !Ref FalconAPISecrets
+              - Effect: "Allow"
+                Action: "cloudtrail-data:PutAuditEvents"
+                Resource: !Ref ChannelARN
+              - Effect: "Allow"
+                Action:
+                  - "ssm:PutParameter"
+                  - "ssm:GetParameter"
+                Resource: "*"
+
+  # Create the Security Group for the ECS Task
+  EcsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ECS Allowed Ports
+      VpcId: !Ref VpcId
+
+  # Create ECS Service
+  FIGService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref FIGLakeCluster
+      TaskDefinition: !Ref FIGTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !Ref EcsSecurityGroup
+          Subnets:
+            - !Ref SubnetID
+
+Outputs:
+  FIGLakeCluster:
+    Description: The ECS Cluster that the FIG Lake Integration is running in.
+    Value: !Ref FIGLakeCluster
+  FIGLakeLogGroup:
+    Description: The Log Group that the FIG Lake Integration is logging to.
+    Value: !Ref FIGLakeLogGroup
+  FIGTaskDefinition:
+    Description: The Task Definition that the FIG Lake Integration is running.
+    Value: !Ref FIGTaskDefinition
+  FIGTaskExecutionRole:
+    Description: The Task Execution Role that the FIG Lake Integration is using.
+    Value: !Ref FIGTaskExecutionRole
+  FIGTaskRole:
+    Description: The Task Role that the FIG Lake Integration is using.
+    Value: !Ref FIGTaskRole
+  FIGService:
+    Description: The ECS Service that the FIG Lake Integration is running in.
+    Value: !Ref FIGService
