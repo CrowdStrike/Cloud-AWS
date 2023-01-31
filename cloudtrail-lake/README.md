@@ -1,5 +1,5 @@
 # AWS CloudTrail Lake Integration
-AWS and CrowdStrike teamed to deliver this integration for AWS CloudTrail Lake that allows you to simplify and streamline the process of consolidating activity data from CrowdStrike Falcon. This integration enables enhanced visibility across environments and applications.
+AWS and CrowdStrike teamed to deliver this integration for AWS CloudTrail Lake that allows you to simplify and streamline the process of consolidating user activity data from CrowdStrike Falcon. With this integration, you gain unparalleled visibility into all user-relevant security activity within the Falcon console, including user creation, deletion, or modification, role changes, and authentication failures.
 
 ## Table of Contents
 - [Overview](#overview)
