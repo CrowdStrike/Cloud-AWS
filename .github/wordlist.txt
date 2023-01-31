@@ -90,6 +90,8 @@ FW
 FalconAgent
 FalconClientID
 FalconClientId
+FalconFileName
+FalconInstallerBucket
 FalconClientSecret
 FalconPy
 FalconSecret
