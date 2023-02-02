@@ -1,0 +1,179 @@
+# Using a combination of Systems Manager State Manager, State Manager Associations, AWS Secrets Manager, 
+# and an SSM Document, you can install CrowdStrike Falcon EDR on Systems Manager Managed EC2 Instances 
+# and ensure installation of Falcon EDR on all new instances, in an account.
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Schedule Automatic Running of CrowdStrike Compliance - per region"
+Parameters:
+  CSAPISecret:
+    Type: String
+    NoEcho: true
+    Description: "API Sec"
+    Default: "CrowdStrike API Key"
+  CID:
+    Type: String
+    NoEcho: true
+    Description: "Client ID"
+    Default: "CrowdStrike Client ID"
+  CSAPIGatewayID:
+    Type: String
+    NoEcho: true
+    Description: "API Gateway ID"
+    Default: "CrowdStrike API Gateway ID"
+  CrowdStrikeLogBucket:
+    Type: String
+    Description: "CrowdStrike Installation Logging Bucket"
+    Default: "example-crowdstrike-logging-bucket-0123"
+  ComplianceSeverity:
+    Type: String
+    Description: "The severity level for when CrowdStrike is not installed"
+    Default: "HIGH"
+  CRONExpression:
+    Type: String
+    Description: "The CRON expression to schedule the association check"
+    Default: "(0 23 23 ? * * *)"
+Resources:
+  # Create CrowdStrike installation Logging bucket.
+  # This bucket is not needed if using in a best practice multi-account strategy environment. 
+  # In a Landing Zone or Control Tower environment, point the SSM Association to output to your Log Archive account bucket. 
+  # This S3 bucket does not have access logging enabled to avoid recursive logging
+  CrowdStrikeLogsBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Ref CrowdStrikeLogBucket
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+# Create Secrets Manager values for storing CrowdStrike API Keys
+# Secrets Manager defaults to using the AWS account's default KMS key
+# Modify each secret resources to use your KMS ID if you would like to encrypt with your own CMK
+  CrowdStrikeAPIKeySec:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Name: "crowdstrike/apiKey"
+      Description: The API Key for CrowdStrike
+      SecretString: !Ref CSAPISecret
+  CrowdStrikeAPIGatewayID:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Name: "crowdstrike/apiClientID"
+      Description: The API Gateway ID for CrowdStrike
+      SecretString: !Ref CSAPIGatewayID
+  CrowdStrikeClientID:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Name: "crowdstrike/clientID"
+      Description: The Client ID for CrowdStrike
+      SecretString: !Ref CID
+  CrowdStrikeInstallationDocument: 
+      Type: "AWS::SSM::Document"
+      Properties: 
+        DocumentType: "Command"
+        Name: "CrowdStrikeMultiOSInstall"
+        Content:
+          description: "CrowdStrike Installation for SSM Enabled Linux and Windows Operating Systems"
+          schemaVersion: "2.2"
+          parameters:
+            OutFile:
+              type: "String"
+              description: "OutFile"
+              default: "install.sh"
+            CSAPIGatewayURL:
+              type: "String"
+              description: "CS API URL"
+              default: "https://api.crowdstrike.com"
+            CID:
+              type: "String"
+              description: "Client ID"
+              default: !Ref CID
+            CSAPIGatewayID:
+              type: "String"
+              description: "Gateway ID"
+              default: !Ref CSAPIGatewayID
+            CSAPISecret:
+              type: "String"
+              description: "API Sec"
+              default: !Ref CSAPISecret
+            InstallCrowdStrike:
+              type: "String"
+              description: "Crowstrike Header"
+              default: "######## Install CrowdStrike Agent ########"
+            CSPath:
+              type: "String"
+              description: "CS Path"
+              default: "C:\\Temp"
+            CSOutFile:
+              type: "String"
+              description: "CS Outfile"
+              default: "C:\\Temp\\falcon_windows_install.ps1"
+            BaseAPI:
+              type: "String"
+              description: "Base API"
+              default: "https://api.crowdstrike.com"
+          mainSteps:
+          - action: "aws:runShellScript"
+            name: "InstallCrowdStrikeLinux"
+            precondition:
+              StringEquals:
+                - platformType
+                - Linux
+            inputs:
+              runCommand:
+                - "if [[ $(ps aux | grep falcon-sensor | grep -vc grep)  > 0 ]] ; then echo 'CrowdStrike Falcon Sensor already installed. Exiting.' && exit 1; fi"
+                - "declare -r SUDO_CMD='sudo -E'"
+                - "export FalconCID={{CID}}"
+                - "export CS_API_GATEWAY_CLIENT_ID={{CSAPIGatewayID}}"
+                - "export CS_API_GATEWAY_CLIENT_SECRET={{CSAPISecret}}"
+                - "curl -sS https://raw.githubusercontent.com/CrowdStrike/Cloud-AWS/main/Agent-Install-Examples/bash/API-download/install.sh --output {{OutFile}}"
+                - "$SUDO_CMD chmod +x {{OutFile}}"
+                - "$SUDO_CMD bash install.sh"
+                - "aws ec2 create-tags --resources `cat /var/lib/cloud/data/instance-id` --tags Key=FalconEDR,Value=True"
+          - action: "aws:runPowerShellScript"
+            name: "WindowsInstall"
+            precondition:
+              StringEquals:
+                - platformType
+                - Windows
+            inputs:
+              runCommand:
+              - "if (Get-Service -Name 'CSFalconService' -ErrorAction SilentlyContinue) { Write-Host 'Crowstrike Agent already installed. Exiting.'; exit 3 }"
+              - "Write-Host {{InstallCrowdStrike}}"
+              - "if (!(Test-Path -Path {{CSPath}} -ErrorAction SilentlyContinue)) { New-Item -ItemType Directory -Path {{CSPath}} -Force }"
+              - "$client = new-object System.Net.WebClient" 
+              - "$client.DownloadFile('https://raw.githubusercontent.com/CrowdStrike/falcon-scripts/main/powershell/install/falcon_windows_install.ps1','{{CSOutFile}}')"
+              - "{{CSOutFile}} {{CSAPIGatewayURL}} {{CSAPIGatewayID}} {{CSAPISecret}}"
+              - "$instanceId = Get-EC2InstanceMetadata -Path '/instance-id'"
+              - "$tag = New-Object Amazon.EC2.Model.Tag"
+              - "$tag.Key = 'FalconEDR'"
+              - "$tag.Value = 'True'"
+              - "New-EC2Tag -Resource $instanceId -Tag $tag"
+      DependsOn:
+      - CrowdStrikeAPIKeySec
+      - CrowdStrikeAPIGatewayID
+      - CrowdStrikeClientID
+  SSMAssociation:
+    Type: "AWS::SSM::Association"
+    Properties:
+      AssociationName: "EndpointToolingCompliance"
+      Name: "CrowdStrikeMultiOSInstall"
+      ScheduleExpression: !Ref CRONExpression
+      Targets:
+        - Key: "InstanceIds"
+          Values:
+            - "*"
+      ComplianceSeverity: !Ref ComplianceSeverity
+      OutputLocation:
+        S3Location:
+          OutputS3BucketName: !Ref CrowdStrikeLogBucket
+          OutputS3KeyPrefix: !Sub "SSMInstallLogs/${AWS::AccountId}/"
+    DependsOn: 
+    - CrowdStrikeInstallationDocument
+    - CrowdStrikeLogsBucket
