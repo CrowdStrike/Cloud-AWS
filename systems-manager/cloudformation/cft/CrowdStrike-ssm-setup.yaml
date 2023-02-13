@@ -76,8 +76,8 @@ Resources:
       Content:
         S3Bucket: !Ref S3Bucket
         S3Key: layer.zip
-      Description: Layer for requests package
-      LayerName: requests-package
+      Description: Layer for falconpy package
+      LayerName: falconpy-package
 
   createSsmParams:
     Type: AWS::Lambda::Function
