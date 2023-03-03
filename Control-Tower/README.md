@@ -10,14 +10,4 @@ CrowdStrike now supports AWS Organization registration directly from the CrowdSt
 
 ## Instructions
 
-Please refer to the following documents for instructions on how to onboard your AWS Organization onto the Falcon Horizon platform:
-
-- [Onboarding both Falcon Horizon and Falcon Discover](https://falcon.crowdstrike.com/documentation/294/registering-accounts)
-- [Onboarding only Falcon Discover](https://falcon.crowdstrike.com/documentation/42/cloud-workloads-discovery-aws-setup)
-
-## Registering Falcon Horizon and Falcon Discover with AWS Control Tower
-
-If you choose to proceed with registering your accounts with AWS Control Tower or would like to refer to the projects for any reason, you can find them below:
-
-- [AWS Control Tower for Falcon Horizon](https://github.com/CrowdStrike/AWS-Control-Tower-Horizon)
-- [AWS Control Tower for Falcon Discover](https://github.com/CrowdStrike/AWS-Control-Tower-Discover)
+The AWS Control Tower integration is being updated to reflect the recent updates to Falcon CSPM's account registration process. The project will be released shortly, with major improvements to functionality and user experience to come.
