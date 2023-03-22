@@ -13,7 +13,7 @@
 	{
       "id": "amzn2",
       "dir": "CS_AMAZON2_ARM64",
-      "file": "CS_AMAZON2_arm64.zip",
+      "file": "CS_AMAZON2_ARM64.zip",
       "name": "amazon",
       "major_version": "2",
       "minor_version": "",
