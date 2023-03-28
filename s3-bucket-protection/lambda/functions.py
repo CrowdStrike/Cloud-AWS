@@ -1,4 +1,4 @@
-"""Security Hub integration functions."""
+"""S3 bucket protection functions."""
 import traceback
 from datetime import datetime
 import boto3
@@ -59,6 +59,20 @@ def send_to_security_hub(manifest, region):
             import_response = client.batch_import_findings(Findings=[manifest])
         except (ClientError, EndpointConnectionError) as err:
             # Boto3 issue communicating with SH, throw the error in the log
-            print(str(err))
+            print("Unable to submit to SecurityHub. Check that integration is accepting findings.")
+            print(err)
 
     return import_response
+
+def check_quota(interface):
+    """Retrieve the current quota details from the API and display the result."""
+    quota_lookup = interface.get_scans()
+    if not quota_lookup["status_code"] == 200:
+        raise SystemExit("Unable to retrieve quota details from the API.")
+    total = quota_lookup["body"]["meta"]["quota"]["total"]
+    used = quota_lookup["body"]["meta"]["quota"]["used"]
+    in_progress = quota_lookup["body"]["meta"]["quota"]["in_progress"]
+    print(f"You have used {used:,} out of {total:,} scans available. "
+          f"Currently {in_progress:,} scan{'s are' if in_progress != 1 else ' is'} running."
+          )
+    return bool(used<total)
