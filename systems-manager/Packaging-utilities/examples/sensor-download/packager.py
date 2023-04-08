@@ -108,13 +108,13 @@ class S3BucketUpdater:  # pylint: disable=R0903
     def __init__(self, region_name):
         self.region = region_name
 
-    def update(self, bucket_name, file_list):
+    def update(self, bucket_name, file_list, prefix = ""):
         """Update the bucket contents."""
         if not self._bucket_exists(bucket_name):
             self._create_bucket(bucket_name)
         for file in file_list:
             file_path = PATH_TO_BUCKET_FOLDER + file
-            self._upload_file(file_path, bucket_name, "falcon/" + file)
+            self._upload_file(file_path, bucket_name, prefix + file)
 
     def _bucket_exists(self, bucket_name):
         """
@@ -316,12 +316,20 @@ if __name__ == '__main__':
         print(
             "Skipping AWS upload: please provide --aws_region, --ssm_automation_doc_name, and --s3bucket command-line "
             "options for upload")
-    elif region and s3bucket and package_name is None:
-        S3BucketUpdater(region).update(s3bucket, files)
-        print("Package has been built successfully.")
-    elif region and s3bucket and package_name:
-        S3BucketUpdater(region).update(s3bucket, files)
+        
+    S3BucketUpdater(region).update(s3bucket, files, 'falcon/')
+    print("Package file have been built and uploaded successfully.")
+
+    if package_name is not None:
         SSMPackageUpdater(region).update(package_name, PATH_TO_BUCKET_FOLDER + "manifest.json")
-        print("Package has been built successfully.")
-    else:
-        print("Nothing to do ... specify region + bucket or region + bucket + package_name")
+        print("Distributor package has been built successfully.")
+    
+    # loop over PATH_TO_BUCKET_FOLDER and upload all files to S3 that are not in files list
+    supporting_files = []
+    for file in os.listdir(PATH_TO_BUCKET_FOLDER):
+        if file not in files:
+            supporting_files.append(file)
+    
+    if len(supporting_files) > 0:
+        S3BucketUpdater(region).update(s3bucket, supporting_files)
+

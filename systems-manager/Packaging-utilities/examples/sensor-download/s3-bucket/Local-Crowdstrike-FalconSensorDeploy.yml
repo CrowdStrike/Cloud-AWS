@@ -1,3 +1,4 @@
+
 description: Automation Document for installing the Crowdstike's Falcon Sensor .
 schemaVersion: '0.3'
 assumeRole: '{{AutomationAssumeRole}}'
@@ -185,7 +186,7 @@ mainSteps:
             queryRes = conn.getresponse()
 
             if queryRes.status != 200:
-              raise ValueError('Received non success response {} while querying for token. Error {}'.format(res.status, res.reason))
+              raise ValueError('Received non success response {} while querying for token. Error {}'.format(queryRes.status, queryRes.reason))
 
             queryResData = queryRes.read()
             resId = json.loads(queryResData)['resources'][0]
@@ -195,7 +196,7 @@ mainSteps:
             entitiesRes = conn.getresponse()
 
             if entitiesRes.status != 200:
-              raise ValueError('Received non success response {} while fetching token by id. Error {}'.format(res.status, res.reason))
+              raise ValueError('Received non success response {} while fetching token by id. Error {}'.format(entitiesRes.status, entitiesRes.reason))
 
             entitiesResData = entitiesRes.read()
             token = json.loads(entitiesResData)['resources'][0]['value']
@@ -226,4 +227,5 @@ mainSteps:
           SSM_CS_CCID: '{{GetCustomerIdentifier.CCID}}'
           SSM_CS_INSTALLPARAMS: '{{InstallerParams}}'
           SSM_CS_AUTH_TOKEN: '{{GetAuthenticationToken.AuthToken}}'
+          SSM_CS_HOST: '{{GetAuthenticationToken.ApiGatewayHost}}'
           SSM_CS_NCNT: '{{GetAuthenticationToken.FalconSensorVersionVal}}'
