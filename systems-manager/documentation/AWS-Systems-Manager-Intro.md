@@ -535,7 +535,6 @@ The CloudFormation template performs three operations
 
 
 3. Select the *Install or Uninstall* from the Action dropdown
-   ![](media/Console-page2.png)
 
 
 4. Select the correct package name and optional package version.
@@ -593,8 +592,7 @@ The CloudFormation template performs three operations
 
 ### Installing With the CLI
 
-The CrowdStrike agent is installed with a automation document as described in the earlier section. The document is
-[Crowdstrike-FalconSensorDeploy.yml](./documents/Crowdstrike-FalconSensorDeploy.yml)
+The CrowdStrike agent is installed with a automation document as described in the earlier section.
 
 To start the installation process via the cli use the **aws ssm start-automation-execution** command.
 [https://docs.aws.amazon.com/cli/latest/reference/ssm/start-automation-execution.html](https://docs.aws.amazon.com/cli/latest/reference/ssm/start-automation-execution.html)
