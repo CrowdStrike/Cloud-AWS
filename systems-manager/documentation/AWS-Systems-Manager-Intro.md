@@ -2,31 +2,32 @@
 
 **Contents**
 
-- [AWS Systems Manager](#aws-systems-manager)
-    * [Monitor -- Monitor resources and applications](#monitor----monitor-resources-and-applications)
-    * [Audit -- Audit resource configurations, user access and policy enforcement](#audit----audit-resource-configurations--user-access-and-policy-enforcement)
-    * [Manage -- Take operation action on resources](#manage----take-operation-action-on-resources)
-    * [Optimise -- Improve efficiency and security posture](#optimise----improve-efficiency-and-security-posture)
 - [CrowdStrike and AWS Systems Manager](#crowdstrike-and-aws-systems-manager)
-    * [Falcon Agent Installation](#falcon-agent-installation)
-- [Package Documents](#package-documents)
-- [Overview of the Setup Process.](#overview-of-the-setup-process)
-- [Setting up and Using Systems Manager](#setting-up-and-using-systems-manager)
-- [Agent Install Process](#agent-install-process)
-- [Setup Systems Manager](#setup-systems-manager)
-    * [Step 1 - Create your AWS SSM package](#step-1---create-your-aws-ssm-package)
-        + [Option A - Creating a Package with the Installer](#option-a---creating-a-package-with-the-installer)
-        + [Option B - Creating a Package without the Installer](#option-b---creating-a-package-without-the-installer)
-    * [Step 2 - Verify the files in the S3 bucket](#step-2---verify-the-files-in-the-s3-bucket)
-    * [Step 3 - Create the Cloudformation Stack](#step-3---create-the-cloudformation-stack)
-        + [Deploy the cloudformation template](#deploy-the-cloudformation-template)
-- [Installing the CrowdStrike Falcon agent](#installing-the-crowdstrike-falcon-agent)
-    * [Installing With the GUI](#installing-with-the-gui)
-    * [Installing With the CLI](#installing-with-the-cli)
-    * [Installing With Python](#installing-with-python)
-- [Troubleshooting](#troubleshooting)
-    + [Linux logs](#linux-logs)
-    + [Windows logs](#windows-logs)
+  - [AWS Systems Manager](#aws-systems-manager)
+    - [Monitor -- Monitor resources and applications](#monitor----monitor-resources-and-applications)
+    - [Audit -- Audit resource configurations, user access and policy enforcement](#audit----audit-resource-configurations-user-access-and-policy-enforcement)
+    - [Manage -- Take operation action on resources](#manage----take-operation-action-on-resources)
+    - [Optimise -- Improve efficiency and security posture](#optimise----improve-efficiency-and-security-posture)
+  - [CrowdStrike and AWS Systems Manager](#crowdstrike-and-aws-systems-manager-1)
+    - [Falcon Agent Installation](#falcon-agent-installation)
+  - [Package Documents](#package-documents)
+  - [Overview of the Setup Process.](#overview-of-the-setup-process)
+  - [Setting up and Using Systems Manager](#setting-up-and-using-systems-manager)
+  - [Agent Install Process](#agent-install-process)
+  - [Setup Systems Manager](#setup-systems-manager)
+    - [Step 1 - Create your AWS SSM package](#step-1---create-your-aws-ssm-package)
+      - [Option A - Creating a Package with the Installer](#option-a---creating-a-package-with-the-installer)
+      - [Option B - Creating a Package without the Installer](#option-b---creating-a-package-without-the-installer)
+    - [Step 2 - Verify the files in the S3 bucket](#step-2---verify-the-files-in-the-s3-bucket)
+    - [Step 3 - Create the Cloudformation Stack](#step-3---create-the-cloudformation-stack)
+      - [Deploy the cloudformation template](#deploy-the-cloudformation-template)
+  - [Installing the CrowdStrike Falcon agent](#installing-the-crowdstrike-falcon-agent)
+    - [Installing With the GUI](#installing-with-the-gui)
+    - [Installing With the CLI](#installing-with-the-cli)
+    - [Installing With Python](#installing-with-python)
+  - [Troubleshooting](#troubleshooting)
+      - [Linux logs](#linux-logs)
+      - [Windows logs](#windows-logs)
 
 ## AWS Systems Manager
 
@@ -183,6 +184,7 @@ automation document to perform the task. During the agent install process the fo
     - SSM_CS_CCID: (CrowdStrike Customer CID)
     - SSM_CS_INSTALLPARAMS: (Additional Install Params)
     - SSM_CS_AUTH_TOKEN: (CrowdStrike API OAuth2 token)
+    - SSM_CS_HOST: (CrowdStrike API Host)
 
 The `AWS-ConfigureAWSPackage` is a standard AWS package that invokes the process of delivering the software package to
 the instance and invoking the install/uninstall scripts.
@@ -195,50 +197,17 @@ Running the automation document
 
 Select from one of two methods of delivering the CrowdStrike agent to the ec2 instance.
 
-Option-A - Create an install package that combines the installation scripts with the CrowdStrike Falcon installer. For
-information on how to complete these steps follow the
-guide [here](https://github.com/CrowdStrike/Cloud-AWS/blob/master/systems-manager/Packaging-utilities/examples/linux-sensor-binary/README.md)
-.
-
-Option-B - Create an install package that uses installation scripts to download the CrowdStrike Falcon installer during
-installation. For information on how to complete these steps follow the
-guide [here](https://github.com/CrowdStrike/Cloud-AWS/blob/master/systems-manager/Packaging-utilities/examples/linux-sensor-download/README.md)
-
-Two zip files are included in the *Packaging-utilities/zip-files* folder that contain example files for creating a
-CrowdStrike package for AWS Systems Manager.
-
-* `Package-sensor-download.zip` contains the files required to create a package where the sensor is downloaded from the
-  CrowdStrike sensor download API.
-
-
-* `Package-with-binary.zip` contains the files required to create a package where the sensor is bundled with the
-  installer scripts and pushed to the host using the systems manager agent. A copy of the instructions with examples is
-  here [README.md](https://github.com/CrowdStrike/Cloud-AWS/tree/systems-manager/systems-manager/Packaging-utilities/examples/linux-sensor-binary)
-
-Select one of the above zip files and unzip its contents to a new location. Once unzipped follow the instructions for
-Option-A or Option-B
+| Option | Description |
+| --- | --- |
+| [Option A](#option-a---creating-a-package-with-the-installer)| Create an install package that combines the installation scripts with the CrowdStrike Falcon installer. |
+| [Option B](#option-b---creating-a-package-without-the-installer) | Create an install package that uses installation scripts to download the CrowdStrike Falcon installer during installation. |
 
 #### Option A - Creating a Package with the Installer
 
 This steps describes how to setup AWS systems manager where the CrowdStrike binary is packaged with the sensor install
 script.
 
-1) Create a new directory
-2) Unzip the file package-with-binary.zip
-
-```text
-user@host linux-sensor-binary % ls -al
-total 40
-drwxr-xr-x  9 jharris  staff    288  9 Mar 20:07 .
-drwx------@ 9 jharris  staff    288  9 Mar 20:04 ..
-drwxr-xr-x  6 jharris  staff    192  8 Mar 18:35 CS_AMAZON
-drwxr-xr-x  5 jharris  staff    160  5 Mar 17:14 CS_WINDOWS
--rw-r--r--  1 jharris  staff   1725  5 Mar 17:11 README.md
--rw-r--r--@ 1 jharris  staff    167  8 Mar 16:08 agent_list.json
-drwxr-xr-x  3 jharris  staff     96  5 Mar 18:13 aws-automation-doc
--rw-r--r--  1 jharris  staff  10040  9 Mar 11:00 packager.py
-drwxr-xr-x  4 jharris  staff    128  9 Mar 20:05 s3-bucket
-```
+1) Navigate to the `linux-sensor-binary` folder in this repository.
 
 The example contains the directories CS_AMAZON and CS_WINDOWS. Each directory should contain the following
 
@@ -381,142 +350,97 @@ drwxr-xr-x  17 user  staff       544 Mar 16 12:28 ..
 
 #### Option B - Creating a Package without the Installer
 
-* The DEFAULT for install will be (latest-release)-2. For example if the latest release of the linux sensor is 5.34.9918
-  the DEFAULT version installed would be 5.33.9808.  
-  It is expected that once installed, sensor versions will be managed via the falcon console.
-
 This guide describes how to setup AWS systems manager where the CrowdStrike binary is downloaded from the CrowdStrike
 API.
 
-1) Create a new directory
-2) Unzip the file package-without-binary.zip
+> The default installed version will be (latest-release)-1. For example if the latest release of the linux sensor is 5.34.9918 the DEFAULT version installed would be 5.33.9808. It is expected that once installed, sensor versions will be managed via the falcon console.
 
-```text
-user@host linux-sensor-download % ls -al
-total 40
-drwxr-xr-x  9 user  staff    288  9 Mar 20:07 .
-drwx------@ 9 user  staff    288  9 Mar 20:04 ..
-drwxr-xr-x  6 user  staff    192  8 Mar 18:35 CS_AMAZON
-drwxr-xr-x  5 user  staff    160  5 Mar 17:14 CS_WINDOWS
--rw-r--r--  1 user  staff   1725  5 Mar 17:11 README.md
--rw-r--r--@ 1 user  staff    167  8 Mar 16:08 agent_list.json
-drwxr-xr-x  3 user  staff     96  5 Mar 18:13 aws-automation-doc
--rw-r--r--  1 user  staff  10040  9 Mar 11:00 packager.py
-drwxr-xr-x  4 user  staff    128  9 Mar 20:05 s3-bucket
-```
+All commands should be ran from the `/Packaging-utilities/examples/sensor-download` directory.
 
-The example contains the directories CS_AMAZON and CS_WINDOWS. Each directory should contain the following
+1. Download or clone this repository
+    ```bash
+    git clone https://github.com/CrowdStrike/Cloud-AWS.git
+    ``` 
+2. Change to the `sensor-download` directory
+    ```bash
+    cd Cloud-AWS/systems-manager/Packaging-utilities/examples/sensor-download   
+    ```
+3. Update `agent_list.json` with the operating systems you want to target.
 
-* Install script that downloads the binary from the CrowdStrike API
-* Uninstall script
+    <details>
+      <summary>Expand for details</summary>
 
-```text
-user@host CS_WINDOWS % ls -al
-total 82056
-drwxr-xr-x  5 jharris  staff       160  5 Mar 17:14 .
-drwxr-xr-x  9 jharris  staff       288  9 Mar 20:38 ..
--rwxr-xr-x@ 1 jharris  staff      5784 25 Jun  2019 install-no-binary.ps1
--rwxr-xr-x@ 1 jharris  staff        50 25 Jun  2019 uninstall.ps1
-```      
+      The `agent_list.json` file should list all the directories that will be included in the package. The file should be in json format and contain a list of objects containing the
+    following keys:
 
-The root folder should contain an "agent_list.json" file. The agent_list.json file should list all the directories that
-will be included in the package. The file should be in json format and contain a list of objects containing the
-following keys * os * dir * file
+    | Key | Description |
+    | --- | --- |
+    | `dir` | The directory that contains the install scripts |
+    | `file` | The name of the zip file that will be created |
+    | `name` | The `code value` used by SSM Distributor. See [here](https://docs.aws.amazon.com/systems-manager/latest/userguide/distributor.html#what-is-a-package-platforms) for a list of valid values |
+    | `arch_type` | The architecture type of the binary. See [here](https://docs.aws.amazon.com/systems-manager/latest/userguide/distributor.html#what-is-a-package-platforms) for a list of valid values |
+    | `major_version` | The major OS version. Must match the exact release version of the operating system Amazon Machine Image (AMI) that you're targeting. |
+    | `minor_version` | The minor OS version. Must match the exact release version of the operating system Amazon Machine Image (AMI) that you're targeting. |
+    | `id` | Optional unique id |
 
-An example 'agent_list.json' file.
+    Below is an example `agent_list.json` file that creates a SSM Distributor package that contains install instructions for the following operating systems:
 
- ```json
-{
-  "linux": [
+    * Amazon Linux 2
+    * Amazon Linux 2 ARM64
+    * All supported Windows versions
+
+    ```json
     {
-      "id": "amzn2",
-      "dir": "CS_AMAZON2_x86_64",
-      "file": "CS_AMAZON2_x86_64.zip",
-      "name": "amazon",
-      "major_version": "2",
-      "minor_version": "",
-      "arch_type": "x86_64",
-      "install_tool": "yum"
-    },
-    {
-      "id": "amzn2",
-      "dir": "CS_AMAZON2_ARM64",
-      "file": "CS_AMAZON2_arm64.zip",
-      "name": "amazon",
-      "major_version": "2",
-      "minor_version": "",
-      "arch_type": "arm64",
-      "install_tool": "yum"
+      "linux": [
+        {
+          "id": "amzn2",
+          "dir": "CS_AMAZON2_x86_64",
+          "file": "CS_AMAZON2_x86_64.zip",
+          "name": "amazon",
+          "major_version": "2",
+          "minor_version": "",
+          "arch_type": "x86_64",
+        },
+        {
+          "id": "amzn2",
+          "dir": "CS_AMAZON2_ARM64",
+          "file": "CS_AMAZON2_arm64.zip",
+          "name": "amazon",
+          "major_version": "2",
+          "minor_version": "",
+          "arch_type": "arm64",
+        }
+      ],
+      "windows": [
+        {
+          "dir": "CS_WINDOWS",
+          "file": "CS_WINDOWS.zip",
+          "id": "windows",
+          "name": "windows",
+          "major_version": "_any",
+          "minor_version": "",
+          "arch_type": "_any",
+        }
+      ]
     }
-  ],
-  "windows": [
-    {
-      "dir": "CS_WINDOWS",
-      "file": "CS_WINDOWS.zip",
-      "id": "windows",
-      "name": "windows",
-      "major_version": "_any",
-      "minor_version": "",
-      "arch_type": "_any",
-      "install_tool": "",
-      "installer_matcher": "exe"
-    }
-  ]
-}
-  ```
-Save the file in the current directory
+    ```
+    </details>
 
-Execute the script "packager.py". The file performs the following functions dependent on the parameters provided
+4. Install the required python modules
+    ```bash
+    pip3 install -r requirements.txt
+    ```
+5. Run the packager script
+      | Parameter | Description | Required |
+      | --- | --- | --- |
+      | `AWS_REGION` | The AWS region where the s3 bucket should exist. | Yes |
+      | `S3BUCKET` | The name of the s3 bucket. | Yes |
 
-Usage
+    ```bash
+    python3 packager.py -r <AWS_REGION> -b <S3BUCKET>
+    ```
 
-```txt
-   % python3 packager.py -h
-
-    usage: packager.py [-h] -r AWS_REGION -b S3BUCKET -p PACKAGE_NAME
-
-    Script execution
-    
-    1) Iterates over the "dir's" and creates a Zip file of the contents with the name of "file".
-    2) Checks for the existence of the S3 bucket and creates it if it does not exist
-    3) Uploads the Zip files to a /falcon folder in the bucket.
-```  
-Script Parameter options
-
-* No Params - The script will exit
-
-
-* AWS_REGION and S3BUCKET Params - The script will generate the zip and manifest files, upload the 
-  contents of the `s3-bucket` folder to S3.
-
-
-* AWS_REGION and S3BUCKET and PACKAGE_NAME Params - The script will generate the zip and manifest files, upload the 
-  contents of the `s3-bucket` folder to S3 and generate the package document in systems manager.
-
-  
-
-Example of the generated files in the s3bucket folder
-
-```text
-user@host s3-bucket % ls -al
-total 145336
-drwxr-xr-x  14 user  staff       448 Mar 16 12:25 .
-drwxr-xr-x  17 user  staff       544 Mar 16 12:28 ..
--rw-r--r--   1 user  staff   4895244 Mar 15 22:50 CS_AMAZON.zip
--rw-r--r--   1 user  staff      3460 Mar 16 12:28 CS_AMAZON2_ARM64.zip
--rw-r--r--   1 user  staff   4895244 Mar 16 12:28 CS_AMAZON2_x86_64.zip
--rw-r--r--   1 user  staff      3460 Mar 15 12:37 CS_AMAZON_ARM.zip
--rw-r--r--   1 user  staff  62840963 Mar 16 12:28 CS_WINDOWS.zip
--rw-r--r--   1 user  staff      9333 Mar 11 14:51 Local-Crowdstrike-FalconSensorDeploy.yml
--rw-r--r--   1 user  staff      2269 Mar 11 14:51 createSsmParams.zip
--rw-r--r--   1 user  staff     10173 Mar 10 18:14 lambda_ssm_setup.zip
--rw-r--r--   1 user  staff    929360 Mar 11 14:51 layer.zip
--rw-r--r--   1 user  staff       587 Mar 16 12:27 manifest.json
--rw-r--r--   1 user  staff     10154 Mar 16 11:30 new_manifest.json
--rw-r--r--   1 user  staff      2664 Mar 16 12:27 packager.log
-
-```
-
+    > Note: The Cloudformation template will create the distributor package so do not pass a value for -p
 ### Step 2 - Verify the files in the S3 bucket
 
 You should now have an s3 bucket that contains all the files required to create the package, automation documents and
@@ -524,6 +448,7 @@ secure Parameters in Systems Manager.
 
 The bucket should contain all the files from the local s3-bucket folder:-
 
+> Note: yours may differ from these images depending on the operating systems you are targeting.
 
 ![](media/cft-s3-bucket.png)
 
@@ -538,7 +463,6 @@ The CloudFormation template performs three operations
 1. Creates an IAM Role CrowdStrike-SSMExecutionRole.  
    The role has the Amazon managed policy AmazonSSMAutomationRole attached to it
    ![](media/iam-role.png)
-
 
 2. Adds parameters to the Systems Manager Parameter Store
 
@@ -562,7 +486,7 @@ The CloudFormation template performs three operations
    ![](media/oauth-token.png)
 
 
-2. Load the CloudFormation template
+2. Load the CloudFormation template located in the `cloudformation/cft` folder.
 
    Add the CrowdStrike API OAuth2 Client ID and Client secret
 
@@ -611,7 +535,6 @@ The CloudFormation template performs three operations
 
 
 3. Select the *Install or Uninstall* from the Action dropdown
-   ![](media/Console-page2.png)
 
 
 4. Select the correct package name and optional package version.
@@ -669,8 +592,7 @@ The CloudFormation template performs three operations
 
 ### Installing With the CLI
 
-The CrowdStrike agent is installed with a automation document as described in the earlier section. The document is
-[Crowdstrike-FalconSensorDeploy.yml](./documents/Crowdstrike-FalconSensorDeploy.yml)
+The CrowdStrike agent is installed with a automation document as described in the earlier section.
 
 To start the installation process via the cli use the **aws ssm start-automation-execution** command.
 [https://docs.aws.amazon.com/cli/latest/reference/ssm/start-automation-execution.html](https://docs.aws.amazon.com/cli/latest/reference/ssm/start-automation-execution.html)

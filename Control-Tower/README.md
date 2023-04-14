@@ -10,4 +10,4 @@ CrowdStrike now supports AWS Organization registration directly from the CrowdSt
 
 ## Instructions
 
-The AWS Control Tower integration is being updated to reflect the recent updates to Falcon CSPM's account registration process. The project will be released shortly, with major improvements to functionality and user experience to come.
+The AWS Control Tower integration is being updated to reflect the recent updates to Falcon CSPM account registration process. The project will be released shortly, with major improvements to functionality and user experience to come.
