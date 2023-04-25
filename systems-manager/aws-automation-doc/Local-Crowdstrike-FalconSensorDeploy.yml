@@ -4,6 +4,14 @@ assumeRole: '{{AutomationAssumeRole}}'
 parameters:
   AWSRegion:
     type: String
+  UninstallerParams:
+    type: String
+    default: ''
+    description: (Optional) Enter CrowdStrike's uninstall time params here. For more info refer Falcon console documentation.
+  MaintenanceToken:
+    type: String
+    default: ''
+    description: (Optional) Uninstall token for windows machines
   InstallerParams:
     type: String
     default: ''
@@ -213,5 +221,7 @@ mainSteps:
           SSM_CS_INSTALLPARAMS: '{{InstallerParams}}'
           SSM_CS_AUTH_TOKEN: '{{GetAuthenticationToken.AuthToken}}'
           SSM_CS_HOST: '{{GetAuthenticationToken.ApiGatewayHost}}'
+          UNINSTALLPARAMS: '{{UninstallerParams}}'
+          MAINTENANCE_TOKEN: '{{MaintenanceToken}}'
 
 

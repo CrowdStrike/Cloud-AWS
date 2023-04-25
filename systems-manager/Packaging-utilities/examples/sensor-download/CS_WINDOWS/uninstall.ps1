@@ -30,7 +30,6 @@ if ($env:MAINTENANCE_TOKEN) {
 Write-Output "Uninstalling with arguments: $uninstallArgs"
 $uninstallProcess = Start-Process -FilePath $uninstallString -ArgumentList $uninstallArgs -PassThru -Wait
 
-Write-Output $uninstallProcess
 # Checks the exit code of the uninstall process and throws an exception if it is not 0
 if ($uninstallProcess.ExitCode -ne 0) {
   Write-Output "Failed to uninstall with exit code: $($uninstallProcess.ExitCode)"
