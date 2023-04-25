@@ -2,13 +2,13 @@
 
 Using a combination of [Systems Manager State Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-state.html), [State Manager Associations](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-state-manager-targets-and-rate-controls.html), [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/), and an [SSM Document](https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-ssm-docs.html), you can install [CrowdStrike Falcon EDR](https://www.crowdstrike.com/products/endpoint-security/falcon-insight-edr/) on Systems Manager Managed EC2 Instances and ensure installation of Falcon EDR on all new instances, in an account.
 
-This differs from [CrowdStrike’s Automating CrowdStrike Falcon agent deployment with AWS EventBridge and AWS Systems Manager State Manager](https://github.com/CrowdStrike/Cloud-AWS/tree/main/state-manager) solution as it does not rely on SSM Distributor packages, nor Lambda functions, and therefore supports more operating systems as of February 2023. However, if customers want a fully Vendor supported solution, they should use [CrowdStrike's](https://github.com/CrowdStrike/Cloud-AWS/tree/main/state-manager).
+This does not rely on SSM Distributor packages, nor Lambda functions, and therefore supports more operating systems as of February 2023.
 
 See "Prerequisites" for requirements to leverage this pattern. 
 
 ## Preqrequisites
 
-### If deploying with CloudFormation
+### Deploying with CloudFormation
 
 * An AWS Account to deploy the infrastructure within.
 * A role within the AWS account that you are able create AWS resources with.
@@ -87,22 +87,22 @@ This solution is intended for less governed environments, where resources may be
 
    _HTTPS_
 ``` bash
-git clone https://gitlab.aws.dev/msaintcr/sm-cs-continuous-deploy.git
+git clone https://github.com/CrowdStrike/Cloud-AWS.git
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_SSH_
 
 ``` bash
-git clone git@ssh.gitlab.aws.dev:msaintcr/sm-cs-continuous-deploy.git
+git clone git@github.com:CrowdStrike/Cloud-AWS.git
 ```
 4. Navigate to the directory containing the CloudFormation before running the commands below:
 ``` bash
-cd sm-cs-continuous-deploy/cloudformation-deploy
+cd Cloud-AWS/systems-manager/cloudformation
 ```
 
 5. Run the following from the AWS CLI:
 
 ``` bash
-aws cloudformation create-stack --template-body file://cs_continuous_deploy.yml --stack-name cs-ssm-cont-deploy \
+aws cloudformation create-stack --template-body file://cs_continuous_deploy.yml --stack-name crowdstrike-ssm-cont-deploy \
 --parameters ParameterKey=CSAPISecret,ParameterValue="CrowdStrikeAPIKey" ParameterKey=CID,ParameterValue="CrowdStrikeCID" ParameterKey=CSAPIGatewayID,ParameterValue="GatewayAPIID" ParameterKey=CrowdStrikeLogBucket,ParameterValue="example-crowdstrike-logging-bucket-0123" ParameterKey=ComplianceSeverity,ParameterValue="HIGH ParameterKey=CRONExpression,ParameterValue="cron(0 23 23 ? * * *)"
 ```
 
