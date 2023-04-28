@@ -221,7 +221,7 @@ mainSteps:
           SSM_CS_INSTALLPARAMS: '{{InstallerParams}}'
           SSM_CS_AUTH_TOKEN: '{{GetAuthenticationToken.AuthToken}}'
           SSM_CS_HOST: '{{GetAuthenticationToken.ApiGatewayHost}}'
-          UNINSTALLPARAMS: '{{UninstallerParams}}'
-          MAINTENANCE_TOKEN: '{{MaintenanceToken}}'
+          SSM_CS_UNINSTALLPARAMS: '{{UninstallerParams}}'
+          SSM_CS_MAINTENANCE_TOKEN: '{{MaintenanceToken}}'
 
 
