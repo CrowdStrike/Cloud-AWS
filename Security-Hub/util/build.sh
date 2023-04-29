@@ -8,7 +8,7 @@ installer=$(echo $vers | cut -d . -f 3)
 installer=$((installer+1))
 vers="$major.$minor.$installer"
 echo $vers > ../VERSION
-contents=('../credvault.py' '../logger.py' '../main.py' '../stream.py' '../install/install.sh' '../service/fig.service')
+contents=('../credvault.py' '../logger.py' '../main.py' '../stream.py' '../install/install.sh' '../service/fig.service' '../VERSION')
 target="sechub-2.0.$installer-install.run"
 
 for file in "${contents[@]}"

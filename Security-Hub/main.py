@@ -141,11 +141,19 @@ except KeyError:
     VERIFY_SSL_CONNECTIONS = True
     config["ssl_verify"] = VERIFY_SSL_CONNECTIONS
 
+# Grab the version detail
+try:
+    with open("VERSION", "r", encoding="utf-8") as ver_file:
+        vers = ver_file.read().strip()
+except OSError:
+    vers = "2.0.x"
+
 # Connect to the API
 falcon = APIHarness(client_id=config["falcon_client_id"],
                     client_secret=config["falcon_client_secret"],
                     base_url=BASE_URL,
-                    ssl_verify=VERIFY_SSL_CONNECTIONS
+                    ssl_verify=VERIFY_SSL_CONNECTIONS,
+                    user_agent=f"crowdstrike-securityhub/{vers}"
                     )
 # Authenticate to the API
 falcon.authenticate()
