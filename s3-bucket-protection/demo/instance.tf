@@ -43,8 +43,8 @@ resource "aws_instance" "amzn_instance" {
         cp /usr/sbin/ifconfig $TESTS/safe2.bin
         # MALICIOUS EXAMPLES
         wget -O malqueryinator.py https://raw.githubusercontent.com/CrowdStrike/falconpy/main/samples/malquery/malqueryinator.py
-        python3 -m pip install crowdstrike-falconpy
-        python3 malqueryinator.py -v "%s?action=CmdRes&u=%I64u&err=kill" -t wide -f malicious.zip -e 3 -k ${var.falcon_client_id} -s ${var.falcon_client_secret}
+        python3 -m pip install urllib3==1.26.15 crowdstrike-falconpy
+        python3 malqueryinator.py -v ryuk -t wide -f malicious.zip -e 3 -k ${var.falcon_client_id} -s ${var.falcon_client_secret}
         unzip -d $TESTS -P infected malicious.zip
         C=0
         for f in $(ls $TESTS --hide=**.*)
