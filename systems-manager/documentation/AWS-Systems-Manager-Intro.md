@@ -1,7 +1,18 @@
+# :warning: This example has moved :warning:
+
+You can find the updated and maintained example in the [aws-systems-manager repository](https://github.com/CrowdStrike/aws-ssm-distributor). The new version includes numerous fixes and enhancements.
+
+Please note that the example in this folder will no longer receive maintenance and may be removed in the future.
+
+:no_entry_sign: everything below is the old example :no_entry_sign:
+---
+
 # CrowdStrike and AWS Systems Manager
 
 **Contents**
 
+- [:warning: This example has moved :warning:](#warning-this-example-has-moved-warning)
+  - [:no\_entry\_sign: everything below is the old example :no\_entry\_sign:](#no_entry_sign-everything-below-is-the-old-example-no_entry_sign)
 - [CrowdStrike and AWS Systems Manager](#crowdstrike-and-aws-systems-manager)
   - [AWS Systems Manager](#aws-systems-manager)
     - [Monitor -- Monitor resources and applications](#monitor----monitor-resources-and-applications)
