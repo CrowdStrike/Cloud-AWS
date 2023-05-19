@@ -404,3 +404,4 @@ ATT
 MITRE
 IOM
 agentless
+nslookup
