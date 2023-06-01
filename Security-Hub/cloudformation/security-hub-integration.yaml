@@ -305,9 +305,76 @@ Resources:
           - 'SecHubIntQueue'
           - 'QueueName'
 
-  # Enable SecurityHub
-  RegionSecurityHub:
-    Type: 'AWS::SecurityHub::Hub'
+  SecurityHubLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - SecurityHubLambdaExecutionRole
+          - Arn
+      Code:
+        ZipFile: |
+          import cfnresponse
+          import boto3
+
+          def handler(event, context):
+              print("Received CloudFormation event: ", event)
+
+              responseData = {}
+
+              if event['RequestType'] == 'Create':
+                try:
+                    client = boto3.client('securityhub')
+                    client.enable_security_hub()
+                    responseData['status'] = "Security Hub enabled"
+                except client.exceptions.ResourceConflictException:
+                    print("Security Hub is already enabled")
+                    responseData['status'] = "Security Hub already enabled"
+                except Exception as e:
+                    print("Error enabling Security Hub:", e)
+                    cfnresponse.send(event, context, cfnresponse.FAILED, {}, "")
+                    return
+              cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, "")
+      Runtime: python3.8
+  SecurityHubLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: SecurityHubManagement
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'securityhub:EnableSecurityHub'
+                Resource: '*'
+        - PolicyName: LambdaExecution
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: '*'
+  CheckResourceExist:
+    Type: 'Custom::LambdaCustomResource'
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - SecurityHubLambdaFunction
+          - Arn
 
   # VPC Flow logging
   FlowLogRole:
@@ -354,3 +421,9 @@ Outputs:
         - Linux
         - PublicIp
     Description: Server's PublicIp Address
+  SecurityHubStatus:
+    Value:
+      Fn::GetAtt:
+        - CheckResourceExist
+        - status
+    Description: Security Hub Status
