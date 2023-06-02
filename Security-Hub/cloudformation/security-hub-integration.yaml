@@ -305,10 +305,6 @@ Resources:
           - 'SecHubIntQueue'
           - 'QueueName'
 
-  # Enable SecurityHub
-  RegionSecurityHub:
-    Type: 'AWS::SecurityHub::Hub'
-
   # VPC Flow logging
   FlowLogRole:
     Type: 'AWS::IAM::Role'

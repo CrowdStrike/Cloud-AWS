@@ -18,21 +18,6 @@ variable "iam_role_name" {
 	default = "CS-SECHUB-INT-example-instance-role"
 }
 
-variable "role_policy_file_name" {
-	type = string
-	default = "instance_role_policy.json"
-}
-
-variable "iam_policy_name" {
-	type = string
-	default = "CS-SECHUB-INT-example-instance-policy"
-}
-
-variable "policy_file_name" {
-	type = string
-	default = "instance_policy.json"
-}
-
 variable "cidr_vpc" {
     description = "CIDR block for the VPC"
     default     = "10.199.0.0/16"
