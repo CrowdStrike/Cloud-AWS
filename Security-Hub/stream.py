@@ -143,7 +143,7 @@ class Stream():  # pylint: disable=R0902
             "created_at": (create_time),
             "updated_at": (update_time),
             "record_state": "ACTIVE",
-            "severity": decoded_line["event"]["Severity"]
+            "severity": decoded_line["event"]["SeverityName"]
         }
 
         if "instance_id" in resource_detail:
