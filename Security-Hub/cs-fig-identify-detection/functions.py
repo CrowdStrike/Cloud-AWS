@@ -68,9 +68,9 @@ def generateManifest(detection_event, region, det_region):
         manifest["CreatedAt"] = detection_event["created_at"]
         manifest["UpdatedAt"] = detection_event["updated_at"]
         manifest["RecordState"] = detection_event["record_state"]
-        severityProduct = detection_event["severity"]
-        severityNormalized = severityProduct * 20
-        manifest["Severity"] = {"Product": severityProduct, "Normalized": severityNormalized}
+        severity_original = detection_event["severity"]
+        severity_label = severity_original.upper()
+        manifest["Severity"] = {"Label": severity_label, "Original": severity_original}
         if "instance_id" in detection_event:
             manifest["Id"] = detection_event["instance_id"] + detection_event["detection_id"]
             manifest["Title"] = "Falcon Alert. Instance: %s" % detection_event["instance_id"]

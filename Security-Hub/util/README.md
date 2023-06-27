@@ -1,30 +1,25 @@
 ## Solution testing / debugging utilities
-Random pieces of detritus I used to put this solution together and test it.
+
+Random pieces of detritus used to put this solution together.
 
 ### build.sh
+
 Build automation script that leverages [makeself](https://makeself.io/) to generate a distribution installer.
+
 ```bash
-$ ./build.sh
+./build.sh
 ```
 
-The build folder is used as a temporary working folder. 
+The build folder is used as a temporary working folder.
 
 The compressed installer is saved to the install folder.
 
-### checkfig.sh
-Quick script to check the status of the FIG service on a remote server.
-```bash
-$ ./checkfig.sh [SSH target]
-```
-### gen-detect.sh
-Generates a detection by sending asynchronous requests to attacker demo servers
-deployed to AWS. Specific to this demo type.
+### update_lambda.sh
 
-I like to use it in a bash loop for long running tests.
-> This command generates a single detection every 10 minutes for 6 hours.
-```bash
-$ for 1 in {1..36}; do ./gen-detect.sh [IP ADDRESS];sleep 600; done
-```
+This script is used to update the `sechub-identify-detections_lamda.zip` zip file.
 
-Logs the time to last_exploit.txt so you can line up detections generated to
-detections received via FIG.
+> *Use this script after making changes to the lambda function code.*
+
+```bash
+./update_lambda.sh
+```
