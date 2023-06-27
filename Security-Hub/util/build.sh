@@ -18,7 +18,10 @@ done
 chmod +x ../build/install.sh
 makeself --keep-umask ../build $target "Falcon Integration Gateway 2.0" sudo ./install.sh
 mv $target ../install
+# Update sechub-2.0.latest-install.run
+cp ../install/$target ../install/sechub-2.0.latest-install.run
 rm ../build/*.py
 rm ../build/*.sh
 rm ../build/*.service
+rm ../build/VERSION
 echo "Build completed."
