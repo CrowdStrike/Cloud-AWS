@@ -20,24 +20,24 @@ For your convenience, we have compiled a table of supported region mappings and 
 
 ### Falcon US-1
 
-| DNS Name                  | Service Name    | VPC Endpoint Service Name                               | AWS Region | Availability Zones  |
-| ------------------------- | --------------- | ------------------------------------------------------- | ---------- | ------------------- |
-| ts01-b.cloudsink.net      | Sensor Proxy    | com.amazonaws.vpce.us-west-1.vpce-svc-08744dea97b26db5d | us-west-1  | usw1-az1 & usw1-az3 |
-| lfodown01-b.cloudsink.net | Download Server | com.amazonaws.vpce.us-west-1.vpce-svc-0f9d8ca86ddcb7106 | us-west-1  | usw1-az1 & usw1-az3 |
+| DNS Name                  | Service Name    | VPC Endpoint Service Name                               | AWS Region |
+| ------------------------- | --------------- | ------------------------------------------------------- | ---------- |
+| ts01-b.cloudsink.net      | Sensor Proxy    | com.amazonaws.vpce.us-west-1.vpce-svc-08744dea97b26db5d | us-west-1  |
+| lfodown01-b.cloudsink.net | Download Server | com.amazonaws.vpce.us-west-1.vpce-svc-0f9d8ca86ddcb7106 | us-west-1  |
 
 ### Falcon US-2
 
-| DNS Name                             | Service Name    | VPC Endpoint Service Name                               | AWS Region | Availability Zones  |
-| ------------------------------------ | --------------- | ------------------------------------------------------- | ---------- | ------------------- |
-| ts01-gyr-maverick.cloudsink.net      | Sensor Proxy    | com.amazonaws.vpce.us-west-2.vpce-svc-08a5bb05d337fd834 | us-west-2  | usw2-az1 & usw2-az2 |
-| lfodown01-gyr-maverick.cloudsink.net | Download Server | com.amazonaws.vpce.us-west-2.vpce-svc-0e11def2d8620ae74 | us-west-2  | usw2-az1 & usw2-az2 |
+| DNS Name                             | Service Name    | VPC Endpoint Service Name                               | AWS Region |
+| ------------------------------------ | --------------- | ------------------------------------------------------- | ---------- |
+| ts01-gyr-maverick.cloudsink.net      | Sensor Proxy    | com.amazonaws.vpce.us-west-2.vpce-svc-08a5bb05d337fd834 | us-west-2  |
+| lfodown01-gyr-maverick.cloudsink.net | Download Server | com.amazonaws.vpce.us-west-2.vpce-svc-0e11def2d8620ae74 | us-west-2  |
 
 ### Falcon EU-1
 
-| DNS Name                             | Service Name    | VPC Endpoint Service Name                                 | AWS Region   | Availability Zones  |
-| ------------------------------------ | --------------- | --------------------------------------------------------- | ------------ | ------------------- |
-| ts01-lanner-lion.cloudsink.net       | Sensor Proxy    | com.amazonaws.vpce.eu-central1.vpce-svc-0eb7b6ca4b7271385 | eu-central-1 | euc1-az1 & euc1-az2 |
-| lfodown01-lanner-lion. cloudsink.net | Download Server | com.amazonaws.vpce.eu-central1.vpce-svc-0340142b9ab8fc564 | eu-central-1 | euc1-az1 & euc1-az2 |
+| DNS Name                             | Service Name    | VPC Endpoint Service Name                                 | AWS Region   |
+| ------------------------------------ | --------------- | --------------------------------------------------------- | ------------ |
+| ts01-lanner-lion.cloudsink.net       | Sensor Proxy    | com.amazonaws.vpce.eu-central1.vpce-svc-0eb7b6ca4b7271385 | eu-central-1 |
+| lfodown01-lanner-lion. cloudsink.net | Download Server | com.amazonaws.vpce.eu-central1.vpce-svc-0340142b9ab8fc564 | eu-central-1 |
 
 ## Quick Start Overview
 

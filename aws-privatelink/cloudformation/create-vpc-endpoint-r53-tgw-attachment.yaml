@@ -95,20 +95,20 @@ Parameters:
 Mappings:
   CSService:
     us-1:
-      ts01bdns: 'ts01-b.cloudsink.net'
-      ts01bservice: 'com.amazonaws.vpce.us-west-1.vpce-svc-08744dea97b26db5d'
-      lfodown01dns: 'lfodown01-b'
-      lfodown01service : 'com.amazonaws.vpce.us-west-1.vpce-svc-0f9d8ca86ddcb7106'
+      sensorProxyDnsName: 'ts01-b.cloudsink.net'
+      sensorProxyVpcEndpoint: 'com.amazonaws.vpce.us-west-1.vpce-svc-08744dea97b26db5d'
+      downloadServerDnsName: 'lfodown01-b.cloudsink.net'
+      downloadServerVpcEndpoint : 'com.amazonaws.vpce.us-west-1.vpce-svc-0f9d8ca86ddcb7106'
     us-2:
-      ts01bdns: 'ts01-gyr-maverick'
-      ts01bservice: 'com.amazonaws.vpce.us-west-2.vpce-svc-08a5bb05d337fd834'
-      lfodown01dns: 'lfodown01-gyr-maverick'
-      lfodown01service: 'com.amazonaws.vpce.us-west-2.vpce-svc-0e11def2d8620ae74'
+      sensorProxyDnsName: 'ts01-gyr-maverick.cloudsink.net'
+      sensorProxyVpcEndpoint: 'com.amazonaws.vpce.us-west-2.vpce-svc-08a5bb05d337fd834'
+      downloadServerDnsName: 'lfodown01-gyr-maverick.cloudsink.net'
+      downloadServerVpcEndpoint: 'com.amazonaws.vpce.us-west-2.vpce-svc-0e11def2d8620ae74'
     eu:
-      ts01bdns: 'ts01-lanner-lion'
-      ts01bservice: 'com.amazonaws.vpce.eu-central1.vpce-svc-0eb7b6ca4b7271385'
-      lfodown01dns: 'lfodown01-lanner-lion'
-      lfodown01service: 'com.amazonaws.vpce.eu-central1.vpce-svc-0340142b9ab8fc564'
+      sensorProxyDnsName: 'ts01-lanner-lion.cloudsink.net'
+      sensorProxyVpcEndpoint: 'com.amazonaws.vpce.eu-central1.vpce-svc-0eb7b6ca4b7271385'
+      downloadServerDnsName: 'lfodown01-lanner-lion.cloudsink.net'
+      downloadServerVpcEndpoint: 'com.amazonaws.vpce.eu-central1.vpce-svc-0340142b9ab8fc564'
 
 Resources:
   TransitGateway:
@@ -446,14 +446,11 @@ Resources:
         - Key: Name
           Value: EndpointSG
 
-  lfodown01bCrowdStrikeEndpoint:
+  SensorProxyVPCEndpoint:
     Type: AWS::EC2::VPCEndpoint
     Properties:
       VpcId: !Ref 'CSPrivLinkVPC'
-      ServiceName: !FindInMap
-        - CSService
-        - !Ref 'CRWDCloud'
-        - lfodown01service
+      ServiceName:  !FindInMap [CSService, !Ref 'CRWDCloud', sensorProxyVpcEndpoint]
       VpcEndpointType: 'Interface'
       PrivateDnsEnabled: False
       SubnetIds:
@@ -462,14 +459,14 @@ Resources:
       SecurityGroupIds:
         - !Ref 'CrowdStrikeEndpointSG'
 
-  ts01bCrowdStrikeEndpoint:
+  DownloadServerVPCEndpoint:
     Type: AWS::EC2::VPCEndpoint
     Properties:
       VpcId: !Ref 'CSPrivLinkVPC'
       ServiceName: !FindInMap
         - CSService
         - !Ref 'CRWDCloud'
-        - ts01bservice
+        - downloadServerVpcEndpoint
       VpcEndpointType: 'Interface'
       PrivateDnsEnabled: False
       SubnetIds:
@@ -487,58 +484,31 @@ Resources:
       VPCs:
         - VPCId: !Ref 'CSPrivLinkVPC'
           VPCRegion: !Ref AWS::Region
-  CrowdStrikeAliasTS01b:
+
+  SensorProxyRoute53Record:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref TenantHostedZone
-      Name: !FindInMap
-        - CSService
-        - !Ref 'CRWDCloud'
-        - ts01bdns
+      Name: !FindInMap [CSService, !Ref CRWDCloud, sensorProxyDnsName]
       Type: A
       AliasTarget:
-        DNSName: !Select
-          - 1
-          - !Split
-            - ':'
-            - !Select
-              - 0
-              - !GetAtt 'ts01bCrowdStrikeEndpoint.DnsEntries'
-        HostedZoneId: !Select
-          - 0
-          - !Split
-            - ':'
-            - !Select
-              - 0
-              - !GetAtt 'ts01bCrowdStrikeEndpoint.DnsEntries'
+        DNSName: !Select [1, !Split [':', !Select [1, !GetAtt 'SensorProxyVPCEndpoint.DnsEntries']]]
+        HostedZoneId: !Select [0, !Split [':', !Select [1, !GetAtt 'SensorProxyVPCEndpoint.DnsEntries']]]
         EvaluateTargetHealth: False
-      Comment: CS domain override
-  CrowdStrikeAliaslfodown:
+      Comment: Routes all Sensor Proxy traffic over CrowdStrike's VPC endpoint service.
+
+  DownloadServerRoute53Record:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref TenantHostedZone
-      Name: !FindInMap
-        - CSService
-        - !Ref 'CRWDCloud'
-        - lfodown01dns
+      Name: !FindInMap [CSService, !Ref CRWDCloud, downloadServerDnsName]
       Type: A
       AliasTarget:
-        DNSName: !Select
-          - 1
-          - !Split
-            - ':'
-            - !Select
-              - 0
-              - !GetAtt 'lfodown01bCrowdStrikeEndpoint.DnsEntries'
-        HostedZoneId: !Select
-          - 0
-          - !Split
-            - ':'
-            - !Select
-              - 0
-              - !GetAtt 'lfodown01bCrowdStrikeEndpoint.DnsEntries'
+        DNSName: !Select [1, !Split [':', !Select [1, !GetAtt 'DownloadServerVPCEndpoint.DnsEntries']]]
+        HostedZoneId: !Select [0, !Split [':', !Select [1, !GetAtt 'DownloadServerVPCEndpoint.DnsEntries']]]
         EvaluateTargetHealth: False
-      Comment: CS domain override
+      Comment: Routes all Download Server traffic over CrowdStrike's VPC endpoint service.
+
   manageRoute53LambdaRole:
     Type: AWS::IAM::Role
     Properties:
