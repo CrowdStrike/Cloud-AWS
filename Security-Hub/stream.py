@@ -60,6 +60,8 @@ class Stream():  # pylint: disable=R0902
         # Find our old position in the stream
         if self.offset > 0:
             self.data_feed = self.data_feed + f"&offset={str(self.offset)}"
+        # Add eventType filter to reduce noise
+        self.data_feed = f"{self.data_feed}&eventType=DetectionSummaryEvent"
         # Our active spout
         self.spigot = False
         # Token reporting lambdas
