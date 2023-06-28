@@ -235,31 +235,26 @@ class Stream():  # pylint: disable=R0902
         decoded_line = json.loads(line.decode("utf-8"))
         # Grab our current offset
         cur_offset = decoded_line["metadata"]["offset"]
-        # Detections only
-        if decoded_line["metadata"]["eventType"] == "DetectionSummaryEvent":
-            # Only submit detections that meet our severity threshold
-            if int(self.severity_threshold) <= int(decoded_line["event"]["Severity"]):
-                creds = {
-                    "client_id": self.api_config["falcon_client_id"],
-                    "client_secret": self.api_config["falcon_client_secret"]
-                }
-                # Is this a child detection?
-                member_cid = self.current_cid.lower()
-                if "customerIDString" in decoded_line["metadata"]:
-                    member_cid = decoded_line["metadata"]["customerIDString"].lower()
-                if member_cid != self.current_cid.lower():
-                    creds["member_cid"] = member_cid
-                # Connect to the Hosts API and check all hosts that match this sensor
-                falcon = APIHarness(creds=creds, base_url=self.base_url)
-                sensor = decoded_line["event"]["SensorId"]
-                # print(sensor)
-                payload = self.check_records(decoded_line, sensor, falcon, payload)
+        # Only submit detections that meet our severity threshold
+        if int(self.severity_threshold) <= int(decoded_line["event"]["Severity"]):
+            creds = {
+                "client_id": self.api_config["falcon_client_id"],
+                "client_secret": self.api_config["falcon_client_secret"]
+            }
+            # Is this a child detection?
+            member_cid = self.current_cid.lower()
+            if "customerIDString" in decoded_line["metadata"]:
+                member_cid = decoded_line["metadata"]["customerIDString"].lower()
+            if member_cid != self.current_cid.lower():
+                creds["member_cid"] = member_cid
+            # Connect to the Hosts API and check all hosts that match this sensor
+            falcon = APIHarness(creds=creds, base_url=self.base_url)
+            sensor = decoded_line["event"]["SensorId"]
+            # print(sensor)
+            payload = self.check_records(decoded_line, sensor, falcon, payload)
 
-            else:
-                # Miss - below severity threshold
-                self.discarded += 1
         else:
-            # Miss - not a detection
+            # Miss - below severity threshold
             self.discarded += 1
 
         return payload, cur_offset
