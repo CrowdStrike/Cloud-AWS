@@ -37,7 +37,7 @@ resource "aws_instance" "amzn_instance" {
         mkdir $TESTS
         wget -O /usr/share/figlet/cricket.flf https://raw.githubusercontent.com/adamchainz/SublimeFiglet/main/pyfiglet/fonts/cricket.flf
         # SAFE EXAMPLES
-        wget -O $TESTS/unscannable1.png https://adversary.crowdstrike.com/assets/images/Adversaries_Ocean_Buffalo.png
+        wget -O $TESTS/unscannable1.png https://www.crowdstrike.com/wp-content/uploads/2023/02/COSMIC-WOLF_AU_500px-300x300.png
         wget -O $TESTS/unscannable2.jpg https://www.crowdstrike.com/blog/wp-content/uploads/2018/04/April-Adversary-Stardust.jpg
         cp /usr/bin/whoami $TESTS/safe1.bin
         cp /usr/sbin/ifconfig $TESTS/safe2.bin
@@ -52,7 +52,6 @@ resource "aws_instance" "amzn_instance" {
           ((C=C+1))
           mv $TESTS/$f $TESTS/malicious$C.bin
         done
-        rm malicious.zip
         chown -R ec2-user:ec2-user $TESTS
         rm malicious.zip
         rm malqueryinator.py
@@ -63,6 +62,6 @@ resource "aws_instance" "amzn_instance" {
         chmod +x /usr/local/bin/*
 		EOF
  tags = {
-	Name = "CrowdStrike S3 Bucket Protection Demo" 
+	Name = "CrowdStrike S3 Bucket Protection Demo"
   }
 }
