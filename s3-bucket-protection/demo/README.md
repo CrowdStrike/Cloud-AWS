@@ -34,7 +34,7 @@ as part of the environment configuration process, including sample files and com
 + The pre-existing PEM key for SSH access to the demonstration instance. This key must exist within the region your demonstration stands up in. (Default: `us-east-2`)
     - You will be asked for the name of this key when the `demo.sh` script executes.
 + CrowdStrike Falcon API credentials with the following scopes:
-    - MalQuery - `READ` (used to download malware samples)
+    - MalQuery - `READ`, `WRITE` (used to download malware samples)
     - Quick Scan - `READ`, `WRITE`
     - Sample Uploads - `READ`,`WRITE`
     - You will be asked to provide these credentials when the `demo.sh` script executes.
