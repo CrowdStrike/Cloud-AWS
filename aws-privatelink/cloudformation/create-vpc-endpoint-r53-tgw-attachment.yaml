@@ -398,6 +398,7 @@ Resources:
       Domain: vpc
   AssociateControlPort:
     Type: AWS::EC2::EIPAssociation
+    DependsOn: TestInstance
     Properties:
       AllocationId: !GetAtt TestInstanceEIP.AllocationId
       NetworkInterfaceId: !Ref TestInstanceInt
