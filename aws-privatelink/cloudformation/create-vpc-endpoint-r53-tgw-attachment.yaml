@@ -247,7 +247,7 @@ Resources:
     Properties:
       RouteTableId:
         !Ref 'CSPrivLinkPrivateRouteTable1'
-      DestinationCidrBlock: 10.1.0.0/16
+      DestinationCidrBlock: !Ref TestVpcCIDR
       TransitGatewayId: !Ref 'TransitGateway'
 
   TestVPC:
