@@ -193,17 +193,6 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-12
    falcon-helm-falcon-sensor-nszf2   1/1     Running   0          92s
    falcon-helm-falcon-sensor-tb584   1/1     Running   0          92s
    ```
- - (optional) Verify that Falcon Sensor for Linux has insert itself to the kernel
- - Note that this must be done on Kubernetes worker nodes so access to these nodes is required for this step. You can access worker nodes through the daemonset pods.
-    ```
-    $ kubectl exec <podname> -n falcon-system --stdin --tty -- /bin/sh
-    $ lsmod | grep falcon
-    falcon_lsm_serviceable     724992  1
-    falcon_nf_netcontain        20480  1
-    falcon_kal                  45056  1 falcon_lsm_serviceable
-    falcon_lsm_pinned_11110     45056  1
-    falcon_lsm_pinned_11308     45056  1
-    ```
 
 ## Uninstall helm chart
 
