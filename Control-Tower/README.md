@@ -4,10 +4,8 @@
 
 # CrowdStrike with AWS Control Tower
 
-CrowdStrike now supports AWS Organization registration directly from the CrowdStrike console. This is the recommended and officially supported approach for customers looking to onboard their AWS accounts across their AWS Organization(s) into the platform.
+CrowdStrike now supports AWS Organization registration through the AWS Built-In (ABI) program.  ABI is a differentiation program that validates AWS Partner solutions that have automated their integrations with relevant AWS foundational services such as identity, management, security, and operations.
 
-> Note:  We strongly recommend that you review the requirements section before proceeding so that you understand the resources that the registration process will create for you. For details, please refer to this [document](horizon-organization-onboarding.md)
+This AWS Built-In (ABI) solution deploys CrowdStrike Falcon Cloud Security integrations for AWS Organizations on the AWS Cloud. It’s for IT administrators and security professionals who want to provide Cloud Security Posture Management (CSPM) across multiple AWS accounts.
 
-## Instructions
-
-The AWS Control Tower integration is being updated to reflect the recent updates to Falcon CSPM account registration process. The project will be released shortly, with major improvements to functionality and user experience to come.
+![Click Here to Get Started](https://aws-abi.s3.amazonaws.com/guide/cfn-abi-crowdstrike-fcs/index.html)
