@@ -8,4 +8,4 @@ CrowdStrike now supports AWS Organization registration through the AWS Built-In 
 
 This AWS Built-In (ABI) solution deploys CrowdStrike Falcon Cloud Security integrations for AWS Organizations on the AWS Cloud. It’s for IT administrators and security professionals who want to provide Cloud Security Posture Management (CSPM) across multiple AWS accounts.
 
-![Click Here to Get Started](https://aws-abi.s3.amazonaws.com/guide/cfn-abi-crowdstrike-fcs/index.html)
+[Click Here to Get Started](https://aws-abi.s3.amazonaws.com/guide/cfn-abi-crowdstrike-fcs/index.html)
