@@ -31,7 +31,8 @@ off the CloudFormation guide.
 - Valid CrowdStrike Falcon API credentials allowing access _READ_ to Event Streams, Hosts, and Detections. (Sensor Download can also be used to lookup CIDs, but it is not required.)
 - Two pre-existing zip files used to create the lambda handler:
   - [sechub-identify-detections_lambda.zip](https://github.com/CrowdStrike/Cloud-AWS/tree/master/Security-Hub/install) (Download the latest)
-  - `layer.zip` - A Lambda layer containing the CrowdStrike FalconPy SDK. You can generate one using the latest SDK with the utility provided [here](https://github.com/CrowdStrike/falconpy/blob/main/util/create-lambda-layer.sh).
+  - `falconpy-layer.zip` - A Lambda layer containing the CrowdStrike FalconPy SDK.
+    - You can generate one using the latest SDK with the utility provided [here](https://github.com/CrowdStrike/falconpy/blob/main/util/create-lambda-layer.sh).
 
 ---
 
@@ -116,7 +117,7 @@ Open the AWS Management Console, then go to the [IAM dashboard](https://console.
         - `LambdaSecHubCustomPolicy`
 
 1. **Name, review, and create**:
-    - Name the role something descriptive, like `Lambda-SecHubInt-LambdaRole`.
+    - Name the role something descriptive, like `Lambda-SecHubRole`.
     - Review the configurations.
     - Optionally, add tags.
     - Click the **Create role** button.
@@ -134,7 +135,7 @@ steps to manually set up these queues in AWS:
 1. **Create New Queue**:
     - Click on the **Create queue** button.
     - Select **Standard** as the queue type.
-    - Name this queue `SecHubIntDeadLetterQueue` or as per your naming convention.
+    - Name this queue `SecHubDeadLetterQueue` or as per your naming convention.
 
 1. **Create Queue**:
     - Click on the **Create queue** button at the bottom of the page.
@@ -144,7 +145,7 @@ steps to manually set up these queues in AWS:
 1. **Create New Queue**:
     - Click on the **Create queue** button.
     - Select **Standard** as the queue type.
-    - Name the queue per your naming convention, for instance, we will use `SecHubIntQueue`.
+    - Name the queue per your naming convention, for instance, we will use `SecHubQueue`.
 
 1. **Configure Queue Settings** (optional):
     - Under the **Configuration** section, set the **Visibility Timeout** to 120 seconds.
@@ -176,7 +177,7 @@ Open the AWS Management Console, then go to the [SSM dashboard](https://console.
       | FIG_FALCON_CLIENT_SECRET | SecureString | The API client secret for the API key used to access your Falcon environment. |
       | FIG_APP_ID | String | A unique string value that describes the name of the application you are connecting to Falcon. (e.g. `sechub-integration-1`) |
       | FIG_SEVERITY_THRESHOLD | String | `3` - An integer representing the threshold for detections you want published to AWS Security Hub. |
-      | FIG_SQS_QUEUE_NAME | String | `SecHubIntQueue` - The name of the SQS queue you created earlier. |
+      | FIG_SQS_QUEUE_NAME | String | `SecHubQueue` - The name of the SQS queue you created earlier. |
       | FIG_SSL_VERIFY | String | `True` - Enable / Disable SSL verification boolean |
       | FIG_API_BASE_URL | String | `https://api.crowdstrike.com` - The base URL for the CrowdStrike Falcon API. |
 
@@ -189,7 +190,7 @@ Open the AWS Management Console, then go to the [Lambda dashboard](https://conso
 1. **Create Layer**:
     - Click on **Layers** from the navigation pane, then click the **Create layer** button.
     - Name your layer (e.g., `falconpy-layer`).
-    - Select **Upload a .zip file** and upload the `layer.zip` file.
+    - Select **Upload a .zip file** and upload the `falconpy-layer.zip` file.
     - Under **Compatible runtimes**, select `Python 3.7`.
     - Click the **Create** button.
 
@@ -198,15 +199,19 @@ Open the AWS Management Console, then go to the [Lambda dashboard](https://conso
 1. **Create Function**:
     - Click on **Functions** from the navigation pane, then click the **Create function** button.
     - Select **Author from scratch**.
-    - Name the function something descriptive, like `SecHubInt-Lambda`.
+    - Name the function something descriptive, like `SecHub-Lambda`.
     - Select **Python 3.7** as the runtime.
     - Click the **Change default execution role** dropdown and select **Use an existing role**.
-    - Select the Lambda role you created earlier (ex: `Lambda-SecHubInt-LambdaRole`).
+    - Select the Lambda role you created earlier (ex: `Lambda-SecHubRole`).
     - Click the **Create function** button.
 1. **Upload Function Code**:
     - Under the Function code section, click on the **Upload from** dropdown and select **.zip file**.
     - Select and upload the `sechub-identify-detections_lambda.zip` file.
     - Click the **Save** button.
+1. **Update Handler**:
+    - In the **Code** tab, scroll down to the **Runtime settings** section.
+    - Click on the **Edit** button.
+    - Change the **Handler** to `main.lambda_handler`.
 1. **Configure General Settings**:
     - In the **Configuration** tab, click on **General configuration**.
     - Set the **Memory (MB)** to `128` and **Timeout** to `1 min`
@@ -226,7 +231,7 @@ Open the AWS Management Console, then go to the [Lambda dashboard](https://conso
 1. **Create Trigger**:
     - In the **Function overview** window or under **Configuration -> Triggers**, select the **Add trigger** button.
     - Select **SQS** as the trigger type.
-    - Select the main SQS queue you created earlier (ex: `SecHubIntQueue`).
+    - Select the main SQS queue you created earlier (ex: `SecHubQueue`).
     - Set the batch size to `1`.
     - Click the **Add** button.
 
@@ -262,33 +267,33 @@ Open the AWS Management Console, then go to the [EC2 dashboard](https://console.
 1. **Name and tags**:
     - Name the instance something descriptive, like `SecHub-Instance`.
     - Optionally, add tags.
-1. **AMI**: Choose Amazon Linux 2 LTS.
+1. **AMI**: Choose `Amazon Linux 2023`.
 1. **Instance Type**: Select your preferred instance type.
 1. **Key pair**: Select your preferred key pair.
 1. **Network settings**:
     - Select the VPC where you would like to deploy the application.
     - Select any other network related settings as per your needs.
-    - **Firewall**: Select the existing security group you created earlier.
+    - **Firewall**: Select the existing security group you created earlier (ex: `SecHub-SG`).
 1. **Advanced details**:
     - Click on **Advanced details** to expand the section.
-    - **IAM instance profile**: Select the EC2 IAM role you created earlier.
+    - **IAM instance profile**: Select the EC2 IAM role you created earlier (ex: `EC2-SecHubRole`).
     - **UserData**: Use the following script for UserData:
 
       > :pencil2: **Replace** the following variables with your own values (optionally):
-      > - `SECHUB-NAME` - Hostname you would like to give the Security Hub integration instance
-      > - `SECHUB-INSTALLER` - Name/version of the Security Hub [installer archive](install/)
+      > - `SECHUB_NAME` - Hostname you would like to give the Security Hub integration instance
+      > - `SECHUB_INSTALLER` - Name/version of the Security Hub [installer archive](install/)
 
       ```bash
-      #! /bin/bash
-      SECHUB-NAME=sechub-crwd-integration
-      SECHUB-INSTALLER=sechub-2.0.latest-install.run
+      #!/bin/bash
+      SECHUB_NAME=sechub-crwd-integration
+      SECHUB_INSTALLER=sechub-2.0.latest-install.run
       cd /var/tmp
-      hostname -b ${SECHUB-NAME}-fig
-      echo ${SECHUB-NAME}-fig > /etc/hostname
-      cat /etc/hosts | sed 's/  localhost/localhost ${SECHUB-NAME}-fig/g'
-      wget -O ${SECHUB-INSTALLER} https://raw.githubusercontent.com/CrowdStrike/Cloud-AWS/master/Security-Hub/install/${SECHUB-INSTALLER}
-      chmod 755 ${SECHUB-INSTALLER}
-      ./${SECHUB-INSTALLER} --target /usr/share/fig
+      hostname -b ${SECHUB_NAME}-fig
+      echo ${SECHUB_NAME}-fig > /etc/hostname
+      sed -i "s/  localhost/ localhost ${SECHUB_NAME}-fig/g" /etc/hosts
+      wget -O ${SECHUB_INSTALLER} https://raw.githubusercontent.com/CrowdStrike/Cloud-AWS/master/Security-Hub/install/${SECHUB_INSTALLER}
+      chmod 755 ${SECHUB_INSTALLER}
+      ./${SECHUB_INSTALLER} --target /usr/share/fig
       ```
 
       > :memo: **NOTE**: For existing instances, you can use the following script to bootstrap the application:
@@ -296,14 +301,15 @@ Open the AWS Management Console, then go to the [EC2 dashboard](https://console.
       > ```bash
       > # Run the below as the root user or via sudo
       > cd /var/tmp
-      > SECHUB-INSTALLER=sechub-2.0.latest-install.run
-      > wget -O ${SECHUB-INSTALLER} https://raw.githubusercontent.com/CrowdStrike/Cloud-AWS/master/Security-Hub/install/${SECHUB-INSTALLER}
-      > chmod 755 ${SECHUB-INSTALLER}
-      > ./${SECHUB-INSTALLER} --target /usr/share/fig
+      > SECHUB_INSTALLER=sechub-2.0.latest-install.run
+      > wget -O ${SECHUB_INSTALLER} https://raw.githubusercontent.com/CrowdStrike/Cloud-AWS/master/Security-Hub/install/${SECHUB_INSTALLER}
+      > chmod 755 ${SECHUB_INSTALLER}
+      > ./${SECHUB_INSTALLER} --target /usr/share/fig
       > ```
 
 1. **Launch Instance**:
     - Click on the **Launch instance** button to initiate a new EC2 instance.
+      > Give the instance a few minutes to bootstrap the application and start the services.
 
 ---
 
