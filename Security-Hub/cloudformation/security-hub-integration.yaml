@@ -52,7 +52,7 @@ Resources:
   SubnetA:
     Type: AWS::EC2::Subnet
     Properties:
-      AvailabilityZone: us-west-2a
+      AvailabilityZone: !Select [0, !GetAZs '']
       VpcId: !Ref VPC
       CidrBlock: 10.0.0.0/24
       MapPublicIpOnLaunch: true
