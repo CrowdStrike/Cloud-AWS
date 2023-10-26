@@ -120,8 +120,8 @@ else:
 
         except Exception as err:
             # Total failure
-            status.status_write("Unable to load configuration parameters.")
-            raise SystemExit("Unable to load configuration parameters.") from err
+            status.status_write("Unable to load configuration parameters from SSM Parameter Store.")
+            raise SystemExit("Unable to load configuration parameters from SSM Parameter Store.") from err
 
 # MAIN ROUTINE
 try:
