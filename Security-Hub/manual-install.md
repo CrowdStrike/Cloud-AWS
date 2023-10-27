@@ -36,7 +36,8 @@ off the CloudFormation guide.
 
 ---
 
-> :warning: **Please ensure you are in the correct AWS region for each step** :warning:
+> [!WARNING]
+> **Please ensure you are in the correct AWS region for each step**
 
 ## IAM Roles for EC2 and Lambda
 
