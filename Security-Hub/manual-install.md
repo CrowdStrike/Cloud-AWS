@@ -3,7 +3,11 @@
 This guide will walk you through the steps required to manually deploy the Security Hub integration application. The guide is based
 off the CloudFormation guide.
 
-> :memo: **NOTE:** This guide assumes that you already have a pre-existing VPC and network infrastructure where you would like to deploy the application in.
+> [!IMPORTANT]
+> This guide is designed with the assumption that you already have a pre-existing VPC (Virtual Private Cloud) and network infrastructure
+> where you plan to deploy the application. If you do not have a VPC and network infrastructure set up yet, we recommend that you first
+> create and configure these resources to meet your needs. Once your VPC and network infrastructure are in place, you can proceed with the steps
+> outlined in this guide to deploy the application.
 
 ## Table of Contents
 
@@ -37,7 +41,8 @@ off the CloudFormation guide.
 ---
 
 > [!WARNING]
-> **Please ensure you are in the correct AWS region for each step**
+> **It's crucial to ensure that you are operating in the correct AWS region throughout each step of this process.** The region selection can significantly impact the deployment and
+> functionality of your resources. Make certain to verify the AWS region at the top-right corner of the AWS Management Console before proceeding with each step.
 
 ## IAM Roles for EC2 and Lambda
 
@@ -162,6 +167,7 @@ steps to manually set up these queues in AWS:
 
 ## SSM Parameters
 
+> [!NOTE]
 > If you prefer to use the [config.json](README.md#configjson) file instead of SSM parameters, you can skip this step. This
 > guide will use SSM parameters to store the configuration values.
 
@@ -238,6 +244,7 @@ Open the AWS Management Console, then go to the [Lambda dashboard](https://conso
 
 ## Security Group
 
+> [!NOTE]
 > If you already have a security group that you would like to use, you can skip this step. As long as the security group allows SSH from your trusted IP, it should work.
 
 Open the AWS Management Console, then go to the [VPC dashboard](https://console.aws.amazon.com/vpc/home).
@@ -255,6 +262,7 @@ Open the AWS Management Console, then go to the [VPC dashboard](https://console.
 
 ## EC2 Instance
 
+> [!NOTE]
 > If you already have an EC2 instance that you would like to use, you can skip this step.
 > As long as the instance has the appropriate IAM role attached, you can copy/modify the UserData script
 > below to bootstrap the application.
