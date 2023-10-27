@@ -7,7 +7,7 @@ then
         groupadd fig
         adduser -g fig fig
     	echo "Installing pre-requisites"
-        yum -y install python3
+        yum -y install python3 python3-pip
         sudo -u fig pip3 install --user crowdstrike-falconpy
         sudo -u fig pip3 install --user boto3
         echo "Setting permissions"

@@ -1,6 +1,7 @@
 """Credential / configuration lookup handler."""
 import urllib
 import json
+import requests
 import boto3
 
 
@@ -9,10 +10,8 @@ class CredVault():  # pylint: disable=R0902
 
     def __init__(self, logger):
         """Init the object and base parameters."""
-        region_lookup = "http://169.254.169.254/latest/meta-data/placement/availability-zone"
-        with urllib.request.urlopen(region_lookup) as region_check:
-            self.region = region_check.read().decode()[:-1]
         self.logger = logger
+        self.region = self._get_region()
         self.falcon_client_id = None
         self.falcon_client_secret = None
         self.app_id = None
@@ -21,6 +20,45 @@ class CredVault():  # pylint: disable=R0902
         self.severity_threshold = None
         self.confirm_provider = None
         self.ssl_verify = None
+
+    # We need to get the region depending on the version of IMDS
+    # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instancedata-data-retrieval.html
+
+    def _get_region(self):
+        """
+        Retrieve the region from IMDS.
+        This function will check the version of IMDS and retrieve the region.
+        """
+        # Define the URLs and headers
+        token_url = "http://169.254.169.254/latest/api/token"
+        token_headers = {"X-aws-ec2-metadata-token-ttl-seconds": "21600"}
+        region_url = "http://169.254.169.254/latest/meta-data/placement/availability-zone"
+
+        # Attempting a GET request for IMDSv1
+        try:
+            with urllib.request.urlopen(region_url, timeout=5) as region_check:
+                region = region_check.read().decode()[:-1]
+                return region
+        except urllib.error.HTTPError:
+            self.logger.status_write("Failed to retrieve region with IMDSv1. Attempting IMDSv2.")
+
+        # Try IMDSv2
+        try:
+            token_response = requests.put(token_url, headers=token_headers, timeout=5)
+            token_response.raise_for_status()  # Raise an exception for HTTP errors
+            token = token_response.text
+            # Using the token to access the region information
+            region_response = requests.get(
+                region_url,
+                headers={"X-aws-ec2-metadata-token": token},
+                timeout=5
+            )
+            region_response.raise_for_status()  # Raise an exception for HTTP errors
+            region = region_response.text[:-1]
+            return region
+        except requests.exceptions.RequestException as e:
+            self.logger.status_write("Failed to retrieve region with IMDSv2. Exiting.")
+            raise SystemExit(e) from e
 
     def get_parameter(self, param_name):
         """
