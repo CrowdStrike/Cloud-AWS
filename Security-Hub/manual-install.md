@@ -276,7 +276,7 @@ Open the AWS Management Console, then go to the [EC2 dashboard](https://console.
 1. **Name and tags**:
     - Name the instance something descriptive, like `SecHub-Instance`.
     - Optionally, add tags.
-1. **AMI**: Choose `Amazon Linux 2023`.
+1. **AMI**: Choose `Amazon Linux 2`.
 1. **Instance Type**: Select your preferred instance type.
 1. **Key pair**: Select your preferred key pair.
 1. **Network settings**:
@@ -322,5 +322,4 @@ Open the AWS Management Console, then go to the [EC2 dashboard](https://console.
 
 ---
 
-That concludes this guide! You should now have a similar environment to what is defined in the
-CloudFormation template. Feel free to adjust settings and configurations as per your needs.
+For further configuration and troubleshooting, please refer to the main [README](README.md).
