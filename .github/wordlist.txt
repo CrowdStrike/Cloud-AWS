@@ -414,3 +414,4 @@ chmod
 githubusercontent
 tmp
 wget
+SCPs
