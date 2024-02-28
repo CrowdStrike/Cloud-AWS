@@ -17,8 +17,7 @@
 | Integration Name | Description |
 |:-|:-|
 | [AWS Control Tower](Control-Tower) | Use AWS Built-In to register the AWS Organization with CrowdStrike Cloud Security. |
-| [AWS CloudFormation]() | Use CloudFormation templates to register the AWS Organization with CrowdStrike Cloud Security. |
-| [Terraform]() | Use Terraform to register the AWS Organization with CrowdStrike Cloud Security. |
+| [AWS CloudFormation or Terraform](aws-registration) | Use CloudFormation or Terraform templates to register the AWS Organization with CrowdStrike Cloud Security. |
 
 ## CrowdStrike Sensor Automation
 
