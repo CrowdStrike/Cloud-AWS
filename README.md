@@ -1,5 +1,12 @@
 ![](https://raw.githubusercontent.com/CrowdStrike/falconpy/main/docs/asset/cs-logo.png)
 
+## AWS Account Registration
+
+| Integration Name | Description |
+|:-|:-|
+| [Amazon Built In](Amazon-Built-In) | Use Amazon Built-In to register the AWS Organization or Control Tower with CrowdStrike Cloud Security. |
+| [AWS CloudFormation or Terraform](aws-registration) | Use CloudFormation or Terraform templates to register the AWS Organization with CrowdStrike Cloud Security. |
+
 ## AWS Service Integrations
 
 | Integration Name | Description |
@@ -11,13 +18,6 @@
 | [Amazon S3 Protected Bucket with CrowdStrike Quick Scan API](s3-bucket-protection) | S3 Bucket Protection secures your Amazon S3 buckets by scanning files as they are uploaded using the CrowdStrike Quick Scan API. |
 | [AWS Verified Access with CrowdStrike Zero Trust Assessment (ZTA)](https://github.com/CrowdStrike/aws-verified-access) | Using CrowdStrike ZTA, we provide customers the ability to assess their endpoint security posture, allowing AWS Verified Access to provide conditional access to private applications that comply to your organization's device posture policies. |
 | [Amazon Security Lake with CrowdStrike Falcon Data Replicator (FDR)](https://github.com/CrowdStrike/aws-security-lake) | Transforms your CrowdStrike FDR data into OCSF (Open Cybersecurity Schema Framework) and ingests it into your Amazon Security Lake for centralized management of your security-related logs. |
-
-## AWS Account Registration
-
-| Integration Name | Description |
-|:-|:-|
-| [AWS Control Tower](Control-Tower) | Use AWS Built-In to register the AWS Organization with CrowdStrike Cloud Security. |
-| [AWS CloudFormation or Terraform](aws-registration) | Use CloudFormation or Terraform templates to register the AWS Organization with CrowdStrike Cloud Security. |
 
 ## CrowdStrike Sensor Automation
 
