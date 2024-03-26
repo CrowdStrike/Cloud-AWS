@@ -12,5 +12,5 @@ The following solutions provide alternative registration methods to the Falcon G
 
 ## Solutions
 
-[CloudFormation](https://github.com/CrowdStrike/cloud-aws-registration-cloudformation)  
-[Terraform](https://github.com/CrowdStrike/cloud-aws-registration-terraform)
+[CloudFormation](https://github.com/CrowdStrike/aws-cspm-registration-cloudformation)  
+[Terraform](https://github.com/CrowdStrike/aws-cspm-registration-terraform)
