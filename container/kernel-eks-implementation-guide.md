@@ -145,20 +145,39 @@ $ CID=1234567890ABCDEFG1234567890ABCDEF-12
    $ CID=1234567890ABCDEFG1234567890ABCDEF-12
    ```
 
+ - Create a namespace for the sensor and set the security context:
+   ```
+   export FALCON_NAMESPACE=falcon-system
+   kubectl create namespace $FALCON_NAMESPACE
+   kubectl label ns --overwrite $FALCON_NAMESPACE pod-security.kubernetes.io/enforce=privileged
+   ```
+
+ - Optional. Silence the warnings and change the auditing level for the Pod Security Standard, and add the following labels:
+   ```
+   kubectl label ns --overwrite $FALCON_NAMESPACE pod-security.kubernetes.io/audit=privileged
+   kubectl label ns --overwrite $FALCON_NAMESPACE pod-security.kubernetes.io/warn=privileged
+   ```
+
  - Add the CrowdStrike Falcon Helm repository
    ```
    $ helm repo add crowdstrike https://crowdstrike.github.io/falcon-helm
    $ helm repo update
    ```
+ 
+ - Check the tag of the container you pushed to ECR and set the variable `FALCON_IMAGE_TAG` to the value.
+   ```
+   FALCON_IMAGE_TAG=THE_VALUE_YOU_RETRIEVED
+   ```
+
+- Optional. If the image is using the `latest` tag, you wish to use `latest`, and using `latest` is aligned with your organisations security processes, delete the `node.image.repository` line in the helm command below.
 
  - Install CrowdStrike Falcon Helm Chart. Above command will install the CrowdStrike Falcon Helm Chart with the release name falcon-helm in the falcon-system namespace.
    ```
    $ helm upgrade --install falcon-helm crowdstrike/falcon-sensor \
-        -n falcon-system --create-namespace \
+        -n "$FALCON_NAMESPACE" \
         --set falcon.cid="$CID" \
-        --set node.image.repository=$FALCON_NODE_IMAGE_URI
-   ```
-   Example output:
+        --set node.image.repository=$FALCON_NODE_IMAGE_URI \
+        --set node.image.tag=$FALCON_IMAGE_TAG
    ```
    Release "falcon-helm" does not exist. Installing it now.
    NAME: falcon-helm
