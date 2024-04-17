@@ -153,19 +153,19 @@ def lambda_handler(event, _):  # pylint: disable=R0912,R0914,R0915
         if result["sha256"] == upload_sha:
             if "no specific threat" in result["verdict"]:
                 # File is clean
-                returned = f"No threat found in {key}"
+                returned = f"Bucket: {bucket_name} No threat found in {key}"
                 log.info(returned)
             elif "unknown" in result["verdict"]:
                 if "error" in result:
                     # Error occurred
-                    returned = f"Scan error for {key}: {result['error']}"
+                    returned = f"Bucket: {bucket_name} Scan error for {key}: {result['error']}"
                 else:
                     # Undertermined scan failure
-                    returned = f"Unable to scan {key}"
+                    returned = f"Bucket: {bucket_name} Unable to scan {key}"
                 log.warning(returned)
             elif "malware" in result["verdict"]:
                 # Mitigation triggers from here
-                returned = f"Verdict for {key}: {result['verdict']}"
+                returned = f"Bucket: {bucket_name} Verdict for {key}: {result['verdict']}"
                 detection = {}
                 detection["sha"] = upload_sha
                 detection["bucket"] = bucket_name
