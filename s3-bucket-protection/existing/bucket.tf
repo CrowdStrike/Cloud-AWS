@@ -4,7 +4,9 @@
 # }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
-  bucket = var.bucket_name
+  for_each = toset(var.bucket_names)
+
+  bucket = each.key
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.func.arn

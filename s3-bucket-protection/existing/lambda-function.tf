@@ -37,11 +37,12 @@ resource "aws_lambda_layer_version" "falconpy" {
 }
 
 resource "aws_lambda_permission" "allow_bucket" {
-  statement_id  = "AllowExecutionFromS3Bucket"
+  for_each = data.aws_s3_bucket.bucket
+  statement_id  = "AllowExecutionFrom-${each.key}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.func.arn
   principal     = "s3.amazonaws.com"
-  source_arn    = data.aws_s3_bucket.bucket.arn
+  source_arn    = each.value.arn
 }
 
 resource "aws_lambda_function" "func" {

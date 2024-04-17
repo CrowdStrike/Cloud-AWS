@@ -1,7 +1,7 @@
-variable "bucket_name" {
+variable "bucket_names" {
     description = "The name of the bucket that is created"
-    type = string
-    default = ""
+    type = list(string)
+    default = []
 }
 variable "lambda_execution_role_name" {
     description = "The name of the lambda execution IAM role"
@@ -71,5 +71,6 @@ variable "base_url" {
     default = "https://api.crowdstrike.com"
 }
 data "aws_s3_bucket" "bucket" {
-  bucket = var.bucket_name
+  for_each = toset(var.bucket_names)
+  bucket   = each.key
 }
