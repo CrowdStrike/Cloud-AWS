@@ -1,3 +1,7 @@
+locals {
+  bucket_arns = [for bucket in data.aws_s3_bucket.bucket : "${bucket.arn}/*"]
+} 
+
 data "aws_caller_identity" "current" {}
 data "aws_iam_policy" "AdministratorAccess" {
   arn = "arn:aws:iam::aws:policy/AdministratorAccess"
@@ -37,7 +41,7 @@ data "aws_iam_policy_document" "lambda_s3_policy_document" {
           "s3:DeleteObjectVersion"
       ]
       effect = "Allow"
-      resources = ["${data.aws_s3_bucket.bucket.arn}/*"]
+      resources = local.bucket_arns
     }
 }
 data "aws_iam_policy_document" "lambda_securityhub_policy_document" {
