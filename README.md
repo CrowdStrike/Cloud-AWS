@@ -29,14 +29,3 @@
 | [AWS Systems Manager with Linux BASH Sensor Installation Script](Agent-Install-Examples/bash) | POSIX script that will install CrowdStrike sensor. The script is current tailored to the use within AWS Systems Manager, but can be used outside the Systems Manager. |
 | [AWS Terraform Template for Sensor Installation](Agent-Install-Examples/Terraform-bootstrap-s3) | Sample AWS Terraform template that builds a test VPC, creates an Ubuntu-based web server, and automatically installs the CrowdStrike Falcon sensor into the virtual machine. |
 
-## DevSecOps Automations
-
-| Integration Name | Description |
-|:-|:-|
-| [EC2 Isolation Webhook](ec2-isolation-webhook/README.md) | Isolate a potentially compromised EC2 instance through an API endpoint while it's undergoing an incident response investigation. |
-
-## Kubernetes and Containers
-
-| Name | Description |
-|:-|:-|
-| [Container Runtime Protection](container/README.md) | Guides to deploying CrowdStrike Falcon on containers and Kubernetes centric AWS services |
