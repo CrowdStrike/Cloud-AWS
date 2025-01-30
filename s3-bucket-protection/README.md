@@ -2,6 +2,13 @@
 
 [![Twitter URL](https://img.shields.io/twitter/url?label=Follow%20%40CrowdStrike&style=social&url=https%3A%2F%2Ftwitter.com%2FCrowdStrike)](https://twitter.com/CrowdStrike)
 
+> [!WARNING]
+> ## DEPRECATION NOTICE
+>
+> This guide will be deprecated in the near future in favor of our new Cloud Storage Protection examples using the QuickScan Pro APIs. The new repository is available at:
+>
+> [https://github.com/crowdstrike/cloud-storage-protection](https://github.com/crowdstrike/cloud-storage-protection)
+
 # CrowdStrike Falcon S3 Bucket Protection
 
 + [Overview](#overview)
@@ -29,7 +36,7 @@ This solution integrates CrowdStrike Falcon Quick Scan with AWS S3, AWS Security
 
 
 ## Solution components
-This solution leverages an S3 bucket trigger to call AWS Lambda for processing. 
+This solution leverages an S3 bucket trigger to call AWS Lambda for processing.
 The serverless lambda function leverages the CrowdStrike [FalconPy SDK](https://github.com/CrowdStrike/falconpy) to
 interact with the CrowdStrike Falcon API to scan the files as the are uploaded to the bucket.
 
@@ -38,7 +45,7 @@ interact with the CrowdStrike Falcon API to scan the files as the are uploaded t
 + [AWS IAM](#aws-iam)
 + [AWS Systems Manager](#aws-systems-manager)
 
-### AWS S3 
+### AWS S3
 Any bucket can be protected by enabling the bucket notification trigger to call the lambda function.
 - Bucket
 - Bucket notification `s3:ObjectCreated:*` -> Lambda trigger
