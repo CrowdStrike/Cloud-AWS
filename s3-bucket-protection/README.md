@@ -5,7 +5,7 @@
 > [!WARNING]
 > ## DEPRECATION NOTICE
 >
-> This repository will be deprecated in the near future in favor of our new Cloud Storage Protection solution using the QuickScan Pro APIs. The new repository is available at:
+> This guide will be deprecated in the near future in favor of our new Cloud Storage Protection examples using the QuickScan Pro APIs. The new repository is available at:
 >
 > [https://github.com/crowdstrike/cloud-storage-protection](https://github.com/crowdstrike/cloud-storage-protection)
 
