@@ -2,13 +2,12 @@
 
 [![Twitter URL](https://img.shields.io/twitter/url?label=Follow%20%40CrowdStrike&style=social&url=https%3A%2F%2Ftwitter.com%2FCrowdStrike)](https://twitter.com/CrowdStrike)
 
-<div style="background-color: #fff3cd; border: 2px solid #ffeeba; border-radius: 4px; padding: 20px; margin: 20px 0;">
-  <h2 style="color: #856404; margin-top: 0;">⚠️ IMPORTANT NOTICE ⚠️</h2>
-  <p>This repository will be deprecated in the near future in favor of our new Cloud Storage Protection solution using the QuickScan Pro APIs. The new version is available at:</p>
-  <p style="background-color: #ffffff; padding: 10px; border-radius: 4px;">
-    🔗 <a href="https://github.com/crowdstrike/cloud-storage-protection">https://github.com/crowdstrike/cloud-storage-protection</a>
-  </p>
-</div>
+> [!WARNING]
+> ## DEPRECATION NOTICE
+>
+> This repository will be deprecated in the near future in favor of our new Cloud Storage Protection solution using the QuickScan Pro APIs. The new repository is available at:
+>
+> [https://github.com/crowdstrike/cloud-storage-protection](https://github.com/crowdstrike/cloud-storage-protection)
 
 # CrowdStrike Falcon S3 Bucket Protection
 
