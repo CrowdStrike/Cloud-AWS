@@ -1,5 +1,0 @@
-boto3
-requests
-urllib3
-botocore
-crowdstrike-falconpy>=0.4
