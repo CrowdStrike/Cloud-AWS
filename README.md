@@ -12,7 +12,7 @@
 | Integration Name | Description |
 |:-|:-|
 | [AWS CloudTrail Lake with CrowdStrike](cloudtrail-lake) | Leverage the CrowdStrike Falcon Streaming API to log and store user activity data from the Falcon console in a seamless and efficient way with AWS CloudTrail Lake. |
-| [AWS Network Firewall with CrowdStrike Threat Intelligence](Network-Firewall) | Build capabilities such as automated blocking of malicious domains (via AWS Network Firewall) based on CrowdStrike detection alerts, or perform threat hunting derived from CrowdStrike domain-based Indicators of Activity (IOAs). |
+| [AWS Network Firewall with CrowdStrike Threat Intelligence](https://github.com/CrowdStrike/aws-network-firewall) | Build capabilities such as automated blocking of malicious domains (via AWS Network Firewall) based on CrowdStrike detection alerts, or perform threat hunting derived from CrowdStrike domain-based Indicators of Activity (IOAs). |
 | [AWS PrivateLink with CrowdStrike Sensor Proxy](aws-privatelink) | Leverage AWS PrivateLink to provide private connectivity between your CrowdStrike-protected workloads and the CrowdStrike cloud. |
 | [AWS Security Hub with CrowdStrike Event Streams API](Falcon-Integration-Gateway) | The Falcon Integration Gateway publishes detections identified by CrowdStrike Falcon for instances residing within Amazon Web Services (AWS) to AWS Security Hub. |
 | [Amazon S3 Protected Bucket with CrowdStrike QuickScan Pro API](https://github.com/crowdstrike/cloud-storage-protection) | S3 Bucket Protection secures your Amazon S3 buckets by scanning files as they are uploaded using the CrowdStrike QuickScan Pro API. |
