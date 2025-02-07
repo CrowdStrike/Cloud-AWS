@@ -4,7 +4,7 @@
 
 | Integration Name | Description |
 |:-|:-|
-| [Amazon Built In](Amazon-Built-In) | Use Amazon Built-In to register the AWS Organization or Control Tower with CrowdStrike Cloud Security. |
+| [Amazon Built In](https://github.com/aws-ia/cfn-abi-crowdstrike-fcs) | Use Amazon Built-In to register the AWS Organization or Control Tower with CrowdStrike Cloud Security. |
 | [AWS CloudFormation or Terraform](aws-registration) | Use CloudFormation or Terraform templates to register the AWS Organization with CrowdStrike Cloud Security. |
 
 ## AWS Service Integrations
@@ -31,4 +31,3 @@
 | [AWS Systems Manager Parameter Store with PowerShell Sensor Installation Script](Agent-Install-Examples/powershell) | Sample automation which leverages AWS Systems Manager Parameter Store to store CrowdStrike API credentials. These credentials are passed into a Microsoft PowerShell script to bootstrap the CrowdStrike Falcon Sensor for Windows during a Windows virtual machine's first boot process. |
 | [AWS Systems Manager with Linux BASH Sensor Installation Script](Agent-Install-Examples/bash) | POSIX script that will install CrowdStrike sensor. The script is current tailored to the use within AWS Systems Manager, but can be used outside the Systems Manager. |
 | [AWS Terraform Template for Sensor Installation](Agent-Install-Examples/Terraform-bootstrap-s3) | Sample AWS Terraform template that builds a test VPC, creates an Ubuntu-based web server, and automatically installs the CrowdStrike Falcon sensor into the virtual machine. |
-
