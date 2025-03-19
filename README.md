@@ -25,6 +25,7 @@
 
 | Integration Name | Description |
 |:-|:-|
+| [AWS EC2 Image Builder](https://github.com/CrowdStrike/aws-ec2-image-builder) | AWS EC2 Image Builder components for Linux and Windows that install and configure the CrowdStrike Falcon sensor, preparing it as a golden image for your AWS environment. |
 | [AWS Systems Manager](https://github.com/CrowdStrike/aws-ssm-distributor) | Utilize AWS Systems Manager to automatically deploy the CrowdStrike Falcon Sensor to your EC2 instances. |
 | [AWS Autoscale Groups for Auto Register/Deregister](Agent-Install-Examples/Cloudformation/autoscale) | Utilize AWS Autoscale Groups to install the CrowdStrike Falcon Sensor during virtual machine initialization, and AWS Autoscale Lifecycle hooks to deregister the instance with CrowdStrike upon virtual machine termination. |
 | [AWS EventBridge and AWS State Manager](state-manager) | Leverage AWS EventBridge and AWS Systems Manager State Manager to manage the deployment of the Falcon Agent and the removal of stale sensors. |
