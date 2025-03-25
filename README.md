@@ -19,6 +19,7 @@
 | [Amazon S3 Protected Bucket with CrowdStrike QuickScan ML API](s3-bucket-protection) (*Deprecated and slated for removal in 6 months*) | S3 Bucket Protection secures your Amazon S3 buckets by scanning files as they are uploaded using the CrowdStrike QuickScan ML API. |
 | [AWS Verified Access with CrowdStrike Zero Trust Assessment (ZTA)](https://github.com/CrowdStrike/aws-verified-access) | Using CrowdStrike ZTA, we provide customers the ability to assess their endpoint security posture, allowing AWS Verified Access to provide conditional access to private applications that comply to your organization's device posture policies. |
 | [Amazon Security Lake with CrowdStrike Falcon Data Replicator (FDR)](https://github.com/CrowdStrike/aws-security-lake) | Transforms your CrowdStrike FDR data into OCSF (Open Cybersecurity Schema Framework) and ingests it into your Amazon Security Lake for centralized management of your security-related logs. |
+| [AWS Verified Access](verified-access) | Integration between CrowdStrike Falcon Zero Trust Assessments (ZTA) and AWS Verified Access. |
 | [AWS Workspaces](workspaces) | Deploy the CrowdStrike Falcon sensor to AWS Workspaces. |
 
 ## CrowdStrike Sensor Automation
