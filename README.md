@@ -28,3 +28,4 @@
 | [AWS Systems Manager](https://github.com/CrowdStrike/aws-ssm-distributor) | Utilize AWS Systems Manager to automatically deploy the CrowdStrike Falcon Sensor to your EC2 instances. |
 | [AWS EC2 Image Builder](https://github.com/CrowdStrike/aws-ec2-image-builder) | AWS EC2 Image Builder components for Linux and Windows that install and configure the CrowdStrike Falcon sensor, preparing it as a golden image for your AWS environment. |
 | [AWS EKS Protection](https://github.com/CrowdStrike/aws-eks-protection) | Automatically deploy the CrowdStrike Falcon Sensor to your EKS Clusters in AWS. |
+| [AWS Elastic Beanstalk](beanstalk) | Examples of how to deploy the Falcon sensor in AWS Elastic Beanstalk Resources. |
