@@ -6,6 +6,7 @@
 |:-|:-|
 | [Amazon Built In](https://github.com/aws-ia/cfn-abi-crowdstrike-fcs) | Use Amazon Built-In to register the AWS Organization or Control Tower with CrowdStrike Cloud Security. |
 | [AWS CloudFormation or Terraform](aws-registration) | Use CloudFormation or Terraform templates to register the AWS Organization with CrowdStrike Cloud Security. |
+| [AWS ECR Registry Connections](https://github.com/CrowdStrike/cloud-registry-connections/tree/main/AWS) | Use CloudFormation to connect your ECR Registries for Image Assessment. |
 
 ## AWS Service Integrations
 
