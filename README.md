@@ -5,13 +5,14 @@
 | Integration Name | Description |
 |:-|:-|
 | [Amazon Built In](https://github.com/aws-ia/cfn-abi-crowdstrike-fcs) | Use Amazon Built-In to register the AWS Organization or Control Tower with CrowdStrike Cloud Security. |
+| [AWS SCP Analysis](https://github.com/CrowdStrike/aws-cspm-scp-analysis) | Analyze Service Control Policies (SCPs) in your AWS Organization to identify policies that may prevent CSPM onboarding. |
 | [AWS CSPM Multi-CID](https://github.com/CrowdStrike/aws-cspm-registration-multi-cid/tree/main) | Use CloudFormation templates to register multiple Falcon CIDs to accounts within the AWS Organization. |
-| [AWS ECR Registry Connections](https://github.com/CrowdStrike/cloud-registry-connections/tree/main/AWS) | Use CloudFormation to connect your ECR Registries for Image Assessment. |
 
 ## AWS Service Integrations
 
 | Integration Name | Description |
 |:-|:-|
+| [AWS ECR Registry Connections](https://github.com/CrowdStrike/cloud-registry-connections/tree/main/AWS) | Use CloudFormation to connect your ECR Registries for Image Assessment. |
 | [AWS CloudTrail Lake with CrowdStrike](cloudtrail-lake) | Leverage the CrowdStrike Falcon Streaming API to log and store user activity data from the Falcon console in a seamless and efficient way with AWS CloudTrail Lake. |
 | [AWS Network Firewall with CrowdStrike Threat Intelligence](https://github.com/CrowdStrike/aws-network-firewall) | Build capabilities such as automated blocking of malicious domains (via AWS Network Firewall) based on CrowdStrike detection alerts, or perform threat hunting derived from CrowdStrike domain-based Indicators of Activity (IOAs). |
 | [AWS PrivateLink with CrowdStrike Sensor Proxy](aws-privatelink) | Leverage AWS PrivateLink to provide private connectivity between your CrowdStrike-protected workloads and the CrowdStrike cloud. |
