@@ -1,0 +1,51 @@
+#!/bin/bash
+# First-boot Falcon sensor install. Runs as root via cloud-init.
+# Inputs via templatefile(): bucket, sensor_rpm_key, ssm_cid_name,
+# ssm_cloud_name, region.
+set -euxo pipefail
+
+exec > /var/log/falcon-bootstrap.log 2>&1
+echo "[$(date -Is)] bootstrap starting"
+
+# 1. Pull the sensor RPM from S3 via the gateway endpoint (no internet egress).
+#    In cross-account deployments, read access is granted by the bucket policy
+#    set on endpoint-vpc (var.authorized_role_arns).
+aws s3 cp "s3://${bucket}/${sensor_rpm_key}" /tmp/falcon-sensor.rpm --region "${region}"
+
+# 2. Install.
+dnf install -y /tmp/falcon-sensor.rpm
+
+# 3. Read CID + cloud from the local SSM Parameter Store (same-account reads).
+#    Disable command tracing around the value fetches so the CID value
+#    doesn't land in /var/log/falcon-bootstrap.log (set -x expands $(...)).
+set +x
+CID=$(aws ssm get-parameter \
+  --name "${ssm_cid_name}" \
+  --with-decryption \
+  --region "${region}" \
+  --query Parameter.Value \
+  --output text)
+
+CLOUD=$(aws ssm get-parameter \
+  --name "${ssm_cloud_name}" \
+  --region "${region}" \
+  --query Parameter.Value \
+  --output text)
+set -x
+
+# 4. Configure the sensor. falconctl handles its own redaction; still, avoid
+#    echoing the CID here.
+set +x
+/opt/CrowdStrike/falconctl -s --cid="$CID" --cloud="$CLOUD"
+set -x
+
+# 5. Start the sensor service.
+systemctl enable --now falcon-sensor
+systemctl restart falcon-sensor
+
+# 6. Emit verification data to the bootstrap log.
+sleep 30
+/opt/CrowdStrike/falconctl -g --aid || true
+systemctl status falcon-sensor --no-pager || true
+
+echo "[$(date -Is)] bootstrap complete"

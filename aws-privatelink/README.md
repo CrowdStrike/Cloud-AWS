@@ -1,75 +1,202 @@
-![CrowdStrike Falcon](https://raw.githubusercontent.com/CrowdStrike/falconpy/main/docs/asset/cs-logo.png)
+![CrowdStrike Logo (Light)](https://raw.githubusercontent.com/CrowdStrike/.github/main/assets/cs-logo-light-mode.png#gh-light-mode-only)
+![CrowdStrike Logo (Dark)](https://raw.githubusercontent.com/CrowdStrike/.github/main/assets/cs-logo-dark-mode.png#gh-dark-mode-only)
+# CrowdStrike Falcon on AWS PrivateLink
 
-![Twitter URL](https://img.shields.io/twitter/url?label=Follow%20%40CrowdStrike&style=social&url=https%3A%2F%2Ftwitter.com%2FCrowdStrike)
+This guide explains how to connect AWS workloads to the CrowdStrike Falcon
+sensor cloud over AWS PrivateLink using the newer cross-region connectivity
+model. It replaces designs that previously required customer-managed
+inter-region routing to reach Falcon PrivateLink services from workload Regions
+outside the Falcon cloud home Region.
 
-# Leverage AWS PrivateLink to provide private connectivity between your CrowdStrike-protected workloads and the CrowdStrike cloud
+This repo showcases three small-scale labs that look at common cloud-native
+architecture patterns unlocked by cross-region PrivateLink. Use them to
+understand the network topology options and get ideas for scaling the pattern
+into your own AWS environment. These examples are learning deployments, not
+production-ready modules, and they are not the only valid designs.
 
-## Overview
+## Table of contents
 
-With the power of AWS PrivateLink, you can create a private communication channel between the CrowdStrike Falcon Sensor and the CrowdStrike cloud. This secure connection allows for the transfer of **Sensor Proxy** data (such as sensor events) and **Sensor Download** content (including channel files, sensor update files, and more).
+- [What PrivateLink provides](#what-privatelink-provides)
+- [What cross-region connectivity changes](#what-cross-region-connectivity-changes)
+- [Falcon cloud home Regions](#falcon-cloud-home-regions)
+- [Design considerations](#design-considerations)
+- [Lab guide index](#lab-guide-index)
+- [Architecture picker](#architecture-picker)
+- [Unsupported Regions](#unsupported-regions)
 
-Please be aware that this setup is specifically designed for sensor-related traffic. As such, it does not support API communication over AWS PrivateLink.
+## What PrivateLink provides
 
-## Region Compatibility and Metadata Details
+AWS PrivateLink lets workloads in a VPC reach a provider service through
+private interface endpoints instead of public internet paths. For Falcon
+sensors, PrivateLink facilitates the core sensor communication needed for the
+sensor to operate, including sensor telemetry. It does not provide private
+connectivity for CrowdStrike APIs or other non-sensor telemetry flows.
 
-In the process of setting up an AWS PrivateLink connection, it's mandatory to align the configuration with the region where your Falcon Customer ID (CID) is housed. To illustrate, if your CID is stationed in `US-1`, your AWS PrivateLink connection needs to be established in the corresponding `us-west-1` region.
+## What cross-region connectivity changes
 
-Should you require communication across multiple regions, a Transit Gateway configuration will be necessary to facilitate the traffic routing throughout the AWS regions. We've provided a sample deployment for your reference in the [Quick Start](#quick-start-overview) section below.
+Historically, a PrivateLink consumer endpoint and the provider endpoint service
+had to be in the same AWS Region. For CrowdStrike customers whose Falcon CID is
+hosted in one Region but whose AWS workloads run elsewhere, customers needed
+to establish inter-region routing to reach the PrivateLink endpoints. That made
+networking designs more complicated, especially in multi-account and
+multi-Region environments.
 
-For your convenience, we have compiled a table of supported region mappings and their corresponding metadata. Please refer to this resource to ensure your configuration aligns with your region's specific requirements.
+Cross-region PrivateLink removes the anchor VPC requirement for supported
+Regions. Your Falcon CID still determines which CrowdStrike cloud and home
+Region the endpoint service is hosted in. The difference is that customers can
+now create PrivateLink connections to Falcon from any AWS commercial Region
+where AWS supports cross-region connectivity.
 
-### Falcon US-1
+## Falcon cloud home Regions
 
-| DNS Name                  | Service Name    | VPC Endpoint Service Name                               | AWS Region |
-| ------------------------- | --------------- | ------------------------------------------------------- | ---------- |
-| ts01-b.cloudsink.net      | Sensor Proxy    | com.amazonaws.vpce.us-west-1.vpce-svc-08744dea97b26db5d | us-west-1  |
-| lfodown01-b.cloudsink.net | Download Server | com.amazonaws.vpce.us-west-1.vpce-svc-0f9d8ca86ddcb7106 | us-west-1  |
+| Falcon cloud | Endpoint service home Region |
+|---|---|
+| US-1 | `us-west-1` |
+| US-2 | `us-west-2` |
+| EU-1 | `eu-central-1` |
 
-### Falcon US-2
+Use the Falcon cloud that matches the CID you deploy sensors against. The
+endpoint service home Region is not a deployment preference; it is determined
+by the Falcon cloud for that CID.
 
-| DNS Name                             | Service Name    | VPC Endpoint Service Name                               | AWS Region |
-| ------------------------------------ | --------------- | ------------------------------------------------------- | ---------- |
-| ts01-gyr-maverick.cloudsink.net      | Sensor Proxy    | com.amazonaws.vpce.us-west-2.vpce-svc-08a5bb05d337fd834 | us-west-2  |
-| lfodown01-gyr-maverick.cloudsink.net | Download Server | com.amazonaws.vpce.us-west-2.vpce-svc-0e11def2d8620ae74 | us-west-2  |
+The complete endpoint service and hostname matrix is in
+[docs/vpc-endpoints-reference.md](docs/vpc-endpoints-reference.md).
 
-### Falcon EU-1
+## Design considerations
 
-| DNS Name                             | Service Name    | VPC Endpoint Service Name                                 | AWS Region   |
-| ------------------------------------ | --------------- | --------------------------------------------------------- | ------------ |
-| ts01-lanner-lion.cloudsink.net       | Sensor Proxy    | com.amazonaws.vpce.eu-central1.vpce-svc-0eb7b6ca4b7271385 | eu-central-1 |
-| lfodown01-lanner-lion. cloudsink.net | Download Server | com.amazonaws.vpce.eu-central1.vpce-svc-0340142b9ab8fc564 | eu-central-1 |
+### AWS Region support
 
-## Quick Start Overview
+The Falcon platform provides PrivateLink connectivity for AWS commercial
+Regions where AWS supports cross-region PrivateLink connectivity. This guide
+focuses on those AWS commercial Regions. Falcon PrivateLink is not supported
+in GovCloud today. See
+[Unsupported Regions](#unsupported-regions) for the commercial Regions that
+are not covered by this guide.
 
-The CloudFormation template provided in this quick start sets up two VPCs: the `CrowdStrike Services VPC`, which has the AWS PrivateLink connection, and the `Test VPC`, which houses a Linux virtual machine. The `CrowdStrike Services VPC` functions as a shared service VPC, enabling other VPCs to transitively route their CrowdStrike sensor-related traffic. While this template is designed to deploy everything within a single region, the underlying principles can be applied for cross-region communication.
+Some AWS Regions are opt-in Regions. If a deployment uses an opt-in Region, the
+relevant AWS account must enable that Region before it can create or target
+cross-region PrivateLink resources there.
 
-The VPCs are interconnected via an AWS Transit Gateway and are configured for DNS resolution. A Route53 private hosted zone is established for the `cloudsink.net` domain and linked to the `Test VPC`. This private hosted zone contains `A` records that create an alias for the VPC endpoints associated with the region in which your Falcon CID is deployed.
+### Availability
 
-### Reference Diagram
+Use at least two Availability Zones for high availability. Deploying endpoint
+network interfaces across multiple AZs gives workloads more than one private
+path to the Falcon service if an AZ-level component becomes unavailable.
 
-![AWS PrivateLink Demo Reference Diagram](./docs/images/privatelink-demo.png)
+### DNS
 
-### Prerequisites
+PrivateLink is DNS-driven. Workloads must resolve the `cloudsink.net` Falcon
+sensor hostnames to the private IP addresses of the correct interface
+endpoints. Many customers use Route 53 private hosted zones with aliases to the
+VPC endpoints for the three configured Falcon endpoints. This can also be done
+in other ways for organizations that manage private DNS outside Route 53.
 
-- You will need to create a ticket with CrowdStrike support to have your AWS account whitelisted, enabling the AWS PrivateLink connection with your CrowdStrike account.
-- You must deploy this template in the same AWS account that has been whitelisted, and in the corresponding region of your Falcon CID, to ensure the `CrowdStrike Services VPC` is provisioned without errors.
+### Falcon sensor installation
 
-### Configuration
+In environments with no internet connectivity, traditional scripts that
+download and install the Falcon sensor directly from CrowdStrike APIs will not
+work from the private workload. Customers usually need a private installation
+path, such as baking the sensor into golden image pipelines or seeding the
+sensor installer into S3 buckets and downloading it over S3 endpoints.
 
-1. Start by creating an S3 bucket in your desired deployment region.
+### AWS account whitelisting
 
-1. Next, [copy the following files](https://github.com/CrowdStrike/Cloud-AWS/tree/main/aws-privatelink/s3bucket) into the S3 bucket you just created.
-   ![S3 bucket with uploaded files from the GitHub project](docs/images/s3bucket-sm.png)
+Customers need to raise a ticket with CrowdStrike support to have their AWS
+account IDs whitelisted to their respective regional VPC endpoints before the
+connection can be initiated. If the account is not whitelisted, the endpoint
+service can appear unavailable when trying to initiate the connection.
 
-1. Set up a CloudFormation Stack using the [provided template](https://github.com/CrowdStrike/Cloud-AWS/blob/main/aws-privatelink/cloudformation/create-vpc-endpoint-r53-tgw-attachment.yaml).
+### Quotas and cost
 
-1. Ensure the successful creation of the CloudFormation template.
-   ![AWS CloudFormation Stack Output that's successfully deployed](docs/images/cft-output-sm.png)
+Cross-region endpoints count against the same interface endpoint quotas as
+other interface endpoints in the VPC. They also incur interface endpoint hourly
+and data processing charges.
 
-1. Establish a connection to the Linux EC2 instance and validate the sharing of the private-hosted domain with the Test VPC. To achieve this, retrieve the DNS name of one of the two endpoints from the [table above](#region-compatibility-and-metadata-details). For instance, if your CID is in `US-1`, use `ts01-b.cloudsink.net`.
-   - Execute the command below, substituting the domain name with one corresponding to your deployment: `nslookup ts01-b.cloudsink.net`
+### IAM and organization controls
 
-     ![A terminal shell that successfully outputs a nslookup query](docs/images/dnstest-sm.png)
+Cross-region PrivateLink is gated by the `vpce:AllowMultiRegion`
+permission-only action. A customer identity policy must allow it, and an AWS
+Organizations service control policy must not deny it. If either layer blocks
+the action, in-region PrivateLink can still work while cross-region endpoint
+creation fails.
 
-1. Install the CrowdStrike sensor on the virtual machine using your usual methods and verify its reporting to the Falcon console under `Host Management`.
-   - Take note that you will need to install the agent via a binary package, as the Sensor Download API will not be accessible over the AWS PrivateLink connection.
+Customers can also use the `ec2:VpceServiceRegion` condition key to restrict
+which remote service Regions an IAM principal may target when creating VPC
+endpoints.
+
+## Lab guide index
+
+Each lab creates an Amazon Linux 2023 EC2 instance to demonstrate sensor
+deployment in a private network. The instances have no internet gateway or NAT
+gateway path, which shows how Falcon sensor connectivity can work in an
+environment without internet egress.
+
+These are three cloud-native examples to help you reason about common network
+topologies. They are starting points for design, not limits on how PrivateLink
+can be used.
+
+### [Architecture 01 - Per-VPC endpoints](docs/architecture-01-per-vpc.md)
+
+This design is for simpler, smaller-footprint environments that do not require
+complicated network routing architecture. Each VPC initiates its own
+PrivateLink connection to the Falcon platform.
+
+Pick this when each VPC can own its own Falcon PrivateLink connection and the
+resulting per-VPC AWS account whitelisting workflow is acceptable.
+
+### [Architecture 02 - Shared VPC](docs/architecture-02-shared-vpc.md)
+
+This design is for AWS environments that use a shared VPC architecture. A hub
+or owner account initiates the PrivateLink connection, then shares subnets to
+workload accounts using AWS Resource Access Manager. AWS documents this as
+[VPC subnet sharing](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-sharing.html).
+Workloads launched in the shared subnets can use the shared VPC's Falcon
+PrivateLink connectivity.
+
+Pick this when you are already running, or plan to run, the AWS shared VPC
+pattern and want workload accounts to inherit centrally managed Falcon network
+connectivity.
+
+### [Architecture 03 - TGW + Route 53 Profiles](docs/architecture-03-tgw-profiles.md)
+
+This design is for enterprise hub-and-spoke environments that use AWS Transit
+Gateway for VPC-to-VPC routing. Spoke VPCs keep their own network ownership,
+while a hub networking account owns the Falcon PrivateLink endpoints and shared
+DNS.
+
+Before cross-region PrivateLink, this pattern typically required inter-region
+TGW or VPC peering back to an endpoint VPC in the Falcon home Region. With
+cross-region PrivateLink, the hub endpoint VPC can live in the same Region as
+the spokes, and PrivateLink handles the connection to the Falcon home Region.
+
+Pick this when TGW is already your standard enterprise connectivity pattern and
+you want to modernize it for cross-region Falcon PrivateLink.
+
+## Architecture picker
+
+| Question | Per-VPC | Shared VPC | TGW + Profiles |
+|---|:---:|:---:|:---:|
+| Small footprint or first proof of concept | Yes |  |  |
+| Each VPC should own its PrivateLink connection | Yes |  |  |
+| Workloads use shared VPC subnets |  | Yes |  |
+| Workloads must stay in their own VPCs | Yes |  | Yes |
+| Existing TGW hub-and-spoke network |  |  | Yes |
+| Central network team owns Falcon connectivity |  | Yes | Yes |
+| Reduce account whitelisting volume across many accounts |  | Yes | Yes |
+
+## Unsupported Regions
+
+The following commercial AWS Regions are not supported by this cross-region
+PrivateLink guide as of May 2026:
+
+| Region | Name |
+|---|---|
+| `ap-southeast-5` | Asia Pacific (Malaysia) |
+| `ap-southeast-7` | Asia Pacific (Thailand) |
+| `mx-central-1` | Mexico (Central) |
+
+Workloads in unsupported Regions that require PrivateLink connectivity will
+require inter-region routing configurations until AWS provides cross-region
+PrivateLink support for these Regions and CrowdStrike follows suit by making
+them available. Until then, we recommend raising a feature request with AWS to
+help accelerate support for these Regions.

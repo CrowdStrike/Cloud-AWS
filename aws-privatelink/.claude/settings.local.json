@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm -rf ~/.claude/plugins/cache/claude-code-warp/warp/2.0.0)",
+      "Bash(cp -R ~/.claude/plugins/marketplaces/claude-code-warp/plugins/warp ~/.claude/plugins/cache/claude-code-warp/warp/2.0.0)",
+      "Bash(mkdir -p ~/.claude/plugins/cache/claude-code-warp/warp/2.0.0/.claude-plugin)",
+      "Bash(cp ~/.claude/plugins/marketplaces/claude-code-warp/plugins/warp/.claude-plugin/plugin.json ~/.claude/plugins/cache/claude-code-warp/warp/2.0.0/.claude-plugin/)"
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+# Terraform state (never commit — holds resource IDs, IPs, and sensitive output values)
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Saved plan files (binary snapshots; may include sensitive input values)
+tfplan
+*.plan
+
+# Provider plugins + local module caches
+.terraform/
+
+# Variable files (often hold secrets)
+*.tfvars
+*.tfvars.json
+!example.tfvars
+!*.example.tfvars
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Sensor artifact cache (holds the ~100MB RPM the fetch script downloads;
+# meant to be workstation-local and regenerated per apply)
+.sensor-cache/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/
+*.swp
+
+# NOTE: .terraform.lock.hcl IS committed on purpose — it pins provider versions
+# so anyone cloning gets reproducible plans.
