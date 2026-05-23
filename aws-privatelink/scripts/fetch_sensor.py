@@ -12,8 +12,8 @@ Run via `uv run fetch_sensor.py ...`. uv will resolve and cache the
 `crowdstrike-falconpy` dependency declared inline (PEP 723) on first run, so
 no venv / pip setup is needed on the caller's machine.
 
-Invoked by Terraform's `null_resource.sensor_fetch` in the
-privatelink-stack module, but also runnable standalone for debugging.
+Invoked by Terraform's `null_resource.sensor_fetch` in each example's
+fetch.tf, but also runnable standalone for debugging.
 
 Inputs (env or flags):
   FALCON_CLIENT_ID / --client-id      CrowdStrike API client ID

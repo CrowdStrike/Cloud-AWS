@@ -10,7 +10,9 @@ shared network infrastructure between VPCs.
 This Terraform example deploys in one consumer Region, `us-east-2` by
 default, with two Availability Zones. For a US-2 Falcon CID, the VPC endpoints
 are created in `us-east-2` and connect to the CrowdStrike endpoint service in
-`us-west-2` over cross-region PrivateLink.
+`us-west-2` over cross-region PrivateLink. The example composes the same
+`endpoint-vpc` and `sensor-host` modules used by the multi-account examples
+(02, 03), wired to a single AWS account.
 
 ## Table of contents
 
@@ -137,8 +139,6 @@ export TF_VAR_falcon_client_secret='...'         # CrowdStrike API secret
 export TF_VAR_owner_email='you@example.com'      # required owner tag
 ```
 
-Using `TF_VAR_*` avoids writing secrets into a `.tfvars` file.
-
 ### Apply
 
 ```bash
@@ -169,10 +169,10 @@ connectivity without deploying the consumer VPC in a Falcon home Region.
 
 To change the consumer Region, set:
 
-```hcl
-region             = "eu-west-1"
-availability_zones = ["eu-west-1a", "eu-west-1b"]
-subnet_cidrs       = ["10.50.1.0/24", "10.50.2.0/24"]
+```bash
+export TF_VAR_region='eu-west-1'
+export TF_VAR_availability_zones='["eu-west-1a", "eu-west-1b"]'
+export TF_VAR_subnet_cidrs='["10.50.1.0/24", "10.50.2.0/24"]'
 ```
 
 Avoid the unsupported Regions listed in the root README.

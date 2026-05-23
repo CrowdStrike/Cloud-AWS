@@ -10,11 +10,9 @@ tfplan
 # Provider plugins + local module caches
 .terraform/
 
-# Variable files (often hold secrets)
+# Variable files (safety net — all inputs come via TF_VAR_ env vars)
 *.tfvars
 *.tfvars.json
-!example.tfvars
-!*.example.tfvars
 
 # Override files
 override.tf

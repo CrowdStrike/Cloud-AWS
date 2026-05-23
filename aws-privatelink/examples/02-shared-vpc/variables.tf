@@ -65,13 +65,13 @@ variable "owner_email" {
 }
 
 variable "falcon_client_id" {
-  description = "CrowdStrike Falcon API client ID with Sensor Download: Read scope. Prefer exporting as TF_VAR_falcon_client_id."
+  description = "CrowdStrike Falcon API client ID with Sensor Download: Read scope. Export as TF_VAR_falcon_client_id."
   type        = string
   sensitive   = true
 }
 
 variable "falcon_client_secret" {
-  description = "CrowdStrike Falcon API client secret. Prefer exporting as TF_VAR_falcon_client_secret."
+  description = "CrowdStrike Falcon API client secret. Export as TF_VAR_falcon_client_secret."
   type        = string
   sensitive   = true
 }
