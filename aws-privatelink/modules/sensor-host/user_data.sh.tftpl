@@ -39,11 +39,21 @@ set +x
 /opt/CrowdStrike/falconctl -s --cid="$CID" --cloud="$CLOUD"
 set -x
 
-# 5. Start the sensor service.
-systemctl enable --now falcon-sensor
-systemctl restart falcon-sensor
+# 5. Wait for PrivateLink endpoints to accept connections before starting
+#    the sensor. Avoids the 2+ minute fallback-to-public-IP timeout cycle.
+echo "[$(date -Is)] waiting for PrivateLink endpoint readiness"
+for i in $(seq 1 30); do
+  if curl -so /dev/null --connect-timeout 3 https://${sensor_proxy_host}:443 2>/dev/null; then
+    echo "[$(date -Is)] endpoint reachable after $i attempts"
+    break
+  fi
+  sleep 5
+done
 
-# 6. Emit verification data to the bootstrap log.
+# 6. Start the sensor service.
+systemctl enable --now falcon-sensor
+
+# 7. Emit verification data to the bootstrap log.
 sleep 30
 /opt/CrowdStrike/falconctl -g --aid || true
 systemctl status falcon-sensor --no-pager || true

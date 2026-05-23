@@ -7,9 +7,8 @@ interface endpoints, its own `cloudsink.net` private hosted zone, its own S3
 gateway endpoint, and one private Amazon Linux 2023 test host. There is no
 shared network infrastructure between VPCs.
 
-This Terraform example deploys in one consumer Region, `us-east-2` by
-default, with two Availability Zones. For a US-2 Falcon CID, the VPC endpoints
-are created in `us-east-2` and connect to the CrowdStrike endpoint service in
+This Terraform example deploys in any supported consumer Region. For a US-2
+Falcon CID, the VPC endpoints connect to the CrowdStrike endpoint service in
 `us-west-2` over cross-region PrivateLink. The example composes the same
 `endpoint-vpc` and `sensor-host` modules used by the multi-account examples
 (02, 03), wired to a single AWS account.
@@ -23,7 +22,6 @@ are created in `us-east-2` and connect to the CrowdStrike endpoint service in
 - [Deployment](#deployment)
   - [Export credentials](#export-credentials)
   - [Apply](#apply)
-  - [Pick a different consumer Region](#pick-a-different-consumer-region)
 - [Teardown](#teardown)
 - [Operational notes](#operational-notes)
 - [Verification](#verification)
@@ -133,11 +131,22 @@ lab S3 bucket so the test host can install without internet egress.
 ### Export credentials
 
 ```bash
-export AWS_PROFILE=...                           # or any other AWS auth method
-export TF_VAR_falcon_client_id='...'             # CrowdStrike API client ID
-export TF_VAR_falcon_client_secret='...'         # CrowdStrike API secret
-export TF_VAR_owner_email='you@example.com'      # required owner tag
+# Required
+export AWS_PROFILE=...                           # AWS credentials for the target account
+export TF_VAR_falcon_client_id='...'             # Falcon API client ID (Sensor Download: Read)
+export TF_VAR_falcon_client_secret='...'         # Falcon API client secret
+export TF_VAR_falcon_cloud='us-2'                # Falcon cloud for this CID (us-1, us-2, eu-1)
+export TF_VAR_owner_email='you@example.com'      # Owner tag for resource accountability
+
+# Optional
+export TF_VAR_region='us-east-2'                 # Region where the lab is deployed
+export TF_VAR_environment='dev'                  # Resource name prefix and environment tag
+export TF_VAR_instance_type='t3.small'           # EC2 instance size for sensor hosts
+export TF_VAR_ami_id='ami-0abcdef1234567890'     # Only set if the default is deprecated; must be Amazon Linux 2023
 ```
+
+Avoid deploying to Falcon home Regions (`us-west-1`, `us-west-2`, `eu-central-1`)
+since the lab is designed to demonstrate cross-region PrivateLink connectivity.
 
 ### Apply
 
@@ -161,21 +170,6 @@ On first apply, Terraform will:
 
 Expect about 3-5 minutes from `apply complete` to the host appearing in the
 Falcon console.
-
-### Pick a different consumer Region
-
-The lab defaults to `us-east-2` because it demonstrates cross-region
-connectivity without deploying the consumer VPC in a Falcon home Region.
-
-To change the consumer Region, set:
-
-```bash
-export TF_VAR_region='eu-west-1'
-export TF_VAR_availability_zones='["eu-west-1a", "eu-west-1b"]'
-export TF_VAR_subnet_cidrs='["10.50.1.0/24", "10.50.2.0/24"]'
-```
-
-Avoid the unsupported Regions listed in the root README.
 
 ## Teardown
 

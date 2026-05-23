@@ -2,6 +2,7 @@ output "deployment" {
   description = "Everything you need to SSM into, verify, and operate the stack."
   value = {
     region                     = var.region
+    environment                = var.environment
     instance_ids               = module.sensor_host.instance_ids
     ami_id                     = module.sensor_host.ami_id
     sensor_bucket              = module.endpoint_vpc.sensor_bucket_name

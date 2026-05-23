@@ -2,6 +2,7 @@ output "deployment" {
   description = "Everything you need to SSM into, verify, and operate the stack. SSM commands target the workload account — prepend --profile $workload_profile on the workstation."
   value = {
     region                     = var.region
+    environment                = var.environment
     owner_profile              = var.owner_profile
     workload_profile           = var.workload_profile
     workload_account_id        = var.workload_account_id

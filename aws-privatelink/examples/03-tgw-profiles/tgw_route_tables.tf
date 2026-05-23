@@ -19,7 +19,7 @@ resource "aws_ec2_transit_gateway_route_table" "hub" {
   transit_gateway_id = aws_ec2_transit_gateway.this.id
 
   tags = {
-    Name = "${local.name_prefix}-hub-rt"
+    Name = "${var.environment}-hub-rt"
   }
 }
 
@@ -29,7 +29,7 @@ resource "aws_ec2_transit_gateway_route_table" "spoke" {
   transit_gateway_id = aws_ec2_transit_gateway.this.id
 
   tags = {
-    Name = "${local.name_prefix}-spoke-rt"
+    Name = "${var.environment}-spoke-rt"
   }
 }
 

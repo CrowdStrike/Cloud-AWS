@@ -10,12 +10,15 @@ data "aws_ssm_parameter" "al2023_ami" {
 locals {
   resolved_ami_id = var.ami_id != null ? var.ami_id : data.aws_ssm_parameter.al2023_ami[0].value
 
+  sensor_proxy_host = "ts01-${local.slug}.cloudsink.net"
+
   user_data = templatefile("${path.module}/user_data.sh.tftpl", {
-    bucket         = var.sensor_bucket_name
-    sensor_rpm_key = var.sensor_bucket_rpm_key
-    ssm_cid_name   = aws_ssm_parameter.falcon_cid.name
-    ssm_cloud_name = aws_ssm_parameter.falcon_cloud.name
-    region         = var.region
+    bucket             = var.sensor_bucket_name
+    sensor_rpm_key     = var.sensor_bucket_rpm_key
+    ssm_cid_name       = aws_ssm_parameter.falcon_cid.name
+    ssm_cloud_name     = aws_ssm_parameter.falcon_cloud.name
+    region             = var.region
+    sensor_proxy_host  = local.sensor_proxy_host
   })
 }
 

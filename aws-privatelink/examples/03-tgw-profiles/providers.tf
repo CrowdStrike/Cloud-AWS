@@ -3,14 +3,10 @@ locals {
     Environment = var.environment
     OwnerEmail  = var.owner_email
     ManagedBy   = "terraform"
-    Project     = "aws-privatelink-reference"
-    Example     = "03-tgw-profiles"
+    Project     = "aws-privatelink"
   }
 }
 
-# Hub (networking) account — hosts the endpoint VPC, TGW, CrowdStrike
-# endpoints, cloudsink.net PHZ, R53 Profile, and sensor bucket. One
-# CrowdStrike allowlist ticket is filed against this account.
 provider "aws" {
   alias   = "hub"
   region  = var.region
@@ -21,10 +17,6 @@ provider "aws" {
   }
 }
 
-# Spoke (workload) account — owns its own VPC with local SSM + S3 gateway
-# endpoints, attaches to the TGW, and consumes the hub's CrowdStrike
-# endpoints + PHZ via the RAM-shared R53 Profile. Any number of spokes
-# share this shape.
 provider "aws" {
   alias   = "spoke"
   region  = var.region

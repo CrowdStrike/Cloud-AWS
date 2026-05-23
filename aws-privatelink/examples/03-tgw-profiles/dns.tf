@@ -18,10 +18,10 @@
 resource "aws_route53profiles_profile" "cloudsink" {
   provider = aws.hub
 
-  name = "${local.name_prefix}-profile"
+  name = "${var.environment}-profile"
 
   tags = {
-    Name = "${local.name_prefix}-profile"
+    Name = "${var.environment}-profile"
   }
 }
 
@@ -29,7 +29,7 @@ resource "aws_route53profiles_profile" "cloudsink" {
 resource "aws_route53profiles_resource_association" "cloudsink_phz" {
   provider = aws.hub
 
-  name         = "${local.name_prefix}-cloudsink"
+  name         = "${var.environment}-cloudsink"
   profile_id   = aws_route53profiles_profile.cloudsink.id
   resource_arn = "arn:aws:route53:::hostedzone/${module.endpoint_vpc.phz_id}"
 }
@@ -39,11 +39,11 @@ resource "aws_route53profiles_resource_association" "cloudsink_phz" {
 resource "aws_ram_resource_share" "profile" {
   provider = aws.hub
 
-  name                      = "${local.name_prefix}-profile"
+  name                      = "${var.environment}-profile"
   allow_external_principals = false
 
   tags = {
-    Name = "${local.name_prefix}-profile"
+    Name = "${var.environment}-profile"
   }
 }
 
