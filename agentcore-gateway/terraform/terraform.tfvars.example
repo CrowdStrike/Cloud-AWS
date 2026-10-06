@@ -1,0 +1,33 @@
+# Copy this file to terraform.tfvars and fill in your values.
+# Never commit terraform.tfvars — it contains your AIDR bearer token.
+
+# ---------------------------------------------------------------------------
+# Required
+# ---------------------------------------------------------------------------
+
+aws_region               = "us-east-1"
+gateway_id               = "your-agentcore-gateway-id"
+gateway_service_role_arn = "arn:aws:iam::123456789012:role/your-gateway-service-role"
+aidr_api_endpoint        = "https://api.crowdstrike.com"
+aidr_api_token           = "YOUR_AIDR_BEARER_TOKEN"
+
+# Set after Step 2 (build and push). Leave commented out for the initial
+# -target=aws_ecr_repository.interceptor apply in Step 1.
+# image_uri = "123456789012.dkr.ecr.us-east-1.amazonaws.com/aidr-agentcore:latest"
+
+# ---------------------------------------------------------------------------
+# Optional
+# ---------------------------------------------------------------------------
+
+# function_name          = "aidr-agentcore-interceptor"
+# table_name             = "aidr-interceptor-state"
+# lambda_timeout_s       = 10
+# lambda_memory_mb       = 256
+# fail_open              = false
+# llm_provider           = ""          # auto-detect; set to openai/anthropic/gemini/cohere/bedrock to override
+# aidr_timeout_s         = "3.0"
+# app_id                 = ""
+# collector_instance_id  = ""
+# subnet_ids             = []
+# security_group_ids     = []
+# tags                   = {}

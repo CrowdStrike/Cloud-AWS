@@ -9,6 +9,12 @@
 | [AWS SCP Analysis](https://github.com/CrowdStrike/aws-cspm-scp-analysis) | Analyze Service Control Policies (SCPs) in your AWS Organization to identify policies that may prevent CSPM onboarding. |
 | [AWS CSPM Multi-CID](https://github.com/CrowdStrike/aws-cspm-registration-multi-cid/tree/main) | Use CloudFormation templates to register multiple Falcon CIDs to accounts within the AWS Organization. |
 
+## Guardian
+
+| Integration Name | Description |
+|:-|:-|
+| [AWS AgentCore Gateway with CrowdStrike AIDR](agentcore-gateway) | Intercept and inspect LLM requests and MCP tool calls flowing through AWS AgentCore Gateway with CrowdStrike AI Detection and Response (AIDR). Blocks prompt injection, PII, and other AI threats before they reach the model or caller. |
+
 ## AWS Service Integrations
 
 | Integration Name | Description |
