@@ -1,4 +1,4 @@
 -r requirements.txt
-pytest>=8
+pytest>=9.1.1
 pytest-mock>=3
 moto[dynamodb]>=5
