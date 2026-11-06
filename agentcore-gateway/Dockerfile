@@ -12,9 +12,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY *.py ./
 
-# SOLAR-2311: The Lambda managed runtime executes under its own non-root sandbox UID
-# regardless of the USER directive, so omitting USER does not grant root privileges at
-# runtime.  If this image is ever run outside Lambda (ECS, local dev, Kubernetes), add a
-# non-root USER directive here and verify that the Lambda bootstrap paths remain writable.
+# The Lambda managed runtime executes under its own non-root sandbox UID regardless of
+# the USER directive, so omitting USER does not grant root privileges at runtime.  If this
+# image is ever run outside Lambda (ECS, local dev, Kubernetes), add a non-root USER
+# directive here and verify that the Lambda bootstrap paths remain writable.
 
 CMD ["lambda_function.lambda_handler"]
